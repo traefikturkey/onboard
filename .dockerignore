@@ -1,0 +1,12 @@
+# Ignore version control files:
+.git/
+.gitignore
+.gitattributes
+
+# Ignore docker and environment files:
+Dockerfile*
+.dockerignore
+.env
+.drone.yml
+README.*
+Makefile

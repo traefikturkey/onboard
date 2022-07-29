@@ -1,0 +1,46 @@
+# ignore enviroment files
+.env
+.rspec
+.bash_history
+.byebug_history
+.irb_history
+/tmp
+
+*.log
+*.rbc
+*.orig
+rerun.txt
+capybara-*.html
+pickle-email-*.html
+
+docker-compose.yml
+config/cloudflared/*.json
+
+# Ignore bundler config.
+/base/.bundle
+/base/vendor/bundle
+
+/base/.mutagen
+
+# Ignore all logfiles and tempfiles.
+/base/log/*
+/base/tmp/*
+!/base/log/.keep
+!/base/tmp/.keep
+
+# Ignore pidfiles, but keep the directory.
+/base/tmp/pids/*
+!/base/tmp/pids/.keep
+
+/base/db/*.sqlite3
+/base/db/*.sqlite3-journal
+/base/db/*.sqlite3-[0-9]*
+/base/public/system
+/base/public/assets
+/base/node_modules
+/base/coverage/
+/base/spec/tmp
+
+# Ignore master key for decrypting credentials and more.
+/base/config/master.key
+/base/config/initializers/secret_token.rb
