@@ -1,0 +1,50 @@
+<style>
+body {
+    font-family: Helvetica, Verdana, Arial, sans-serif;
+    font-size: 10pt;
+    color: #b1b1b1;
+    margin: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+}
+ul li {
+    border-bottom: 1px solid #E0E0E0;
+    list-style: none outside none;
+    margin: 0px;
+    padding: 3px 3px 3px 3px;
+}
+user agent stylesheet
+li {
+    display: list-item;
+    text-align: -webkit-match-parent;
+}
+.gadget-box {
+  border: 1px solid #dcdcdc;
+  margin: 10px 0 0 10px;
+  position: relative;
+  border-radius: 5px 5px 0 0;
+}
+.header {
+    background-color: #272062;
+    padding-left: 15px;
+}
+a:link {
+  color: #0c65ea;
+  font-weight: bold;
+  text-decoration: none;
+}
+</style>
+
+<div class="gadget-box">
+  <div class="header"><a href="<%= feed.channel.link %>"><%= feed.channel.title %></a></div>
+  <div>
+    <ul>
+      <% feed.channel.items.first(9).each do |item| %>
+        <li>
+          <div><a href="<%= item.link %>"><%= item.title %></a></div>
+          <div><%= decode item.description %></div>
+        </li>
+      <% end %>
+    </ul>
+  </div>
+</div>

@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1.3-labs 
 FROM ruby:3-alpine AS base
 
+ARG APP_USER=anvil
 ARG GEM_HOME=/usr/local/bundle
 
 ENV APP=/app
@@ -28,22 +29,7 @@ RUN apk --no-cache add \
 
 WORKDIR $APP
 
-COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
-#!/bin/bash
-set -e
-if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
-  set -x
-  set -o xtrace
-fi
-
-chmod +x ./bin/*
-
-echo "Running: $@"
-exec $@
-EOF
-
-ENTRYPOINT ["docker-entrypoint.sh"]
-CMD ["bundle", "exec", "puma"]
+CMD ["bundle", "exec", "puma", "-C", "config/puma.rb", "config.ru"]
 
 ##############################
 # Begin DEV 
@@ -51,8 +37,22 @@ CMD ["bundle", "exec", "puma"]
 FROM base AS dev
 
 RUN apk --no-cache add \
-  build-base \
+  build-base && \
   rm -rf /var/cache/apk/* 
 
 COPY ./base/Gemfile* $APP
 RUN bundle install 
+
+
+
+
+##############################
+# Begin PROD 
+##############################
+FROM base AS prod
+
+# copy gems from dev
+COPY --from=dev ${GEM_HOME} ${GEM_HOME}
+COPY --chown=$APP_USER:$APP_USER ./base/ /app
+
+USER $APP_USER

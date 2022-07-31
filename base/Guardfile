@@ -1,0 +1,10 @@
+interactor :off
+
+guard :bundler do
+  watch('Gemfile')
+end
+
+guard 'puma', config: 'config/puma.rb' do
+  watch('Gemfile.lock')
+  watch(%r{^config})
+end

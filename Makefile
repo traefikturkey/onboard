@@ -49,11 +49,7 @@ else
 	local_branch = $(shell git rev-parse --abbrev-ref HEAD | tr -d '\n')
 endif
 
-ifeq (, $(shell which docker-compose))
-	COMPOSE_COMMAND = docker-compose
-else
-	COMPOSE_COMMAND = docker compose
-endif
+COMPOSE_COMMAND = docker compose
 
 # order is important since these files are concatinated together
 COMPOSE_FILES := ./compose/docker-compose.common.yml
@@ -63,12 +59,13 @@ COMPOSE_FILES += ./compose/docker-compose.$(ENV_CONTEXT).yml
 export DOCKER_HOST_PATH := $(or $(CURDIR), $(shell pwd))
 export APP_NAME := $(or $(APP_NAME), $(notdir $(DOCKER_HOST_PATH)))
 export APP_DOMAIN := $(or $(APP_DOMAIN), $(shell hostname -d 2>/dev/null), $(or $(DOCKER_NAMESPACE), ilude).com)
-ifeq (development, $(DEPLOY_STAGE))
-	APP_HOST_NAME := $(APP_NAME).local.$(APP_DOMAIN)
+ifeq ($(ENV_CONTEXT),production)
+	APP_FQDN := $(APP_NAME).$(APP_DOMAIN)
 else
-	APP_HOST_NAME := $(APP_NAME)-$(ENV_CONTEXT).$(APP_DOMAIN)
+#$(APP_NAME)-$(ENV_CONTEXT).$(APP_DOMAIN)
+	APP_FQDN := $(APP_NAME).$(APP_DOMAIN)
 endif
-
+export APP_FQDN
 ATTACH_HOST := app
 
 # use the rest as arguments as empty targets

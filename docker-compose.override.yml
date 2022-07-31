@@ -1,0 +1,18 @@
+version: "3.8"
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args: 
+      - BUNDLE_DEPLOYMENT=false
+      - BUNDLE_WITH=development:test
+    command: bundle exec guard --no-interactions
+    environment:
+      - PUMA_WORKERS=0
+      - RAILS_DEVELOPMENT_HOSTS=${APP_FQDN}
+      - DOCKER_HOST_PATH=${DOCKER_HOST_PATH}
+    volumes:
+      - ./base:/app
