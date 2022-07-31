@@ -1,0 +1,1 @@
+This bird is still deep frying. Please check back often to see if things are up to tempature yet!
