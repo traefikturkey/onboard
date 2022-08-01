@@ -38,7 +38,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mingw x64_mingw ]
 
   # Use console on exceptions pages [https://github.com/rails/web-console]
-  gem "web-console"
+  #gem "web-console"
   gem 'rack-mini-profiler', require: false
   gem 'stackprof'
   gem 'memory_profiler'
@@ -46,6 +46,7 @@ group :development, :test do
   gem "guard"
   gem "guard-puma"
   gem "guard-bundler"
+  gem "guard-rspec", require: false
   gem "better_errors"
   gem "binding_of_caller"
   gem "byebug", platforms: [:mri, :mingw, :x64_mingw]

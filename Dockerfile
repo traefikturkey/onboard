@@ -19,8 +19,8 @@ RUN apk --no-cache add \
   curl \
   tzdata && \
   ln -snf /etc/localtime /usr/share/zoneinfo/$TZ && echo $TZ > /etc/timezone && \
-  addgroup -S $APP_USER && \
-  adduser -SDH -s /sbin/nologin -G $APP_USER $APP_USER && \
+  addgroup -g 1000 -S $APP_USER && \
+  adduser -u 1000 -SDH -s /sbin/nologin -G $APP_USER $APP_USER && \
   mkdir -p $APP && \
   chown $APP_USER:$APP_USER $APP && \
   echo "alias l='ls -lhav --color=auto --group-directories-first'" >> /etc/profile.d/aliases.sh && \
@@ -40,10 +40,11 @@ RUN apk --no-cache add \
   build-base && \
   rm -rf /var/cache/apk/* 
 
-COPY ./base/Gemfile* $APP
+COPY --chown=$APP_USER:$APP_USER ./base/Gemfile* $APP
+
+USER $APP_USER
+
 RUN bundle install 
-
-
 
 
 ##############################

@@ -162,16 +162,15 @@ Rails.application.configure do
       status = (status.start_with?('2') || status.start_with?('3')) ? status.light_blue : status.pink
 
       output = []
-      output << "#{data[:method]}".ljust(4, ' ').green
-      output << " #{data[:user]}".ljust(6, ' ').green
-      output << " code=".green
-      output << status
-      output << " fmt=#{data[:format]}".ljust(9, ' ').green
-      output << " time=#{data[:duration] || 0}".ljust(13, ' ').bold_green
-      output << " view=#{data[:view] || 0}".ljust(12, ' ').bold_cyan
-      output << " db=#{data[:db] || 0}".ljust(10, ' ').bold_magenta
+      output << "#{data[:method]}".green
+      output << " #{data[:user]}".green if data[:user]
+      output << " code=#{status.light_blue}".green
+      output << " fmt=".green + data[:format].to_s.light_blue
+      output << " time=".green + (data[:duration] || 0).to_s.light_blue
+      output << " view=".green + (data[:view] || 0).to_s.light_blue
+      output << " db=".green + (data[:db] || 0).to_s.light_blue
       output << " #{data[:path]}".light_blue
-      output << " params=#{data[:params]}".green
+      output << " params=".green + data[:params].to_s.light_blue
 
       output.join.to_s
     end
@@ -210,17 +209,20 @@ Rails.application.configure do
     sql_callers = "disabled".red
   end
 
-  message = ["RAILS_ENV: ".light_blue]
-  message << Rails.env.red
-  message << " LOG[#{log_type}]: ".light_blue
-  message << ENV.fetch("RAILS_LOG_LEVEL", "DEBUG".downcase).red
-  Rails.logger.info message.join
+  rail_log_message = "RAILS_ENV: ".light_blue
+  rail_log_message << Rails.env.red
+  rail_log_message << " LOG[#{log_type}]: ".light_blue
+  rail_log_message << ENV.fetch("RAILS_LOG_LEVEL", "DEBUG".downcase).red
+  
 
-  message = ["SQL logging: ".light_blue]
-  message << sql_logging
-  message << " SQL callers: ".light_blue
-  message << sql_callers
+  sql_log_message = "SQL logging: ".light_blue
+  sql_log_message << sql_logging
+  sql_log_message << " SQL callers: ".light_blue
+  sql_log_message << sql_callers
 
-  Rails.logger.info message.join
-  Rails.logger.info "Site URL: ".light_blue + "https://#{ENV['APP_FQDN']}/".green 
+  unless Rails.env.test? 
+    Rails.logger.info rail_log_message 
+    Rails.logger.info sql_log_message 
+    Rails.logger.info "Site URL: ".light_blue + "https://#{ENV['APP_FQDN']}/".green 
+  end
 end
