@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RSS Feed Reader</title>
+    <style>
+      body {
+        font-family: Helvetica, Verdana, Arial, sans-serif;
+        font-size: 11px;
+        color: #ddd; /* Set text color to light gray */
+        background-color: #222; /* Set background color to dark gray */
+      }
+      
+      a:link {
+        text-decoration: none;
+        font-size: 12px;
+        font-weight: bold;
+        color: #4ecdc4; /* Change link color to turquoise */
+      }
+
+      a:link, a:visited, a:hover, a:active {
+        color: #4ecdc4; /* Ensure consistent link color */
+      }
+
+      ul li {
+        border-bottom: 1px solid #444; /* Darken border color */
+        list-style: none outside none;
+        margin: 0px;
+        padding: 3px;
+      }
+
+      li {
+        display: list-item;
+        text-align: -webkit-match-parent;
+      }
+
+      .column {
+        float: left;
+        width: 33.33%;
+        padding: 10px;
+        box-sizing: border-box; /* Ensures padding is included in width */
+      }
+
+      .row:after {
+        content: "";
+        display: table;
+        clear: both;
+      }
+
+      .feed-box {
+        padding: 10px;
+      }
+
+      .feed-header {
+        border-top-left-radius: 5px;
+        border-top-right-radius: 5px;
+        background-color: #333; /* Darken background color */
+        color: #ddd; /* Set text color to light gray */
+        font-size: 13px;
+        font-weight: bold;
+        height: 24px;
+        line-height: 24px;
+        overflow: hidden;
+        padding: 0 5px 0 7px;
+        position: relative;
+        text-align: left;
+        cursor: move;
+      }
+
+      .description {
+        color: #aaa; /* Set description text color to lighter gray */
+      }
+
+      .feed-box ul {
+        margin: 0; /* Remove default margin */
+        padding: 0; /* Remove default padding */
+        list-style-type: none; /* Remove default list-style */
+        text-align: left; /* Align list items to the left */
+      }
+
+      .feed-content {
+        max-height: 380px;
+        overflow-y: auto;
+        border-left: 1px solid #444;
+        border-right: 1px solid #444;
+        border-bottom: 1px solid #444;
+        scrollbar-width: thin; /* Set scrollbar width to thin */
+        scrollbar-color: #666 #333; /* Set scrollbar color */
+        
+      }
+
+      /* Thin scrollbar track */
+      .feed-content::-webkit-scrollbar {
+          width: 8px; /* Set scrollbar width */
+      }
+
+      /* Thin scrollbar thumb */
+      .feed-content::-webkit-scrollbar-thumb {
+          background-color: #666; /* Set thumb color */
+          border-radius: 10px; /* Set thumb border radius */
+      }
+
+      /* Darker scrollbar track */
+      .feed-content::-webkit-scrollbar-track {
+          background-color: #333; /* Set track color */
+      }
+
+    </style>
+</head>
+<body>
+    <h1>RSS Feed Reader</h1>
+    <div class="row">
+        {% for source, articles in news.items() %}
+        <div class="column">
+            <div class="feed-box">
+              <div class="feed-header">{{ source }}</div>
+              <div class="feed-content"> 
+                <ul>
+                    {% for article in articles[:10] %}
+                    <li>
+                        <a href="{{ article.link }}">{{ article.title }}</a>
+                        <div class="description">{{ article.summary }}</div>
+                    </li>
+                    {% endfor %}
+                </ul>
+              </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
