@@ -1,2 +1,5 @@
 Flask 
+Flask-Caching
 feedparser
+bs4
+lxml
