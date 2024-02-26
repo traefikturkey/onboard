@@ -1,5 +1,6 @@
-Flask 
-Flask-Caching
+flask 
+flask-caching
 feedparser
 bs4
 lxml
+docker

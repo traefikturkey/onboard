@@ -3,6 +3,7 @@ body {
   font-size: 11px;
   color: #e9e9e9d8; /* Set text color to light gray */
   background-color: #2a2a2c; /* Set background color to dark gray */
+  margin: 0px;
 }
 
 a {
@@ -72,7 +73,7 @@ li {
 }
 
 .description {
-  /* color: #aaa; Set description text color to lighter gray */
+  padding: 3px 0px 0px 0px;
 }
 
 .box-content {
@@ -106,4 +107,31 @@ li {
 /* Darker scrollbar track */
 .box-content::-webkit-scrollbar-track {
     background-color: #333; /* Set track color */
+}
+
+.header, .tabbar {
+  overflow: hidden;
+  background-color: #333;
+  height: 30px;
+  padding: 0px 10px;
+}
+
+.header a, .tabbar a {
+  float: left;
+  display: block;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 10px;
+  
+  text-decoration: none;
+}
+
+.header a:hover, .tabbar a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+.tabbar a {
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }

@@ -1,5 +1,8 @@
 run: requirements
-	python app.py
+	python app/app.py
 
 requirements:
 	pip install -r requirements.txt
+
+build:
+	docker build -t onboard .

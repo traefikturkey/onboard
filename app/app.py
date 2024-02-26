@@ -1,14 +1,18 @@
 import os
 import html
 import yaml
+
 import feedparser
 import pprint
 from bs4 import BeautifulSoup
+from docker import APIClient
 from flask import Flask, render_template
 from flask_caching import Cache
 
+
 app = Flask(__name__)
 cache = Cache(app, config={'CACHE_TYPE': 'simple', 'CACHE_DEFAULT_TIMEOUT': 600})  # 600 seconds = 10 minutes
+docker_client = APIClient(base_url='unix://var/run/docker.sock')
 
 last_modified_times = {}
 pp = pprint.PrettyPrinter(indent=2)
@@ -34,11 +38,25 @@ def load_file(file_name):
 def clean_html(text):
     return BeautifulSoup( html.unescape(text), 'lxml').text.lstrip('Tweet')
 
+def docker_event_stream():
+    events = docker_client.events()
+    for event in events:
+        yield 'data: {}\n\n'.format(event)
+
+@app.route('/events')
+def events():
+    return app.response_class(
+        docker_event_stream(),
+        mimetype='text/event-stream'
+    )
+
 # Define route to render the template
 @app.route('/') 
 def index():
     # Load feeds and bookmarks
-    feeds = load_file('feeds.yml')
+    layout = load_file('layout.yml')
+    feeds = layout['feeds']
+    headers = layout['headers']
     bookmarks = load_file('bookmarks.yml')['bookmarks']
 
     # Divide feeds into three columns
@@ -53,7 +71,7 @@ def index():
     )
 
     # Add feeds to the appropriate column
-    for feed in feeds['feeds']:
+    for feed in feeds:
         column_index = (feed['column'] - 1) % 3
         columns[column_index].append({'title': feed['name'], 'link': feed['link'], 'url': feed['url']})
             
@@ -78,7 +96,7 @@ def index():
                 item['type'] = 'feed'
 
     # Pass column data to the template
-    return render_template('index.html', columns=columns)
+    return render_template('index.html', columns=columns, headers=headers)
 
 if __name__ == '__main__':
     app.run(debug=True)

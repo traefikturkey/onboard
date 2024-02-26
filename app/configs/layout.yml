@@ -1,3 +1,13 @@
+headers:
+  - name: "Docs"
+    link: "https://docs.google.com/"
+  - name: "Gmail"
+    link: "https://mail.google.com/mail/u/0/"
+  - name: "Maps"
+    link: "https://www.google.com/maps"
+  - name: "Youtube"
+    link: "https://www.youtube.com/"
+
 feeds:
   - name: "Lawrence Person's BattleSwarm Blog"
     link: "https://www.battleswarmblog.com/"

@@ -89,9 +89,10 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
 fi
 
 ansible-playbook --inventory 127.0.0.1 --connection=local  .devcontainer/ansible/setup-container.yml  
+sudo chown ${USER}:${USER} /var/run/docker.sock
 
 echo "Running: $@"
-exec $@less
+exec $@
 EOF
 
 USER ${USER}

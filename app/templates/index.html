@@ -7,7 +7,16 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 <body>
-  <h1>iMafen Industries</h1>
+  <div class="header">
+  {% for header in headers %}
+      <a href="{{header.link}}" target="_blank">{{header.name}}</a>
+  {% endfor %}
+  </div>
+  <div class="tabbar">
+      <a href="#tab1">Tab 1</a>
+      <a href="#tab2">Tab 2</a>
+      <a href="#tab3">Tab 3</a>
+  </div>
   <div class="row">
       {% for column in columns %}
       <div class="column">
@@ -29,5 +38,15 @@
       </div>
       {% endfor %}
   </div>
+  <h1>Docker Events</h1>
+  <div id="events"></div>
+  <script>
+      var events = new EventSource('/events');
+      events.onmessage = function(event) {
+          var data = event.data;
+          var container = document.getElementById('events');
+          container.innerHTML += '<p>' + data + '</p>';
+      };
+  </script>
 </body>
 </html>

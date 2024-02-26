@@ -24,7 +24,8 @@
 	"mounts": [
 		"source=${localWorkspaceFolderBasename}-home,target=/home/${localEnv:USER}${localEnv:USERNAME},type=volume",
 		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/${localEnv:USER}${localEnv:USERNAME}/.ssh,type=bind,consistency=cached",
-		"source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached"
+		"source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 
 	//Configure tool-specific properties.
