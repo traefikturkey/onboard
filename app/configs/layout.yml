@@ -17,6 +17,11 @@ feeds:
     link: "https://cafehayek.com/"
     url: "https://cafehayek.com/feed"
     column: 1
+  - name: "Slashdot"
+    link: "https://slashdot.org/"
+    url: "https://rss.slashdot.org/Slashdot/slashdotMain"
+    column: 1
+    summary: false
   - name: "Real Clear Politics"
     link: "https://www.realclearpolitics.com/"
     url: "https://www.realclearpolitics.com/index.xml"

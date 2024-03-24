@@ -1,8 +1,5 @@
 # syntax=docker/dockerfile:1.4
-ARG IMAGE_LANG=python 
-ARG IMAGE_VERSION=3.12-alpine3.19
-
-FROM ${IMAGE_LANG}:${IMAGE_VERSION}
+FROM python:3.10-alpine
 LABEL maintainer="Mike Glenn <mglenn@ilude.com>"
 
 ARG PUID=${PUID:-1000}
@@ -39,9 +36,6 @@ RUN apk --no-cache add \
   git \
   iproute2 \
   jq \
-  just \
-  just-bash-completion \
-  just-zsh-completion \
   less \
   linux-headers \
   make \
@@ -77,8 +71,12 @@ RUN addgroup -g ${PGID} ${USER} && \
 
 ENV HOME=/home/${USER}
 
-COPY requirements.txt /tmp
-RUN pip install --no-cache-dir -r /tmp/requirements.txt
+RUN python -m pip install --upgrade pip && \
+    pip install --no-cache-dir \
+    ansible \
+    ansible-lint \
+    argcomplete \
+    poetry 
 
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash

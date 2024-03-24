@@ -5,6 +5,10 @@ bookmarks:
     url: https://www.amazon.com/
   - title: ChatGPT
     url: https://chat.openai.com/
+  - title: ClaudeGPT
+    url: https://anthropic.com/claude
+  - title: GrokGPT
+    url: https://chat.grok.com/
   - title: Cloudflare
     url: https://www.cloudflare.com/
   - title: Codeword Generator
@@ -23,7 +27,10 @@ bookmarks:
     url: https://www.office.com/
   - title: Slickdeals
     url: https://slickdeals.net/
+  - title: Teams
+    url: https://teams.microsoft.com/
   - title: Tailscale
     url: https://tailscale.com/
   - title: Thingiverse
     url: https://www.thingiverse.com/
+    

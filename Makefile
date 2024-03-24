@@ -1,8 +1,8 @@
-run: requirements
-	python app/app.py
+.PHONY: run
+SITE_PACKAGES := $(shell pip show pip | grep '^Location' | cut -f2 -d':')
+run: $(SITE_PACKAGES)
+	python3 app/app.py
 
-requirements:
+$(SITE_PACKAGES): requirements.txt
 	pip install -r requirements.txt
-
-build:
-	docker build -t onboard .
+	touch requirements.txt

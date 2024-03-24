@@ -1,6 +1,10 @@
+argcomplete
+bs4
+docker
 flask 
 flask-caching
 feedparser
-bs4
 lxml
-docker
+python-dotenv
+pyyaml 
+requests

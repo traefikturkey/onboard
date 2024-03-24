@@ -1,1 +1,5 @@
 .env
+__pycache__/
+app/notebook.ipynb
+gmail/
+*-spike/

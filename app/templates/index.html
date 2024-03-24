@@ -1,52 +1,65 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mafenbot 2000</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mafenbot 2000</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
+
 <body>
-  <div class="header">
-  {% for header in headers %}
-      <a href="{{header.link}}" target="_blank">{{header.name}}</a>
-  {% endfor %}
-  </div>
-  <div class="tabbar">
-      <a href="#tab1">Tab 1</a>
-      <a href="#tab2">Tab 2</a>
-      <a href="#tab3">Tab 3</a>
-  </div>
-  <div class="row">
-      {% for column in columns %}
-      <div class="column">
+  <div class="wrapper">
+    <div class="content">
+      <div class="header">
+        {% for header in headers %}
+        <a href="{{header.link}}" target="_blank">{{header.name}}</a>
+        {% endfor %}
+      </div>
+      <div class="tabbar">
+        <a href="#tab1">Tab 1</a>
+        <a href="#tab2">Tab 2</a>
+        <a href="#tab3">Tab 3</a>
+      </div>
+      <div class="row">
+        {% for column in columns %}
+        <div class="column">
           {% for feed in column %}
           <div class="box {{ feed.type }}-box">
-            <div class="box-header {{ feed.type }}-header"><a href="{{ feed.link }}" target="_blank">{{ feed.title }}</a></div>
-            <div class="box-content {{ feed.type }}-content"> 
+            <div class="box-header {{ feed.type }}-header">
+              <a href="{{ feed.link }}" target="_blank">{{ feed.title }}</a></div>
+            <div class="box-content {{ feed.type }}-content">
               <ul>
-                  {% for article in feed.articles %}
-                  <li>
-                      <a href="{{ article.link }}">{{ article.title }}</a>
-                      <div class="description {{ feed.type }}">{{ article.summary }}</div>
-                  </li>
-                  {% endfor %}
+                {% for article in feed.articles %}
+                <li>
+                  <a href="{{ article.link }}" class="{{ feed.type }}-link">
+                    {% if article.title %}
+                      {{ article.title }}
+                    {% else %}
+                      No Title
+                    {% endif %}
+                  </a>
+                  {% if feed.summary_enabled and article.summary %}
+                  <div class="summary {{ feed.type }}">{{ article.summary }}</div>
+                  {% endif %}
+                </li>
+                {% endfor %}
               </ul>
             </div>
           </div>
           {% endfor %}
+        </div>
+        {% endfor %}
       </div>
-      {% endfor %}
+    </div>
   </div>
-  <h1>Docker Events</h1>
-  <div id="events"></div>
-  <script>
-      var events = new EventSource('/events');
-      events.onmessage = function(event) {
-          var data = event.data;
-          var container = document.getElementById('events');
-          container.innerHTML += '<p>' + data + '</p>';
-      };
-  </script>
+  <div class="footer-status">
+    <p>
+      <a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a> is a 
+      <a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
+      &copy; {{ today_date.year }}
+    </p>
+  </div>
 </body>
+
 </html>

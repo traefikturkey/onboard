@@ -3,28 +3,27 @@
 {
 	"name": "${localWorkspaceFolderBasename}",
 	"containerEnv": {
-		"HOST_PROJECT_PATH": "${localWorkspaceFolder}"
+		"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+    "PROJECT_NAME": "${localWorkspaceFolderBasename}",
+    "PROJECT_PATH": "${containerWorkspaceFolder}",
+    "FLASK_DEBUG": "True"
 	},
 	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
 	"build": { 
-		"context": ".",
-		"dockerfile": "Dockerfile",
+		"context": "..",
+		"dockerfile": "../Dockerfile",
+    "target": "devcontainer",
 		"args": {
-			"USER": "${localEnv:USER}${localEnv:USERNAME}",
-			"PROJECT_NAME": "${localWorkspaceFolderBasename}",
-			"HOST_PROJECT_PATH": "${localWorkspaceFolder}",
-			"TZ": "${localEnv:TZ:America/New_York}",
-			"TERM_SHELL": "${localEnv:TERM_SHELL:bash}"
+      "PROJECT_NAME": "${localWorkspaceFolderBasename}",
+      "PROJECT_PATH": "${containerWorkspaceFolder}"
 		}
 	},
-	"workspaceFolder": "/workspace/${localWorkspaceFolderBasename}",
+  "updateContentCommand": "LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local  ${containerWorkspaceFolder}/.devcontainer/ansible/setup-container.yml",
+	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"runArgs": ["--name", "${localWorkspaceFolderBasename}_devcontainer", "--hostname", "${localWorkspaceFolderBasename}","--env-file",".devcontainer/.env" ],
-	"initializeCommand": "make initialize --ignore-errors -f .devcontainer/Makefile",
-	"updateContentCommand": "make setup --ignore-errors -f .devcontainer/Makefile", 
 	"mounts": [
-		"source=${localWorkspaceFolderBasename}-home,target=/home/${localEnv:USER}${localEnv:USERNAME},type=volume",
-		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/${localEnv:USER}${localEnv:USERNAME}/.ssh,type=bind,consistency=cached",
-		"source=${localWorkspaceFolder},target=/workspace/${localWorkspaceFolderBasename},type=bind,consistency=cached",
+		"source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
+		"source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/anvil/.ssh,type=bind,consistency=cached",
 		"source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
 	],
 
