@@ -90,7 +90,7 @@ exec $@
 EOF
 
 WORKDIR $PROJECT_PATH
-ENTRYPOINT [ "docker-entrypoint.sh" ]
+ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
 
 ##############################
