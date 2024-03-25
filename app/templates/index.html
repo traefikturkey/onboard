@@ -39,7 +39,7 @@
                       No Title
                     {% endif %}
                   </a>
-                  {% if feed.summary_enabled and article.summary %}
+                  {% if feed.summary_enabled and article.summary and article.summary >= article.title %}
                   <div class="summary {{ feed.type }}">{{ article.summary }}</div>
                   {% endif %}
                 </li>
