@@ -25,7 +25,7 @@ app = Flask(__name__)
 # 600 seconds = 10 minutes
 cache = Cache(app, config={'CACHE_TYPE': 'simple',
               'CACHE_DEFAULT_TIMEOUT': 600})
-docker_client = APIClient(base_url='unix://var/run/docker.sock')
+#docker_client = APIClient(base_url='unix://var/run/docker.sock')
 current_working_directory = os.path.dirname(os.path.realpath(__file__))
 
 last_modified_times = {}
@@ -74,16 +74,16 @@ def process_duplicates(data):
 def inject_current_date():
   return {'today_date': datetime.now()}
 
-def docker_event_stream():
-  events = docker_client.events()
-  for event in events:
-    yield 'data: {}\n\n'.format(event)
+# def docker_event_stream():
+#   events = docker_client.events()
+#   for event in events:
+#     yield 'data: {}\n\n'.format(event)
 
-@app.route('/events')
-def events():
-  return app.response_class(
-    docker_event_stream(),
-    mimetype='text/event-stream'
+# @app.route('/events')
+# def events():
+#   return app.response_class(
+#     docker_event_stream(),
+#     mimetype='text/event-stream'
   )
 
 # Define route to render the template
