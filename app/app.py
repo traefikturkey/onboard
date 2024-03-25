@@ -151,4 +151,4 @@ if __name__ == '__main__':
     app.run(port=port, debug=True)
   else:
     from waitress import serve
-    serve(app, listen="*:{port}")
+    serve(app, host='0.0.0.0', port=port)

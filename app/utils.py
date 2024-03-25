@@ -17,6 +17,6 @@ def copy_default_to_configs():
             dst = os.path.join(config_dir, file)
             shutil.copy2(src, dst)
         
-        print("Files copied successfully from 'default' to 'config'.")
+        print(f"Files copied successfully from {default_dir} to {config_dir}.")
     else:
-        print("Directory 'config' is not empty. No action taken.")
+        print(f"Directory {config_dir} is not empty. No action taken.")
