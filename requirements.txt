@@ -8,4 +8,4 @@ lxml
 python-dotenv
 pyyaml 
 requests
-hypercorn
+hypercorn==0.15.0

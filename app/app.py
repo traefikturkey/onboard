@@ -28,13 +28,10 @@ cache = Cache(app, config={'CACHE_TYPE': 'simple',
 #docker_client = APIClient(base_url='unix://var/run/docker.sock')
 current_working_directory = os.path.dirname(os.path.realpath(__file__))
 
+global last_modified_times
 last_modified_times = {}
-pp = pprint.PrettyPrinter(indent=2)
-
 
 def load_file(file_name):
-  global last_modified_times
-
   # Adjust file path for the configs subdirectory
   file_path = os.path.join(current_working_directory, 'configs', file_name)
 
