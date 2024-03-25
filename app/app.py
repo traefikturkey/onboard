@@ -23,8 +23,10 @@ app = Flask(__name__)
 
 
 # 600 seconds = 10 minutes
-cache = Cache(app, config={'CACHE_TYPE': 'simple',
-              'CACHE_DEFAULT_TIMEOUT': 600})
+cache = Cache(app, config={
+  'CACHE_TYPE': 'simple',            
+  'CACHE_DEFAULT_TIMEOUT': 600
+})
 #docker_client = APIClient(base_url='unix://var/run/docker.sock')
 current_working_directory = os.path.dirname(os.path.realpath(__file__))
 
@@ -64,7 +66,6 @@ def process_duplicates(data):
       print(article['title'])
       article['summary'] = ''
     
-      
   return data
 
 @app.context_processor
@@ -85,6 +86,7 @@ def inject_current_date():
 
 # Define route to render the template
 @app.route('/')
+@cache.cached(timeout=300)
 def index():
   # Load feeds and bookmarks
   layout = load_file('layout.yml')
