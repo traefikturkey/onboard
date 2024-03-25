@@ -21,7 +21,6 @@ copy_default_to_configs()
 
 app = Flask(__name__)
 
-
 # 600 seconds = 10 minutes
 cache = Cache(app, config={
   'CACHE_TYPE': 'simple',            
@@ -86,7 +85,7 @@ def inject_current_date():
 
 # Define route to render the template
 @app.route('/')
-@cache.cached(timeout=300)
+@cache.cached(timeout=600)
 def index():
   # Load feeds and bookmarks
   layout = load_file('layout.yml')
