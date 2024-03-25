@@ -40,6 +40,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     less \
     locales \
     make \
+    sudo \
     tzdata \
     zsh && \
     # cleanup
@@ -51,6 +52,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     groupadd --gid ${PGID} ${USER} && \
     useradd --uid ${PUID} --gid ${PGID} -s /bin/${TERM_SHELL} -m ${USER} && \
+    echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER} && \
     echo "alias l='ls -lhA --color=auto --group-directories-first'" >> /etc/zshenv && \
     echo "alias es='env | sort'" >> /etc/zshenv && \
     echo "PS1='\h:\$(pwd) \$ '" >> /etc/zshenv && \
@@ -65,6 +68,11 @@ set -e
 if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
   set -x
   set -o xtrace
+fi
+
+if [ -S "/var/run/docker.sock" ]; then
+  echo "Docker socket detected. changing ownership to  ${USER}:${USER}..."
+  sudo chown ${USER}:${USER} /var/run/docker.sock
 fi
 
 # Check if the directory exists
@@ -141,7 +149,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ripgrep \
     rsync \
     sshpass \
-    sudo \
     tar \
     tree \
     util-linux \
@@ -152,9 +159,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* 
-
-RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
-    chmod 0440 /etc/sudoers.d/${USER} 
 
 ENV DOTFILES_URL=https://github.com/ilude/dotfiles.git
 
