@@ -2,7 +2,7 @@ import os
 import shutil
 
 def copy_default_to_configs():
-    default_dir = 'default'
+    default_dir = 'defaults'
     config_dir = 'configs'
 
     # Check if the config directory is empty
