@@ -84,7 +84,7 @@ def inject_current_date():
 #   return app.response_class(
 #     docker_event_stream(),
 #     mimetype='text/event-stream'
-  )
+# )
 
 # Define route to render the template
 @app.route('/')
