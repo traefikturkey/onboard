@@ -8,4 +8,4 @@ lxml
 python-dotenv
 pyyaml 
 requests
-waitress
+hypercorn

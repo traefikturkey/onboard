@@ -147,8 +147,13 @@ def index():
 
 if __name__ == '__main__':
   port = int(os.environ.get("ONBOARD_PORT", 9830))
+  print(f"Starting {os.environ.get('PROJECT_NAME', 'OnBoard').title()} server on port {port}")
   if os.environ.get("FLASK_DEBUG", "False") == "True":
     app.run(port=port, debug=True)
   else:
-    from waitress import serve
-    serve(app, host='0.0.0.0', port=port)
+    import asyncio
+    from hypercorn.config import Config
+    from hypercorn.asyncio import serve
+    config = Config()
+    config.bind = [f"0.0.0.0:{port}"]
+    asyncio.run(serve(app, config))
