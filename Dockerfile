@@ -37,10 +37,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     make \
     tzdata \
     zsh && \
-    # install google chrome for webdriver
-    curl -o google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb && \
-    apt install -fy ./google-chrome-stable_current_amd64.deb && \
-    rm -rf google-chrome-stable_current_amd64.deb && \ 
     # cleanup
     apt-get autoremove -fy && \
     apt-get clean && \
@@ -125,7 +121,6 @@ USER ${USER}
 
 CMD [ "python3", "app.py" ]
 
-
 ##############################
 # Begin devcontainer 
 ##############################
@@ -133,6 +128,7 @@ FROM build as devcontainer
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ansible \
+    dnsutils \
     exa \
     iproute2 \
     jq \
