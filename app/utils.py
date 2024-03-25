@@ -2,8 +2,9 @@ import os
 import shutil
 
 def copy_default_to_configs():
-    default_dir = 'defaults'
-    config_dir = 'configs'
+    pwd = os.path.dirname(os.path.abspath(__file__))
+    default_dir = os.path.join(pwd, 'defaults') 
+    config_dir = os.path.join(pwd, 'configs')
 
     # Check if the config directory is empty
     if not os.listdir(config_dir):
