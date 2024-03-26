@@ -71,19 +71,19 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
 fi
 
 if [ -S "/var/run/docker.sock" ]; then
-  echo "Docker socket detected. changing ownership to  ${USER}:${USER}..."
+  echo "/var/run/docker.sock detected. Changing ownership to ${USER}:${USER}..."
   sudo chown ${USER}:${USER} /var/run/docker.sock
 fi
 
 # Check if the directory exists
-if [ -d "${PROJECT_PATH}/.devcontainer/entrypoint.d" ]; then
-  # Loop through all *.sh files in the directory and execute them
-  for script in "${PROJECT_PATH}/.devcontainer/entrypoint.d"/*.sh; do
-    chmod +x "$script"
-    echo "Executing entrypoint script: $script"
-    "$script"
-  done
-fi
+# if [ -d "${PROJECT_PATH}/.devcontainer/entrypoint.d" ]; then
+#   # Loop through all *.sh files in the directory and execute them
+#   for script in "${PROJECT_PATH}/.devcontainer/entrypoint.d"/*.sh; do
+#     chmod +x "$script"
+#     echo "Executing entrypoint script: $script"
+#     "$script"
+#   done
+# fi
 
 echo "Running: $@"
 exec $@
