@@ -142,30 +142,71 @@ ul li:last-child {
 }
 
 /* Headers and Tab Bars */
-.header, .tabbar {
-  overflow: hidden;
+.header {
   background-color: #333;
-  height: 1.875em; /* 30px converted to 1.875em */
-  padding: 0 0.625em; /* 0px, 10px converted to 0, 0.625em */
+  padding: 0 0.5rem 1rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-.header a, .tabbar a {
-  float: left;
-  display: block;
-  color: #f2f2f2;
-  text-align: center;
-  padding: 0.625em; /* 10px converted to 0.625em */
+.header a {
+  color: #d3d3d3;
   text-decoration: none;
+  padding: 0.5rem 1rem; /* Adjust padding */
+  transition: all 0.3s ease; /* Add transition for smooth hover effect */
+  background-color: #555;
 }
 
-.header a:hover, .tabbar a:hover {
-  background-color: #ddd;
-  color: black;
+.header a:first-child {
+  border-bottom-left-radius: 0.25rem; /* Add rounded corner to the first link */
 }
 
-.tabbar a {
-  border-top-left-radius: 0.625em; /* Rounded from 0.625em */
-  border-top-right-radius: 0.625em; /* Rounded from 0.625em */
+.header a:last-child {
+  border-bottom-right-radius: 0.25rem; /* Add rounded corner to the last link */
+}
+
+.header a:hover {
+  background-color: #444;
+  color: #98c379;
+}
+
+.tab-bar {
+  background-color: #333; /* Same background color as header */
+  padding: 0 1rem; /* Adjust padding */
+  display: flex;
+  align-items: flex-end; /* Align tabs to the bottom */
+  border-bottom: 1px solid #555; /* Add bottom border */
+}
+
+.tab-bar a {
+  color: #d3d3d3;
+  text-decoration: none;
+  padding: 0.5rem 1rem; /* Adjust padding */
+  transition: all 0.3s ease; /* Add transition for smooth hover effect */
+  background-color: #555;
+  margin-right: 0.25rem; /* Add some spacing between tabs */
+  border-top-left-radius: 0.25rem; /* Add rounded corners */
+  border-top-right-radius: 0.25rem;
+  position: relative; /* Required for z-index */
+  z-index: 1; /* Bring tab to the front */
+  margin-bottom: -1px; /* Move tabs up to align with bottom border */
+}
+
+.tab-bar a:hover {
+  background-color: #666;
+  color: #98c379;
+}
+
+.tab-bar a.active {
+  background-color: #2a2a2c; /* Match body background color */
+  color: #98c379;
+}
+
+/* Row */
+.row {
+  background-color: #2a2a2c; /* Match body background color */
+  padding: 1rem; /* Add some padding */
 }
 
 /* Footer */
@@ -175,3 +216,4 @@ ul li:last-child {
   background-color: #1a1a1c;
   color: #ddd;
 }
+

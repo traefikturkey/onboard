@@ -12,11 +12,14 @@
   <div class="wrapper">
     <div class="content">
       <div class="header">
-        {% for header in headers %}
-        <a href="{{header.link}}" target="_blank">{{header.name}}</a>
-        {% endfor %}
+        <div>
+          {% for header in headers %}
+          <a href="{{header.link}}" target="_blank">{{header.name}}</a>
+          {% endfor %}
+        </div>
+        <div class="logo">OB</div> <!-- Placeholder for the logo -->
       </div>
-      <div class="tabbar">
+      <div class="tab-bar">
         <a href="#tab1">Tab 1</a>
         <a href="#tab2">Tab 2</a>
         <a href="#tab3">Tab 3</a>
