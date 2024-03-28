@@ -1,11 +1,6 @@
-import html
 import os
-import re
 import shutil
-
 import yaml
-
-from bs4 import BeautifulSoup
 
 def copy_default_to_configs():
   pwd = os.path.dirname(os.path.abspath(__file__))
@@ -27,33 +22,28 @@ def copy_default_to_configs():
     print(f"Default files synced from {default_dir} to {config_dir}.")
   else:
     print(f"No files copied from {default_dir} to {config_dir}.")    
-    
-def clean_html(text):
-  text = text.replace('\n', ' ').replace('\r', ' ')
-  text = BeautifulSoup(html.unescape(text), 'lxml').text
-  text = re.sub(r'\[.*?\].*$', '', text)
-  # text = re.sub(r'http[s]?://\S+', '', text, flags=re.IGNORECASE)
-  # text = ' '.join([x.capitalize() for x in text.split(' ')])
 
-  return text.strip()
+class FileData:
+    def __init__(self, last_modified=0, contents=None):
+        self.last_modified = last_modified
+        self.contents = contents
 
-global last_modified_times
-last_modified_times = {}
+    def __getitem__(self, key, default=None):
+        return self.contents.get(key, default)
 
-def load_file(file_name, cache):
-  # Adjust file path for the configs subdirectory
-  current_working_directory = os.path.dirname(os.path.realpath(__file__))
-  file_path = os.path.join(current_working_directory, 'configs', file_name)
+file_cache = {}
 
-  # Check the last modification time of the file
-  current_modified_time = os.path.getmtime(file_path)
-  current_data = cache.get(file_path)
+def load_file(file_name, cache=None):
+    current_working_directory = os.path.dirname(os.path.realpath(__file__))
+    file_path = os.path.join(current_working_directory, 'configs', file_name)
 
-  # If the file has been modified since the last check, reload it
-  if current_modified_time != last_modified_times.get(file_path) or not current_data:
-    last_modified_times[file_path] = current_modified_time
-    with open(file_path, 'r') as file:
-      current_data = yaml.safe_load(file)
-      cache.set(file_path, current_data)
+    # Check the last modification time of the file
+    current_modified_time = os.path.getmtime(file_path)
 
-  return current_data
+    # Only load the file if it has been modified since the last check or if there is no value for that file in the dict
+    if current_modified_time > file_cache.get(file_path, FileData()).last_modified or file_path not in file_cache:
+        with open(file_path, 'r') as file:
+            contents = yaml.safe_load(file)
+        file_cache[file_path] = FileData(current_modified_time, contents)
+
+    return file_cache[file_path].contents

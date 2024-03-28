@@ -10,27 +10,34 @@ headers:
   - name: "Youtube"
     link: "https://www.youtube.com/"
 
-widgets:
-  - name: "Lawrence Person's BattleSwarm Blog"
-    type: "feed"
-    link: "https://www.battleswarmblog.com/"
-    url: "https://www.battleswarmblog.com/?feed=rss2"
-    column: 1
-  - name: "Cafe Hayek"
-    type: "feed"
-    link: "https://cafehayek.com/"
-    url: "https://cafehayek.com/feed"
-    column: 1
-  - name: "Slashdot"
-    type: "feed"
-    link: "https://slashdot.org/"
-    url: "https://rss.slashdot.org/Slashdot/slashdotMain"
-    column: 1
-    summary: false
-  - name: "Bookmarks"
-    type: "bookmarks"
-    column: 2
-    bookmarks:
+tabs:
+  - name: "Home"
+    columns: 3
+    widgets:
+    - name: "Lawrence Person's BattleSwarm Blog"
+      type: "feed"
+      link: "https://www.battleswarmblog.com/"
+      url: "https://www.battleswarmblog.com/?feed=rss2"
+      column: 1
+      position: 1
+    - name: "Cafe Hayek"
+      type: "feed"
+      link: "https://cafehayek.com/"
+      url: "https://cafehayek.com/feed"
+      column: 1
+      position: 2
+    - name: "Slashdot"
+      type: "feed"
+      summary_enabled: False
+      link: "https://slashdot.org/"
+      url: "https://rss.slashdot.org/Slashdot/slashdotMain"
+      column: 1
+      position: 3
+    - name: "Bookmarks"
+      type: "bookmarks"
+      column: 2
+      position: 1
+      bookmarks:
       - title: Ali Express
         url: https://www.aliexpress.com/
       - title: Amazon
@@ -65,18 +72,27 @@ widgets:
         url: https://tailscale.com/
       - title: Thingiverse
         url: https://www.thingiverse.com/
-  - name: "Real Clear Politics"
-    type: "feed"
-    link: "https://www.realclearpolitics.com/"
-    url: "https://www.realclearpolitics.com/index.xml"
-    column: 2
-  - name: "Instapundit"
-    type: "feed"
-    link: "https://instapundit.com/"
-    url: "https://instapundit.com/feed/"
-    column: 3
-  - name: "Twitchy"
-    type: "feed"
-    link: "https://twitchy.com/"
-    url: "https://twitchy.com/feed"
-    column: 3
+    - name: "Real Clear Politics"
+      type: "feed"
+      link: "https://www.realclearpolitics.com/"
+      url: "https://www.realclearpolitics.com/index.xml"
+      column: 2
+      position: 2
+    - name: "Instapundit"
+      type: "feed"
+      link: "https://instapundit.com/"
+      url: "https://instapundit.com/feed/"
+      column: 3
+      position: 1
+    - name: "Twitchy"
+      type: "feed"
+      link: "https://twitchy.com/"
+      url: "https://twitchy.com/feed"
+      column: 3
+      position: 2
+  - name: "More"
+    columns: 3
+    widgets:
+  - name: "Monitoring"
+    columns: 3
+    widgets:

@@ -1,7 +1,7 @@
 argcomplete
 bs4
 docker
-flask 
+flask[async]
 flask-caching
 feedparser
 lxml
@@ -9,3 +9,4 @@ python-dotenv
 pyyaml 
 requests
 hypercorn==0.15.0
+aiohttp[speedups]

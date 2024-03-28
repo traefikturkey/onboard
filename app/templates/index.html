@@ -6,6 +6,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>OnBoard</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
 </head>
 
 <body>
@@ -20,9 +22,34 @@
         <div class="logo">OB</div> <!-- Placeholder for the logo -->
       </div>
       <div class="tab-bar">
-        <a href="#tab1">Tab 1</a>
-        <a href="#tab2">Tab 2</a>
-        <a href="#tab3">Tab 3</a>
+        {% for tab in tabs %}
+          <a href="/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
+        {% endfor %}
+        <div class="tab-buttons">
+          <button class="new-tab-btn">New Tab</button>
+          <button class="edit-tab-btn">Edit Tab</button>
+        </div>
+        <div class="modal">
+          <div class="modal-content">
+            <div>
+              <label for="tabNameInput">Tab Name:</label>
+              <input type="text" id="tabNameInput" placeholder="Enter tab name">
+            </div>
+            <div>
+              <label for="columnSelect">Number of Columns:</label>
+              <select id="columnSelect">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+              </select>
+            </div>
+            
+            <button id="saveBtn">Save</button>
+          </div>
+        </div>
       </div>
       <div class="row">
         {% for column in columns %}
@@ -30,7 +57,7 @@
           {% for feed in column %}
           <div class="box {{ feed.type }}-box">
             <div class="box-header {{ feed.type }}-header">
-              <a href="{{ feed.link }}" target="_blank">{{ feed.title }}</a></div>
+              <a href="{{ feed.link }}" target="_blank">{{ feed.name }}</a></div>
             <div class="box-content {{ feed.type }}-content">
               <ul>
                 {% for article in feed.articles %}
@@ -42,7 +69,7 @@
                       No Title
                     {% endif %}
                   </a>
-                  {% if feed.summary_enabled and article.summary and article.summary >= article.title %}
+                  {% if feed.summary_enabled and article.summary %}
                   <div class="summary {{ feed.type }}">{{ article.summary }}</div>
                   {% endif %}
                 </li>
