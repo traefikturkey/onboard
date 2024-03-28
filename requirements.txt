@@ -3,6 +3,7 @@ bs4
 docker
 flask[async]
 flask-caching
+Flask-Minify
 feedparser
 lxml
 python-dotenv

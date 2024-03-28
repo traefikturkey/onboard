@@ -1,29 +1,5 @@
 /* Reset and Basics */
-html, body {
-  height: 100%;
-  margin: 0;
-}
 
-/* Body Styles */
-body {
-  display: flex;
-  flex-direction: column;
-  font-family: 'Roboto', Helvetica, sans-serif;
-  font-size: 0.95em; /* 12px converted to 0.75em */
-  color: #D3D3D3;
-  background-color: #2a2a2c;
-}
-
-/* Layout */
-.wrapper {
-  flex: 1 0 auto;
-  display: flex;
-  flex-direction: column;
-}
-
-.content {
-  flex: 1 0 auto;
-}
 
 /* Links */
 a, .bookmarks-link:visited {

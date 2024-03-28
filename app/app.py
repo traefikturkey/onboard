@@ -23,6 +23,9 @@ else:
     'CACHE_TYPE': 'simple',            
     'CACHE_DEFAULT_TIMEOUT': 600
   }
+  from flask_minify import Minify
+  Minify(app=app, html=True, js=True, cssless=True)
+  
   
 cache = Cache(app, config=cache_config)
 
