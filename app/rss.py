@@ -53,7 +53,7 @@ class Rss:
 						widget['articles'] = [{
 								'title': " ".join(entry.get('title', 'No Title').split()).strip() , 
 								'link': entry.link, 
-								'summary': self.clean_html(entry.get('summary', ''))} for entry in parsed_feed.entries[:10]] if 'entries' in parsed_feed else []
+								'summary': self.clean_html(entry.get('summary', ''))} for entry in parsed_feed.entries[:widget.get('article_limit',10)]] if 'entries' in parsed_feed else []
 						widget['last_updated'] = start_time
 						widget = post_processor.process(widget['name'], widget)
 						self.feed_cache.set(widget['name'], widget)
