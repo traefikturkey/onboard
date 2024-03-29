@@ -50,7 +50,7 @@
       </div>
       <div class="tab-bar">
         {% for tab in tabs %}
-          <a href="/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
+          <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
         {% endfor %}
         <div class="tab-buttons">
           <button class="new-tab-btn">New Tab</button>

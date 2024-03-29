@@ -1,9 +1,11 @@
 .env
 __pycache__/
 app/notebook.ipynb
+app/feed_cache
 gmail/
 *-spike/
 
-configs/*.yml
-!configs/.keep
+app/configs/*.yml
+!app/configs/.keep
+
 
