@@ -19,16 +19,6 @@ class Rss:
 		if not os.path.exists(cache_dir):
 			os.makedirs(cache_dir)
 		self.feed_cache = FileSystemCache(cache_dir, default_timeout=60*15)
-	
-	def clean_html(self, text: str) -> str:
-		text = text.replace('\n', ' ').replace('\r', ' ').strip()
-		if text:
-			text = BeautifulSoup(html.unescape(text), 'lxml').text
-			text = re.sub(r'\[.*?\].*$', '', text)
-			# text = re.sub(r'http[s]?://\S+', '', text, flags=re.IGNORECASE)
-			# text = ' '.join([x.capitalize() for x in text.split(' ')])
-			
-		return text
 
 	async def load_feed(self, widget):
 		start_time = time.time()
@@ -38,7 +28,7 @@ class Rss:
 		# check if feed is in self.feeds and that the last updated time is less than 15 minutes ago	
 		if cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
 			widget['articles'] = cached_widget['articles']
-			print(f"Loaded {widget['name']} from cache")
+			# print(f"Loaded {widget['name']} from cache")
 		else:
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
 			async with aiohttp.ClientSession() as session:
@@ -48,16 +38,20 @@ class Rss:
 						print(await response.text())
 					else:
 						print(f"Loaded {widget['name']} with Status Code: {response.status}")
+						article_limit = widget.get('article_limit', 10)
 						parsed_feed = feedparser.parse(await response.text())
 						
 						widget['articles'] = [{
-								'title': " ".join(entry.get('title', 'No Title').split()).strip() , 
+								'title': entry.get('title', 'No Title').strip() , 
 								'link': entry.link, 
-								'summary': self.clean_html(entry.get('summary', ''))} for entry in parsed_feed.entries[:widget.get('article_limit',10)]] if 'entries' in parsed_feed else []
+								'summary': entry.get('summary', None)
+        		} for entry in parsed_feed.entries[:article_limit]] if 'entries' in parsed_feed else []
+						
 						widget['last_updated'] = start_time
-						widget = post_processor.process(widget['name'], widget)
 						self.feed_cache.set(widget['name'], widget)
-
+			
+		widget = post_processor.process(widget)
+		
 		return (time.time() - start_time)
 	
 	def find_feed_links(self, url):

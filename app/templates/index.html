@@ -87,7 +87,7 @@
               <a href="{{ feed.link }}" target="_blank">{{ feed.name }}</a></div>
             <div class="box-content {{ feed.type }}-content">
               <ul>
-                {% for article in feed.articles %}
+                {% for article in feed.articles[:feed.get('article_limit', 10)] %}
                 <li>
                   <a href="{{ article.link }}" class="{{ feed.type }}-link">
                     {% if article.title %}
