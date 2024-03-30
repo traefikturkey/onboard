@@ -3,9 +3,7 @@ import time
 import aiohttp
 from cachelib import FileSystemCache
 import feedparser
-import html
 import requests
-import re
 
 from post_processor import post_processor
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
@@ -26,7 +24,7 @@ class Rss:
 		cached_widget = self.feed_cache.get(widget['name'])
 		
 		# check if feed is in self.feeds and that the last updated time is less than 15 minutes ago	
-		if cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
+		if cached_widget and 'last_updated' in cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
 			widget['articles'] = cached_widget['articles']
 			# print(f"Loaded {widget['name']} from cache")
 		else:
@@ -42,15 +40,16 @@ class Rss:
 						parsed_feed = feedparser.parse(await response.text())
 						
 						widget['articles'] = [{
-								'title': entry.get('title', 'No Title').strip() , 
+								'original_title': entry.get('title', 'No Title').strip(), 
 								'link': entry.link, 
-								'summary': entry.get('summary', None)
-        		} for entry in parsed_feed.entries[:article_limit]] if 'entries' in parsed_feed else []
+								'original_summary': entry.get('summary', None)
+						} for entry in parsed_feed.entries[:article_limit]] if 'entries' in parsed_feed else []
 						
 						widget['last_updated'] = start_time
 						self.feed_cache.set(widget['name'], widget)
-			
-		widget = post_processor.process(widget)
+						
+		post_processor.process(widget)
+		self.feed_cache.set(widget['name'], widget)
 		
 		return (time.time() - start_time)
 	

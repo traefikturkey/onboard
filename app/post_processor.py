@@ -27,7 +27,10 @@ class PostProcessor:
 		return snake_case_string
 
 	def process(self, widget):
-		
+		if 'processed' in widget and widget['processed'] and not bool(os.environ.get('FLASK_DEBUG')):
+			print (f"Widget {widget['name']} already processed.")
+			return widget
+
 		self.normalize(widget)
 
 		# Check if the class has already been loaded
@@ -47,29 +50,33 @@ class PostProcessor:
 			self.loaded_classes[class_name] = instance
 
 		# Call process() method of the instance with the provided data
-		result = instance.process(widget)
-		return result
+		widget = instance.process(widget)
+		widget['processed'] = True
+		return widget
 
 	def normalize(self, widget):
-			for article in widget['articles']:
-				article['title'] = re.sub(r'\s+', ' ', article['title'])
+		for article in widget['articles']:
+			article['title'] = article['original_title'].strip()
+			article['title'] = re.sub(r'\s+', ' ', article['title'])
 
-				if not article['summary']:
-					continue
+			if not article['original_summary']:
+				continue
+			else:
+				article['summary'] = article['original_summary']
 
-				article['summary'] = article['summary'].replace('\n', ' ').replace('\r', ' ').strip()
-				article['summary'] = BeautifulSoup(html.unescape(article['summary']), 'lxml').text
-				# strip [...] from the end of the summary
-				article['summary'] = re.sub(r'\[[\.+|…\]].*$', '', article['summary'])
+			article['summary'] = article['summary'].replace('\n', ' ').replace('\r', ' ').strip()
+			article['summary'] = BeautifulSoup(html.unescape(article['summary']), 'lxml').text
+			# strip [...] from the end of the summary
+			article['summary'] = re.sub(r'\[[\.+|…\]].*$', '', article['summary'])
 
-				if article['summary'] == article['title']:
-					article['summary'] = None
-				elif (article['title'] in article['summary'] and len(article['title'])/len(article['summary']) > 0.64):
-					article['title'] = article['summary']
-					article['summary'] = None
-				elif (article['summary'] in article['title']):
-					article['summary'] = article['title']
-					article['title'] = None
+			if article['summary'] == article['title']:
+				article['summary'] = None
+			elif (article['title'] in article['summary'] and len(article['title'])/len(article['summary']) > 0.64):
+				article['title'] = article['summary']
+				article['summary'] = None
+			elif (article['summary'] in article['title']):
+				article['summary'] = article['title']
+				article['title'] = None
 
 # Instantiate loader when the module is imported
 post_processor = PostProcessor()

@@ -1,10 +1,12 @@
 argcomplete
 bs4
 docker
+feedparser
 flask[async]
 flask-caching
 Flask-Minify
-feedparser
+langchain
+langchain-community
 lxml
 python-dotenv
 pyyaml 
