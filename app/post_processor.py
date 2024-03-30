@@ -52,7 +52,7 @@ class PostProcessor:
 
 	def normalize(self, widget):
 			for article in widget['articles']:
-				article['title'] = re.sub('\s+', ' ', article['title'])
+				article['title'] = re.sub(r'\s+', ' ', article['title'])
 
 				if not article['summary']:
 					continue
