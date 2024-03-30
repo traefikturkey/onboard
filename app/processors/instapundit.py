@@ -31,7 +31,7 @@ class Instapundit:
 
 	def process(self, widget):
 		for article in widget['articles'][:]:
-			if '#CommissionEarned' in article['title'] or re.search('Open Thread', article['title'], re.IGNORECASE):
+			if article['title'] and ('#CommissionEarned' in article['title'] or re.search('Open Thread', article['title'], re.IGNORECASE)):
 				widget['articles'].remove(article)
 				next
 			if self.chain:

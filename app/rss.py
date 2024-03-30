@@ -51,7 +51,7 @@ class Rss:
 		post_processor.process(widget)
 		self.feed_cache.set(widget['name'], widget)
 		
-		return (time.time() - start_time)
+		return widget
 	
 	def find_feed_links(self, url):
 		response = requests.get(url)

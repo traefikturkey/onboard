@@ -1,18 +1,19 @@
 import os
-import yaml
 import asyncio
 from datetime import datetime
 
-from flask import Flask, request, render_template
+from flask import Flask, Response, request, render_template
 from flask_caching import Cache
 
-from utils import copy_default_to_configs, load_file
+from utils import copy_default_to_configs
 from rss import rss
+from yaml_parser import yaml_parser
+import json
 
 copy_default_to_configs()
 
 app = Flask(__name__)
-
+app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 if os.environ.get("FLASK_DEBUG", "False") == "True":
 	cache_config={
 		'CACHE_TYPE': 'null'
@@ -41,8 +42,8 @@ def save_tab_name():
 	column_count = data.get('column_count')
 
 	if tab_name and column_count >= 1 and column_count <= 6:
-		with open('configs/layout.yml', 'r') as file:
-			layout = yaml.safe_load(file)
+		
+		layout = yaml_parser.load_layout()
 
 		tabs = layout['tabs']
 
@@ -54,8 +55,8 @@ def save_tab_name():
 			# Add a new tab
 			tabs.append({'name': tab_name, 'columns': column_count, 'widgets': []})
 
-		with open('configs/layout.yml', 'w') as file:
-			yaml.safe_dump(layout, file)
+		# with open('configs/layout.yml', 'w') as file:
+		# 	yaml.safe_dump(layout, file)
 
 		return {'message': f'Tab name "{tab_name}" with {column_count} columns saved successfully'}
 	else:
@@ -67,7 +68,7 @@ def save_tab_name():
 @cache.cached(timeout=600)
 async def index(tab_name=None):
 	# Load feeds and bookmarks
-	layout = load_file('layout.yml', cache)
+	layout = yaml_parser.load_layout()
 	headers = layout['headers']
 	
 	tabs = layout['tabs']
@@ -96,6 +97,16 @@ async def index(tab_name=None):
 	# Pass column data to the template
 	return render_template('index.html', tabs=tabs, columns=columns, headers=headers, current_tab_name=current_tab['name'])
 
+
+@app.route('/widget/<widget_name>')
+async def widget(widget_name):
+	widget = yaml_parser.find_widget(widget_name)
+	widget = await rss.load_feed(widget)
+	return Response(
+        response=json.dumps(widget, indent=2),
+        status=200,
+        mimetype='application/json'
+    )
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
 	if os.environ.get("FLASK_DEBUG", "False") == "True":

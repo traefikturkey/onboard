@@ -27,9 +27,9 @@ class PostProcessor:
 		return snake_case_string
 
 	def process(self, widget):
-		if 'processed' in widget and widget['processed'] and not bool(os.environ.get('FLASK_DEBUG')):
-			print (f"Widget {widget['name']} already processed.")
-			return widget
+		# if 'processed' in widget and widget['processed'] and not bool(os.environ.get('FLASK_DEBUG')):
+		# 	print (f"Widget {widget['name']} already processed.")
+		# 	return widget
 
 		self.normalize(widget)
 
