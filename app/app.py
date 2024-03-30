@@ -86,6 +86,7 @@ async def index(tab_name=None):
 				widget['summary_enabled'] = widget.get('summary_enabled', True)
 				tasks.append(asyncio.create_task(rss.load_feed(widget)))
 			elif widget['type'] == 'bookmarks':
+				widget['article_limit'] = -1
 				widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
 				
 		await asyncio.wait(tasks)
