@@ -2,6 +2,7 @@ aiohttp[speedups]
 argcomplete
 bs4
 docker
+feedparser
 Flask-Minify
 flask[async]
 flask-caching
