@@ -29,7 +29,7 @@ else:
 	
 	
 cache = Cache(app, config=cache_config)
-page_timeout = os.environ.get('ONBOARD_PAGE_TIMEOUT', 600)
+page_timeout = int(os.environ.get('ONBOARD_PAGE_TIMEOUT', 600))
 
 @app.context_processor
 def inject_current_date():

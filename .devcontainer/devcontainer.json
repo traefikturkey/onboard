@@ -50,6 +50,9 @@
 				"dev.containers.gitCredentialHelperConfigLocation": "system",
 				"editor.tabSize": 2,
 				"files.readonlyFromPermissions": true,
+				"terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
+				"terminal.integrated.defaultProfile.linux": "zsh",
+				"terminal.integrated.defaultProfile.windows": "pwsh",
 				"terminal.integrated.profiles.linux": {
 					"bash": {
 						"path": "/bin/bash",
@@ -60,7 +63,12 @@
 						"path": "/bin/zsh",
 						"icon": "terminal-linux",
 						"args": ["-l"]
-					}
+					},
+					"pwsh": {
+						"args": ["-nologo"],
+						"icon": "terminal-powershell",
+						"path": "pwsh"
+					},
 				},
 				"terminal.integrated.tabs.description": "",
 				"terminal.integrated.tabs.title": "${local}${separator}${cwdFolder}${separator}${process}",
