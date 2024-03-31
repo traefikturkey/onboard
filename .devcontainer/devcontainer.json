@@ -20,6 +20,7 @@
 	},
 	"initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
   "updateContentCommand": "LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local  ${containerWorkspaceFolder}/.devcontainer/ansible/setup-container.yml",
+	"postAttachCommand": "zsh -l",
 	"workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
 	"runArgs": ["--name", "${localWorkspaceFolderBasename}_devcontainer", "--hostname", "${localWorkspaceFolderBasename}","--env-file",".devcontainer/.env" ],
 	"mounts": [

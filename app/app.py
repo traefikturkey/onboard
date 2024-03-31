@@ -29,6 +29,7 @@ else:
 	
 	
 cache = Cache(app, config=cache_config)
+page_timeout = os.environ.get('ONBOARD_PAGE_TIMEOUT', 600)
 
 @app.context_processor
 def inject_current_date():
@@ -65,7 +66,7 @@ def save_tab_name():
 # Define route to render the template
 @app.route('/')
 @app.route('/tab/<tab_name>')
-@cache.cached(timeout=600)
+@cache.cached(timeout=page_timeout)
 async def index(tab_name=None):
 	# Load feeds and bookmarks
 	layout = yaml_parser.load_layout()
