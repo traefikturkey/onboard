@@ -111,16 +111,14 @@ async def widget(widget_name):
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
 	debug = bool(os.environ.get("FLASK_DEBUG", "False"))
-	print(f"Running on port {port} with debug={debug}")
-	app.run(port=port, debug=debug)
-	# if debug:
-	# 	app.run(port=port, debug=debug)
-	# else:
-	# 	from hypercorn.config import Config
-	# 	from hypercorn.asyncio import serve
-	# 	config = Config()
-	# 	config.accesslog="-"
-	# 	config.errorlog="-"
-	# 	config.loglevel="DEBUG"
-	# 	config.bind = f"0.0.0.0:{port}"
-	# 	print(asyncio.run(serve(app, config)))
+	if debug:
+		app.run(port=port, debug=debug)
+	else:
+		from hypercorn.config import Config
+		from hypercorn.asyncio import serve
+		config = Config()
+		config.accesslog="-"
+		config.errorlog="-"
+		config.loglevel="DEBUG"
+		config.bind = f"0.0.0.0:{port}"
+		print(asyncio.run(serve(app, config)))
