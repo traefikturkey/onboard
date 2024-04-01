@@ -115,5 +115,9 @@ if __name__ == '__main__':
 	else:
 		from hypercorn.config import Config
 		from hypercorn.asyncio import serve
-		config = Config(bind=f"0.0.0.0:{port}")
+		config = Config()
+		config.accesslog="-"
+		config.errorlog="-"
+		config.loglevel="DEBUG"
+		config.bind = f"0.0.0.0:{port}"
 		print(asyncio.run(serve(app, config)))

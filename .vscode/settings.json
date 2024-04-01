@@ -1,9 +1,11 @@
 {
   "cSpell.words": [
+    "accesslog",
     "azuretools",
     "cssless",
     "devcontainer",
     "hykin",
+    "hypercorn",
     "Instapundit",
     "JSONIFY",
     "langchain",
