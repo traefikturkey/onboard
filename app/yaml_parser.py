@@ -13,6 +13,7 @@ class YamlParser:
 	def __init__(self):
 		self.file_cache = {}
 		self.pwd = os.path.dirname(os.path.realpath(__file__))
+		self.layout = os.path.join(self.pwd, "configs/layout.yml")
 
 	# 	logging_args = SimpleNamespace(quiet=True, verbose=False, debug=False)
 	# 	log = ConsolePrinter(logging_args)
@@ -22,8 +23,6 @@ class YamlParser:
 	# 	# example demonstrates loading YAML data from an external file.  You could also
 	# 	# use the same function to load data from STDIN or even a String variable.  See
 	# 	# the Parser class for more detail.
-	# 	self.layout = os.path.join(self.pwd, "configs/layout.yml")
-	# 	print(self.layout)
 	# 	(yaml_data, doc_loaded) = Parsers.get_yaml_data(parser, log, self.layout)
 	# 	if not doc_loaded:
 	# 			# There was an issue loading the file; an error message has already been

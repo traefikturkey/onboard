@@ -1,14 +1,16 @@
 import os
 import asyncio
+import json
+import signal
 from datetime import datetime
-
+import sys
+from typing import Any
 from flask import Flask, Response, request, render_template
 from flask_caching import Cache
 
 from utils import copy_default_to_configs
 from rss import rss
 from yaml_parser import yaml_parser
-import json
 
 copy_default_to_configs()
 
@@ -104,12 +106,27 @@ if __name__ == '__main__':
 	development = bool(os.environ.get("FLASK_ENV", "development")  == "development")
 	if development:
 		app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
-	else:
+		sys.exit()
+	try:
 		from hypercorn.config import Config
 		from hypercorn.asyncio import serve
+
+		shutdown_event = asyncio.Event()
+
+		def _signal_handler(*_: Any) -> None:
+			print ("Shutting down...")
+			shutdown_event.set()
+
 		config = Config()
 		config.accesslog="-"
 		config.errorlog="-"
 		config.loglevel="DEBUG"
 		config.bind = f"0.0.0.0:{port}"
-		print(asyncio.run(serve(app, config)))
+		loop = asyncio.new_event_loop()
+		loop.add_signal_handler(signal.SIGTERM, _signal_handler)
+		loop.run_until_complete(
+				serve(app, config, shutdown_trigger=shutdown_event.wait)
+		)
+	except KeyboardInterrupt:
+		print ("\nShutting down...")
+		sys.exit()
