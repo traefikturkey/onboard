@@ -7,8 +7,12 @@ $(SITE_PACKAGES): requirements.txt
 	pip install -r requirements.txt
 	touch requirements.txt
 
-build_image:
-	docker build -t ghcr.io/traefikturkey/onboard:latest .
+build-image:
+	docker build --target production -t ghcr.io/traefikturkey/onboard:latest .
 
-push_image:
+push-image: build-image
 	docker push ghcr.io/traefikturkey/onboard
+
+ansible:
+	LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml
+	LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/setup-container.yml

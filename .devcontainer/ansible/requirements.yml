@@ -1,0 +1,10 @@
+---
+- name: Install Requirements
+  hosts: localhost
+  connection: local 
+  gather_facts: false
+  tasks:
+    - name: Install roles from Ansible Galaxy
+      command: ansible-galaxy install {{ item }}
+      with_items:
+        - "geerlingguy.docker"
