@@ -110,8 +110,10 @@ async def widget(widget_name):
     )
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
-	if os.environ.get("FLASK_DEBUG", "False") == "True":
-		app.run(port=port, debug=True)
+	debug = bool(os.environ.get("FLASK_DEBUG", "False"))
+	print(f"Running on port {port} with debug={debug}")
+	if debug:
+		app.run(port=port, debug=debug)
 	else:
 		from hypercorn.config import Config
 		from hypercorn.asyncio import serve
