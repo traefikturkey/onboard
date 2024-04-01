@@ -65,6 +65,8 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
 set -e
+set -x
+set -o xtrace
 if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
   set -x
   set -o xtrace
@@ -74,8 +76,6 @@ fi
 #   echo "/var/run/docker.sock detected. Changing ownership to ${USER}:${USER}..."
 #   sudo chown ${USER}:${USER} /var/run/docker.sock
 # fi
-
-ls -lha
 
 echo "Running: $@"
 exec $@
