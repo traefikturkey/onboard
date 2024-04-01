@@ -65,7 +65,7 @@ def save_tab_name():
 		return {'error': 'Invalid tab name or column count'}, 400
 
 # Define route to render the template
-@app.route('/')
+@app.route('/test')
 async def test():
 	return render_template('test.html')
 
@@ -73,6 +73,7 @@ async def test():
 async def clicked():
 	return render_template('clicked.html')
 
+@app.route('/')
 @app.route('/tab/<tab_name>')
 @cache.cached(timeout=page_timeout)
 async def index(tab_name=None):
