@@ -1,0 +1,28 @@
+<div class="box {{ widget.type }}-box"
+  {% if not widget.articles %}
+    hx-get="/widget/{{ widget.name }}" hx-trigger="load" hx-swap="outerHTML"
+  {% endif %}
+>
+  <div class="box-header {{ widget.type }}-header">
+    <a href="{{ widget.link }}" target="_blank">{{ widget.name }}</a></div>
+  <div class="box-content {{ widget.type }}-content">
+    <ul>
+      {% for article in widget.articles[:widget.get('article_limit', 10)] %}
+      <li>
+        <a href="{{ article.link }}" class="{{ widget.type }}-link">
+          {% if article.title %}
+            {{ article.title }}
+          {% else %}
+            No Title
+          {% endif %}
+        </a>
+        {% if widget.summary_enabled and article.summary %}
+        <div class="summary {{ widget.type }}">{{ article.summary }}</div>
+        {% endif %}
+      </li>
+      {% else %}
+      <li>Loading...</li>
+      {% endfor %}
+    </ul>
+  </div>
+</div>

@@ -32,6 +32,7 @@
       flex: 1 0 auto;
     }
   </style>
+  <script defer src="https://unpkg.com/htmx.org@1.6.1"></script>
   <script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script defer src="{{ url_for('static', filename='js/script.js') }}"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
@@ -81,29 +82,8 @@
       <div class="row">
         {% for column in columns %}
         <div class="column">
-          {% for feed in column %}
-          <div class="box {{ feed.type }}-box">
-            <div class="box-header {{ feed.type }}-header">
-              <a href="{{ feed.link }}" target="_blank">{{ feed.name }}</a></div>
-            <div class="box-content {{ feed.type }}-content">
-              <ul>
-                {% for article in feed.articles[:feed.get('article_limit', 10)] %}
-                <li>
-                  <a href="{{ article.link }}" class="{{ feed.type }}-link">
-                    {% if article.title %}
-                      {{ article.title }}
-                    {% else %}
-                      No Title
-                    {% endif %}
-                  </a>
-                  {% if feed.summary_enabled and article.summary %}
-                  <div class="summary {{ feed.type }}">{{ article.summary }}</div>
-                  {% endif %}
-                </li>
-                {% endfor %}
-              </ul>
-            </div>
-          </div>
+          {% for widget in column %}
+            {% include "widget.html" ignore missing with context %}
           {% endfor %}
         </div>
         {% endfor %}

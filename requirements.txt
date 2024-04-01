@@ -3,7 +3,8 @@ argcomplete
 bs4
 docker
 feedparser
-Flask-Minify
+#flask-htmx
+flask-minify
 flask[async]
 flask-caching
 hypercorn==0.15.0

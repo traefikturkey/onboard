@@ -26,7 +26,7 @@ class Rss:
 		# check if feed is in self.feeds and that the last updated time is less than 15 minutes ago	
 		if cached_widget and 'last_updated' in cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
 			widget['articles'] = cached_widget['articles']
-			# print(f"Loaded {widget['name']} from cache")
+			print(f"Loaded {widget['name']} from cache")
 		else:
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
 			async with aiohttp.ClientSession() as session:
@@ -48,8 +48,8 @@ class Rss:
 						widget['last_updated'] = start_time
 						self.feed_cache.set(widget['name'], widget)
 						
-		post_processor.process(widget)
-		self.feed_cache.set(widget['name'], widget)
+			post_processor.process(widget)
+			self.feed_cache.set(widget['name'], widget)
 		
 		return widget
 	

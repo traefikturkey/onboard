@@ -1,10 +1,8 @@
 import os
 import asyncio
-import json
 import signal
 from datetime import datetime
 import sys
-from typing import Any
 from flask import Flask, Response, request, render_template
 from flask_caching import Cache
 
@@ -29,9 +27,9 @@ else:
 	from flask_minify import Minify
 	Minify(app=app, html=True, js=True, cssless=True)
 	
-	
 cache = Cache(app, config=cache_config)
 page_timeout = int(os.environ.get('ONBOARD_PAGE_TIMEOUT', 600))
+widgets = {}
 
 @app.context_processor
 def inject_current_date():
@@ -67,6 +65,13 @@ def save_tab_name():
 
 # Define route to render the template
 @app.route('/')
+async def test():
+	return render_template('test.html')
+
+@app.route('/clicked', methods = ['GET', 'POST'])
+async def clicked():
+	return render_template('clicked.html')
+
 @app.route('/tab/<tab_name>')
 @cache.cached(timeout=page_timeout)
 async def index(tab_name=None):
@@ -82,24 +87,25 @@ async def index(tab_name=None):
 	
 	# Add feeds to the appropriate column
 	if current_tab['widgets']:
-		tasks = []
 		for widget in current_tab['widgets']:
+			widget['articles'] = []
+			widget['summary_enabled'] = widget.get('summary_enabled', True)
 			column_index = (widget['column'] - 1) % column_count
 			columns[column_index].append(widget)
-			if widget['type'] == 'feed':
-				widget['summary_enabled'] = widget.get('summary_enabled', True)
-				tasks.append(asyncio.create_task(rss.load_feed(widget)))
-			elif widget['type'] == 'bookmarks':
+			if widget['name'] not in widgets:
+				widgets[widget['name']] = widget
+			if widget['type'] == 'bookmarks':
 				widget['article_limit'] = -1
 				widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
-				
-		await asyncio.wait(tasks)
-		for column in columns:
-			column.sort(key = lambda x: x['position'])
 	
 	# Pass column data to the template
 	return render_template('index.html', tabs=tabs, columns=columns, headers=headers, current_tab_name=current_tab['name'])
 
+@app.route('/widget/<widget_name>')
+@cache.cached(timeout=page_timeout)
+async def widget(widget_name):
+	widget = await rss.load_feed(widgets[widget_name])
+	return render_template('widget.html', widget=widget)
 
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
