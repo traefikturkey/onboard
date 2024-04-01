@@ -5,8 +5,8 @@ from langchain.prompts import ChatPromptTemplate
 
 class Instapundit:
 	def __init__(self):
-		ollama_url = os.getenv('OLLAMA_URL')
-		if ollama_url:
+		self.ollama_url = os.getenv('OLLAMA_URL')
+		if self.ollama_url:
 			_prompt = ChatPromptTemplate.from_messages([
 				("human", """
 					Title: {title}
@@ -25,16 +25,17 @@ class Instapundit:
 					"""),
 				])
 
-			_model = Ollama(base_url=ollama_url, model="dolphin-mistral", keep_alive=5, temperature=0.0)
+			_model = Ollama(base_url=self.ollama_url, model="dolphin-mistral", keep_alive=5, temperature=0.0)
 
 			self.chain = _prompt | _model
+			
 
 	def process(self, widget):
 		for article in widget['articles'][:]:
 			if article['title'] and ('#CommissionEarned' in article['title'] or re.search('Open Thread', article['title'], re.IGNORECASE)):
 				widget['articles'].remove(article)
 				next
-			if self.chain:
+			if self.ollama_url:
 				title = self.chain.invoke({"title": article['original_title'], "summary": article['original_summary']})
 				title = title.strip().strip('""')
 				article['title'] = title
