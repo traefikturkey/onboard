@@ -65,8 +65,6 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
 set -e
-set -x
-set -o xtrace
 if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
   set -x
   set -o xtrace
@@ -123,6 +121,8 @@ FROM base as production
 COPY --from=build --chown=${USER}:${USER}	${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 USER ${USER}
+
+ENV FLASK_ENV=production
 
 CMD [ "python3", "app.py" ]
 

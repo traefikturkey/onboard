@@ -99,20 +99,11 @@ async def index(tab_name=None):
 	return render_template('index.html', tabs=tabs, columns=columns, headers=headers, current_tab_name=current_tab['name'])
 
 
-@app.route('/widget/<widget_name>')
-async def widget(widget_name):
-	widget = yaml_parser.find_widget(widget_name)
-	widget = await rss.load_feed(widget)
-	return Response(
-        response=json.dumps(widget, indent=2),
-        status=200,
-        mimetype='application/json'
-    )
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
-	debug = bool(os.environ.get("FLASK_DEBUG", "False"))
-	if debug:
-		app.run(port=port, debug=debug)
+	development = bool(os.environ.get("FLASK_ENV", "development")  == "development")
+	if development:
+		app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
 	else:
 		from hypercorn.config import Config
 		from hypercorn.asyncio import serve
