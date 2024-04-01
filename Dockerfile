@@ -70,10 +70,10 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
   set -o xtrace
 fi
 
-if [ -S "/var/run/docker.sock" ]; then
-  echo "/var/run/docker.sock detected. Changing ownership to ${USER}:${USER}..."
-  sudo chown ${USER}:${USER} /var/run/docker.sock
-fi
+# if [ -S "/var/run/docker.sock" ]; then
+#   echo "/var/run/docker.sock detected. Changing ownership to ${USER}:${USER}..."
+#   sudo chown ${USER}:${USER} /var/run/docker.sock
+# fi
 
 ls -lha
 
