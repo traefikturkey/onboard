@@ -2,6 +2,7 @@
 // README at: https://github.com/devcontainers/templates/tree/main/src/alpine
 {
   "name": "${localWorkspaceFolderBasename}",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "containerEnv": {
     "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
     "PROJECT_NAME": "${localWorkspaceFolderBasename}",
@@ -23,7 +24,6 @@
   "initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
   "updateContentCommand": "LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local  ${containerWorkspaceFolder}/.devcontainer/ansible/setup-container.yml",
   "postAttachCommand": "zsh -l",
-  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
   "runArgs": ["--name", "${localWorkspaceFolderBasename}_devcontainer", "--hostname", "${localWorkspaceFolderBasename}","--env-file",".devcontainer/.env" ],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
