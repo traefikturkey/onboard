@@ -85,6 +85,7 @@ fi
 #   done
 # fi
 
+ls -lha
 
 echo "Running: $@"
 exec $@
@@ -143,6 +144,8 @@ FROM build as devcontainer
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ansible \
     dnsutils \
+    docker \
+    docker-compose \
     exa \
     iproute2 \
     jq \
