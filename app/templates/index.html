@@ -1,40 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="no-js" lang="en">
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>OnBoard</title>
-  <style>
-    html, body {
-      height: 100%;
-      margin: 0;
-    }
+  <meta name="description" content="">
 
-    /* Body Styles */
-    body {
-      display: flex;
-      flex-direction: column;
-      font-family: 'Roboto', Helvetica, sans-serif;
-      font-size: 0.95em; /* 12px converted to 0.75em */
-      color: #D3D3D3;
-      background-color: #2a2a2c;
-    }
+  <meta property="og:title" content="OnBoard">
+  <meta property="og:type" content="">
+  <meta property="og:url" content="">
+  <meta property="og:image" content="">
+  <meta property="og:image:alt" content="">
 
-    /* Layout */
-    .wrapper {
-      flex: 1 0 auto;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .content {
-      flex: 1 0 auto;
-    }
-  </style>
-  <script defer src="https://unpkg.com/htmx.org@1.6.1"></script>
-  <script defer src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-  <script defer src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
 </head>
 
