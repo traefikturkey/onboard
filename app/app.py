@@ -30,7 +30,7 @@ else:
 	
 cache = Cache(app, config=cache_config)
 page_timeout = int(os.environ.get('ONBOARD_PAGE_TIMEOUT', 600))
-widgets = {}
+feeds = {}
 
 @app.context_processor
 def inject_current_date():
@@ -101,7 +101,7 @@ async def index(tab_name=None):
 					widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
 				case 'feed':
 					widget['hx-get'] = '/rss/' + widget['name']
-					widgets[widget['name']] = widget
+					feeds[widget['name']] = widget
 				case _:
 					pass
 	
@@ -111,7 +111,7 @@ async def index(tab_name=None):
 @app.route('/rss/<widget_name>')
 @cache.cached(timeout=page_timeout)
 async def widget(widget_name):
-	widget = await rss.load_feed(widgets[widget_name])
+	widget = await rss.load_feed(feeds[widget_name])
 	return render_template('widget.html', widget=widget)
 
 if __name__ == '__main__':
