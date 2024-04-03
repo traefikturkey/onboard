@@ -94,13 +94,14 @@ async def index(tab_name=None):
 			widget['summary_enabled'] = widget.get('summary_enabled', True)
 			column_index = (widget['column'] - 1) % column_count
 			columns[column_index].append(widget)
-			widgets[widget['name']] = widget
+			
 			match widget['type']:
 				case 'bookmarks':
 					widget['article_limit'] = -1
 					widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
 				case 'feed':
 					widget['hx-get'] = '/rss/' + widget['name']
+					widgets[widget['name']] = widget
 				case _:
 					pass
 	
