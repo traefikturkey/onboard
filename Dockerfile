@@ -70,19 +70,13 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
 fi
 
 if [ "$(id -u)" = "0" ]; then
+  groupmod -o -g ${PGID:-1000} ${USER}
+  usermod -o -u ${PUID:-1000} ${USER}
+
   # get gid of docker socket file
-  SOCK_DOCKER_GID=`ls -ng /var/run/docker.sock | cut -f3 -d' '`
+  SOCK_DOCKER_GID=`stat -c %g /var/run/docker.sock`
+  groupmod -o -g "$SOCK_DOCKER_GID" ${USER}
 
-  # get group of docker inside container
-  CUR_DOCKER_GID=`getent group docker | cut -f3 -d: || true`
-
-  # if they dont match, adjust
-  if [ ! -z "$SOCK_DOCKER_GID" -a "$SOCK_DOCKER_GID" != "$CUR_DOCKER_GID" ]; then
-    groupmod -g ${SOCK_DOCKER_GID} -o docker
-  fi
-  if ! groups ${USER} | grep -q docker; then
-    usermod -aG docker ${USER}
-  fi
   # Add call to gosu to drop from root user to jenkins user
   # when running original entrypoint
   set -- gosu ${USER} "$@"

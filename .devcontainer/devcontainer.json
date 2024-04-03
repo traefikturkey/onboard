@@ -23,7 +23,7 @@
   },
   "initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
   "updateContentCommand": "make ansible",
-  "postAttachCommand": "zsh -l",
+  //"postAttachCommand": "zsh -l",
   "runArgs": ["--name", "${localWorkspaceFolderBasename}_devcontainer", "--hostname", "${localWorkspaceFolderBasename}","--env-file",".devcontainer/.env" ],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
