@@ -1,6 +1,6 @@
 <div class="box {{ widget.type }}-box"
-  {% if not widget.articles %}
-    hx-get="/widget/{{ widget.name }}" hx-trigger="load" hx-swap="outerHTML"
+  {% if widget['hx-get'] and not widget.articles %}
+    hx-get="{{ widget['hx-get'] }}" hx-trigger="load" hx-swap="outerHTML"
   {% endif %}
 >
   <div class="box-header {{ widget.type }}-header">

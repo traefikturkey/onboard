@@ -94,16 +94,20 @@ async def index(tab_name=None):
 			widget['summary_enabled'] = widget.get('summary_enabled', True)
 			column_index = (widget['column'] - 1) % column_count
 			columns[column_index].append(widget)
-			if widget['name'] not in widgets:
-				widgets[widget['name']] = widget
-			if widget['type'] == 'bookmarks':
-				widget['article_limit'] = -1
-				widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
+			widgets[widget['name']] = widget
+			match widget['type']:
+				case 'bookmarks':
+					widget['article_limit'] = -1
+					widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
+				case 'feed':
+					widget['hx-get'] = '/rss/' + widget['name']
+				case _:
+					pass
 	
 	# Pass column data to the template
 	return render_template('index.html', tabs=tabs, columns=columns, headers=headers, current_tab_name=current_tab['name'])
 
-@app.route('/widget/<widget_name>')
+@app.route('/rss/<widget_name>')
 @cache.cached(timeout=page_timeout)
 async def widget(widget_name):
 	widget = await rss.load_feed(widgets[widget_name])
