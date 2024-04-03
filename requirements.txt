@@ -3,10 +3,12 @@ argcomplete
 bs4
 docker
 feedparser
-#flask-htmx
-flask-minify
+flask-admin 
 flask[async]
 flask-caching
+#flask-htmx
+flask-minify
+flask-sqlalchemy
 hypercorn==0.15.0
 langchain
 langchain-community

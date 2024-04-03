@@ -42,12 +42,16 @@ tabs:
         url: https://www.aliexpress.com/
       - title: Amazon
         url: https://www.amazon.com/
+      - title: BingGPT
+        url: https://www.bing.com/chat
       - title: ChatGPT
         url: https://chat.openai.com/
       - title: ClaudeGPT
         url: https://claude.ai/chats
       - title: GrokGPT
         url: https://chat.grok.com/
+      - title: PerplexityGPT
+        url: https://perplexity.ai/
       - title: Cloudflare
         url: https://www.cloudflare.com/
       - title: Codeword Generator

@@ -37,6 +37,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     ca-certificates \
     curl \
+    gosu \
     less \
     locales \
     make \
@@ -52,8 +53,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     groupadd --gid ${PGID} ${USER} && \
     useradd --uid ${PUID} --gid ${PGID} -s /bin/${TERM_SHELL} -m ${USER} && \
-    echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
-    chmod 0440 /etc/sudoers.d/${USER} && \
     echo "alias l='ls -lhA --color=auto --group-directories-first'" >> /etc/zshenv && \
     echo "alias es='env | sort'" >> /etc/zshenv && \
     echo "PS1='\h:\$(pwd) \$ '" >> /etc/zshenv && \
@@ -70,9 +69,23 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
   set -o xtrace
 fi
 
-if [ -S "/var/run/docker.sock" ]; then
-  echo "/var/run/docker.sock detected. Changing ownership to ${USER}:${USER}..."
-  sudo chown ${USER}:${USER} /var/run/docker.sock
+if [ "$(id -u)" = "0" ]; then
+  # get gid of docker socket file
+  SOCK_DOCKER_GID=`ls -ng /var/run/docker.sock | cut -f3 -d' '`
+
+  # get group of docker inside container
+  CUR_DOCKER_GID=`getent group docker | cut -f3 -d: || true`
+
+  # if they dont match, adjust
+  if [ ! -z "$SOCK_DOCKER_GID" -a "$SOCK_DOCKER_GID" != "$CUR_DOCKER_GID" ]; then
+    groupmod -g ${SOCK_DOCKER_GID} -o docker
+  fi
+  if ! groups ${USER} | grep -q docker; then
+    usermod -aG docker ${USER}
+  fi
+  # Add call to gosu to drop from root user to jenkins user
+  # when running original entrypoint
+  set -- gosu ${USER} "$@"
 fi
 
 echo "Running: $@"
@@ -120,7 +133,6 @@ FROM base as production
 
 COPY --from=build --chown=${USER}:${USER}	${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
-USER ${USER}
 
 ENV FLASK_ENV=production
 
@@ -151,6 +163,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get clean && \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* 
+
+RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER} 
 
 ENV DOTFILES_URL=https://github.com/ilude/dotfiles.git
 
