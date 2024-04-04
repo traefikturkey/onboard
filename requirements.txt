@@ -5,6 +5,7 @@ docker
 feedparser
 flask-admin 
 flask[async]
+flask-bcrypt
 flask-caching
 #flask-htmx
 flask-minify

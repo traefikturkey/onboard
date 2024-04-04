@@ -1,10 +1,11 @@
+import json
 import os
 import asyncio
 import signal
 from datetime import datetime
 import sys
 from typing import Any
-from flask import Flask, Response, request, render_template
+from flask import Flask, request, render_template
 from flask_caching import Cache
 
 from utils import copy_default_to_configs
@@ -15,6 +16,7 @@ copy_default_to_configs()
 
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+
 if os.environ.get("FLASK_DEBUG", "False") == "True":
 	cache_config={
 		'CACHE_TYPE': 'null'
@@ -35,6 +37,23 @@ feeds = {}
 @app.context_processor
 def inject_current_date():
 	return {'today_date': datetime.now()}
+
+
+from docker import APIClient
+
+docker_client = APIClient(base_url='unix://var/run/docker.sock')
+
+def docker_event_stream():
+	events = docker_client.events(decode=True)
+	for event in events:
+		yield 'data: {}\n\n'.format(json.dumps(event))
+
+@app.route('/events')
+def events():
+	return app.response_class(
+		docker_event_stream(),
+		mimetype='text/event-stream'
+)
 
 @app.route('/save_tab_name', methods=['POST'])
 def save_tab_name():
@@ -92,9 +111,8 @@ async def index(tab_name=None):
 		for widget in current_tab['widgets']:
 			widget['articles'] = []
 			widget['summary_enabled'] = widget.get('summary_enabled', True)
-			column_index = (widget['column'] - 1) % column_count
+			column_index = (widget.get('column', 1) - 1) % column_count
 			columns[column_index].append(widget)
-			
 			match widget['type']:
 				case 'bookmarks':
 					widget['article_limit'] = -1
@@ -102,6 +120,8 @@ async def index(tab_name=None):
 				case 'feed':
 					widget['hx-get'] = '/rss/' + widget['name']
 					feeds[widget['name']] = widget
+				case 'docker':
+					widget['template'] = 'docker.html'
 				case _:
 					pass
 	

@@ -94,9 +94,11 @@ tabs:
       url: "https://twitchy.com/feed"
       column: 3
       position: 2
-  - name: "More"
-    columns: 3
+  - name: "Docker"
+    columns: 1
     widgets:
+    - name: "Docker"
+      type: "docker"
   - name: "Monitoring"
     columns: 3
     widgets:

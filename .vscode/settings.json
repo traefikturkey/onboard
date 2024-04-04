@@ -25,5 +25,8 @@
     "Thingiverse",
     "yamlpath",
     "zcompdump"
+  ],
+  "python.analysis.extraPaths": [
+    "./app"
   ]
 }

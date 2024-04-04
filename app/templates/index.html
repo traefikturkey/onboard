@@ -62,7 +62,7 @@
         {% for column in columns %}
         <div class="column">
           {% for widget in column %}
-            {% include "widget.html" ignore missing with context %}
+            {% include widget.get('template', 'widget.html') ignore missing with context %}
           {% endfor %}
         </div>
         {% endfor %}
