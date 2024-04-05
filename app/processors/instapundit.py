@@ -36,6 +36,7 @@ class Instapundit:
 				widget['articles'].remove(article)
 				next
 			if self.ollama_url:
+				#print("{title': '" + article['original_title'] + "', 'summary': '" + article['original_summary'] + "'},")
 				title = self.chain.invoke({"title": article['original_title'], "summary": article['original_summary']})
 				title = title.strip().strip('""')
 				article['title'] = title

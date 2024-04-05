@@ -13,6 +13,6 @@
     docker_compose_package_state: present
 
     docker_users:
-      - "{{ ansible_env.SUDO_USER }}"
+      - "{{ lookup('env', 'USER') }}"
   roles:
     - role: setup-container
