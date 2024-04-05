@@ -1,0 +1,20 @@
+<div class="box"
+{% if widget and widget['hx-get'] and not containers %}
+  hx-get="{{ widget['hx-get'] }}" hx-trigger="load" hx-swap="outerHTML"
+{% endif %}
+>
+  <div class="box-header">
+    Docker Containers
+  </div>
+  <div class="box-content">
+    <ul>
+      {% for container in containers %}
+      <li>
+        {{ container.name }}
+      </li>
+      {% else %}
+        Loading...
+      {% endfor %}
+    </ul>
+  </div>
+</div>

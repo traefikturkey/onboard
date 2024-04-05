@@ -39,9 +39,9 @@ def inject_current_date():
 	return {'today_date': datetime.now()}
 
 
-from docker import APIClient
+import docker
 
-docker_client = APIClient(base_url='unix://var/run/docker.sock')
+docker_client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
 def docker_event_stream():
 	events = docker_client.events(decode=True)
@@ -53,44 +53,12 @@ def events():
 	return app.response_class(
 		docker_event_stream(),
 		mimetype='text/event-stream'
-)
+	)
 
-@app.route('/save_tab_name', methods=['POST'])
-def save_tab_name():
-	data = request.get_json()
-	tab_name = data.get('tab_name')
-	tab_index = data.get('tab_index')
-	column_count = data.get('column_count')
-
-	if tab_name and column_count >= 1 and column_count <= 6:
-		
-		layout = yaml_parser.load_layout()
-
-		tabs = layout['tabs']
-
-		if tab_index is not None:
-			# Edit an existing tab
-			tabs[tab_index]['name'] = tab_name
-			tabs[tab_index]['columns'] = column_count
-		else:
-			# Add a new tab
-			tabs.append({'name': tab_name, 'columns': column_count, 'widgets': []})
-
-		# with open('configs/layout.yml', 'w') as file:
-		# 	yaml.safe_dump(layout, file)
-
-		return {'message': f'Tab name "{tab_name}" with {column_count} columns saved successfully'}
-	else:
-		return {'error': 'Invalid tab name or column count'}, 400
-
-# Define route to render the template
-@app.route('/test')
-async def test():
-	return render_template('test.html')
-
-@app.route('/clicked', methods = ['GET', 'POST'])
-async def clicked():
-	return render_template('clicked.html')
+@app.route('/docker_containers')
+def containers():
+	containers = docker_client.containers.list(filters={'status':'running'})
+	return render_template('docker_containers.html', containers=containers)
 
 @app.route('/')
 @app.route('/tab/<tab_name>')
@@ -120,8 +88,11 @@ async def index(tab_name=None):
 				case 'feed':
 					widget['hx-get'] = '/rss/' + widget['name']
 					feeds[widget['name']] = widget
-				case 'docker':
-					widget['template'] = 'docker.html'
+				case 'docker_events':
+					widget['template'] = 'docker_events.html'
+				case 'docker_containers':
+					widget['hx-get'] = '/docker_containers'
+					widget['template'] = 'docker_containers.html'
 				case _:
 					pass
 	
@@ -133,6 +104,35 @@ async def index(tab_name=None):
 async def widget(widget_name):
 	widget = await rss.load_feed(feeds[widget_name])
 	return render_template('widget.html', widget=widget)
+
+@app.route('/save_tab_name', methods=['POST'])
+def save_tab_name():
+	data = request.get_json()
+	tab_name = data.get('tab_name')
+	tab_index = data.get('tab_index')
+	column_count = data.get('column_count')
+
+	if tab_name and column_count >= 1 and column_count <= 6:
+		
+		layout = yaml_parser.load_layout()
+
+		tabs = layout['tabs']
+
+		if tab_index is not None:
+			# Edit an existing tab
+			tabs[tab_index]['name'] = tab_name
+			tabs[tab_index]['columns'] = column_count
+		else:
+			# Add a new tab
+			tabs.append({'name': tab_name, 'columns': column_count, 'widgets': []})
+
+		# with open('configs/layout.yml', 'w') as file:
+		# 	yaml.safe_dump(layout, file)
+
+		return {'message': f'Tab name "{tab_name}" with {column_count} columns saved successfully'}
+	else:
+		return {'error': 'Invalid tab name or column count'}, 400
+
 
 if __name__ == '__main__':
 	port = int(os.environ.get("ONBOARD_PORT", 9830))
@@ -163,3 +163,4 @@ if __name__ == '__main__':
 	except KeyboardInterrupt:
 		print ("\nShutting down...")
 		sys.exit()
+	

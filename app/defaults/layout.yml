@@ -98,7 +98,7 @@ tabs:
     columns: 1
     widgets:
     - name: "Docker"
-      type: "docker"
+      type: "docker_containers"
   - name: "Monitoring"
     columns: 3
     widgets:

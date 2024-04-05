@@ -1,10 +1,14 @@
 import os
 import shutil
+from pathlib import Path
 
 def copy_default_to_configs():
 	pwd = os.path.dirname(os.path.abspath(__file__))
 	default_dir = os.path.join(pwd, 'defaults') 
 	config_dir = os.path.join(pwd, 'configs')
+ 
+ 
+	Path(config_dir).mkdir(parents=True, exist_ok=True)
 	
 	# copy files from default directory to configs directory that are missing
 	# track number of files copied in variable files_copied

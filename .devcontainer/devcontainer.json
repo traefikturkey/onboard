@@ -41,7 +41,8 @@
         "mikestead.dotenv",
         "EditorConfig.EditorConfig",
         "redhat.vscode-yaml",
-        "redhat.ansible"
+        "redhat.ansible",
+        "ms-toolsai.jupyter"
       ],
       "settings": {
         "files.exclude": {
