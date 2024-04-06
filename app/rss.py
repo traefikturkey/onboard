@@ -21,7 +21,7 @@ class Rss:
 	async def load_feed(self, widget):
 		start_time = time.time()
 
-		cached_widget = None # self.feed_cache.get(widget['name'])
+		cached_widget = self.feed_cache.get(widget['name'])
 		
 		# check if feed is in self.feeds and that the last updated time is less than 15 minutes ago	
 		if cached_widget and 'last_updated' in cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
