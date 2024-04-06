@@ -105,6 +105,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     git \
     openssl \
     openssh-client \
+    sqlite3 \
+    libsqlite3-dev \
     wget && \
     apt-get autoremove -fy && \
     apt-get clean && \

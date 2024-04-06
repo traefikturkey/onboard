@@ -6,5 +6,5 @@ gmail/
 
 app/configs/*.yml
 !app/configs/.keep
-
+notebooks/data/
 
