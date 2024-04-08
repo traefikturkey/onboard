@@ -39,6 +39,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
     gosu \
     less \
+    libopenblas-dev \
     locales \
     make \
     sudo \
@@ -98,6 +99,7 @@ FROM base as build
 RUN apt-get update && apt-get install -y --no-install-recommends \
     binutils \
     build-essential \
+    pkg-config gfortran \
     cmake \
     coreutils \
     extra-cmake-modules \
