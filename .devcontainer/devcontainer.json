@@ -42,7 +42,13 @@
         "EditorConfig.EditorConfig",
         "redhat.vscode-yaml",
         "redhat.ansible",
-        "ms-toolsai.jupyter"
+        "ms-toolsai.jupyter",
+        "ms-python.autopep8",
+        "streetsidesoftware.code-spell-checker",
+        "eamodio.gitlens",
+        "nhoizey.gremlins",
+        "esbenp.prettier-vscode",
+        "peakchen90.open-html-in-browser"
       ],
       "settings": {
         "files.exclude": {
