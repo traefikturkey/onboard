@@ -1,0 +1,38 @@
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+
+# Assume you have the following:
+# - topic_distributions_initial: a 2D numpy array containing the topic distributions for the initial dataset
+# - topic_distributions_titles: a 2D numpy array containing the topic distributions for the titles in the recommendation pool
+# - user_topic_distribution: a 1D numpy array representing the user's topic distribution
+import pandas as pd
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.decomposition import NMF
+
+videos = pd.read_json('./data/youtube_history.json')
+vectorizer = TfidfVectorizer(stop_words='english')
+video_vectors = vectorizer.fit_transform(videos['text'])
+
+topic_count = 100
+nmf = NMF(n_components=topic_count, random_state=42)
+topic_distributions_initial = nmf.fit_transform(video_vectors)
+
+feed_entries = pd.read_json('./data/feed_entries.json')
+vectorizer = TfidfVectorizer(stop_words='english')
+feed_vectors = vectorizer.fit_transform(feed_entries['titles'])
+
+# Use Non-negative Matrix Factorization (NMF) to extract topics
+nmf = NMF(n_components=topic_count, random_state=42)
+topic_distributions_titles = nmf.fit_transform(feed_vectors)
+
+# Compute similarity between titles and user's interests
+similarities = cosine_similarity(topic_distributions_titles, user_topic_distribution.reshape(1, -1))
+
+# Sort titles based on similarity and get the top-k recommendations
+top_k = 5
+recommended_titles_idx = np.argsort(similarities.squeeze())[-top_k:]
+recommended_titles = [title_names[idx] for idx in recommended_titles_idx]
+
+print("Recommended titles:")
+for title in recommended_titles:
+    print(title)
