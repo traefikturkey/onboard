@@ -1,0 +1,9 @@
+gensim
+lxml==5.1.1
+matplotlib
+nltk
+numpy
+pandas
+scikit-learn
+scipy==1.11.0
+torch

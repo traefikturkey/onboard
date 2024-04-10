@@ -180,12 +180,14 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install ipykernel docutils jupyter notebook jupyterhub && \
-    pip3 install watermark pyyaml pylint h5py tensorflow && \
-    pip3 install --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
-    pip3 install --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
+RUN pip3 install --target=${PYTHON_DEPS_PATH} ipykernel docutils jupyter notebook jupyterhub && \
+    pip3 install --target=${PYTHON_DEPS_PATH} watermark pyyaml pylint h5py tensorflow && \
+    pip3 install --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
+    pip3 install --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
       
-RUN python -m ipykernel install --user --name="jupyter_devbox" --display-name="jupyter_devbox_python3"
+COPY .devcontainer/requirements.devcontainer.txt requirements.txt
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} -r requirements.txt && \
+    rm -rf requirements.txt
 
 RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
