@@ -162,6 +162,26 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* 
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libjpeg-dev libpng-dev libpq-dev \
+    imagemagick gnuplot gnuplot-x11 libssl-dev libzmq3-dev graphviz libffi-dev libxml2-dev libxslt-dev && \
+    apt-get autoremove -fy && \
+    apt-get clean && \
+    apt-get autoclean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+RUN pip3 install ipykernel docutils jupyter notebook jupyterhub && \
+    pip3 install watermark pyyaml pylint h5py tensorflow && \
+    pip3 install --prefer-binary \
+      matplotlib seaborn plotly graphviz opencv-python-headless imutils \
+      keras --no-deps && \
+    pip3 install --prefer-binary \
+      pandas-datareader bottleneck \
+      scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache \
+      alpha_vantage statsmodels
+      
+RUN python -m ipykernel install --user --name="jupyter_devbox" --display-name="jupyter_devbox_python3"
+
 RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
