@@ -163,8 +163,18 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     rm -rf /var/lib/apt/lists/* 
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    libjpeg-dev libpng-dev libpq-dev \
-    imagemagick gnuplot gnuplot-x11 libssl-dev libzmq3-dev graphviz libffi-dev libxml2-dev libxslt-dev && \
+    graphviz \
+    imagemagick \
+    libffi-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libpq-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    gnuplot \
+    gnuplot-x11 \
+    libzmq3-dev && \
     apt-get autoremove -fy && \
     apt-get clean && \
     apt-get autoclean -y && \
@@ -172,20 +182,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 RUN pip3 install ipykernel docutils jupyter notebook jupyterhub && \
     pip3 install watermark pyyaml pylint h5py tensorflow && \
-    pip3 install --prefer-binary \
-      matplotlib seaborn plotly graphviz opencv-python-headless imutils \
-      keras --no-deps && \
-    pip3 install --prefer-binary \
-      pandas-datareader bottleneck \
-      scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache \
-      alpha_vantage statsmodels
+    pip3 install --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
+    pip3 install --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
       
 RUN python -m ipykernel install --user --name="jupyter_devbox" --display-name="jupyter_devbox_python3"
 
 RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
-
-ENV DOTFILES_URL=https://github.com/ilude/dotfiles.git
 
 USER ${USER}
   

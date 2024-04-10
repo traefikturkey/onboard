@@ -24,7 +24,7 @@
   "initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
   "updateContentCommand": "make ansible",
   //"postAttachCommand": "zsh -l",
-  "runArgs": ["--name", "${localWorkspaceFolderBasename}_devcontainer", "--hostname", "${localWorkspaceFolderBasename}","--env-file",".devcontainer/.env" ],
+  "runArgs": ["--name","${localWorkspaceFolderBasename}_devcontainer", "--hostname","${localWorkspaceFolderBasename}", "--env-file",".devcontainer/.env", "--gpus","all"],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/anvil/.ssh,type=bind,consistency=cached",
@@ -59,6 +59,7 @@
         "dev.containers.gitCredentialHelperConfigLocation": "system",
         "editor.tabSize": 2,
         "files.readonlyFromPermissions": true,
+        "python.analysis.extraPaths": [ "${containerWorkspaceFolder}/app" ],
         "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.defaultProfile.windows": "pwsh",
