@@ -185,7 +185,7 @@ RUN pip3 install --target=${PYTHON_DEPS_PATH} ipykernel docutils jupyter noteboo
     pip3 install --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
     pip3 install --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
       
-COPY .devcontainer/requirements.devcontainer.txt requirements.txt
+COPY .devcontainer/requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} -r requirements.txt && \
     rm -rf requirements.txt
 
