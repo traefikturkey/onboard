@@ -11,7 +11,7 @@ body {
   font-family: 'Roboto', Helvetica, sans-serif;
   font-size: 0.95em; /* 12px converted to 0.75em */
   color: #D3D3D3;
-  background-color: #2a2a2c;
+  background-color: #262626;
 }
 
 /* Layout */
@@ -88,7 +88,7 @@ ul li:last-child {
 .box-header {
   border-top-left-radius: 0.313em; /* Rounded from 0.3125em */
   border-top-right-radius: 0.313em; /* Rounded from 0.3125em */
-  background-color: #595959;
+  background-color: #3c3c3c;
   font-size: 1.25em; /* Rounded from 0.8125em */
   font-weight: bold;
   height: 1.5em; /* 24px converted to 1.5em */
