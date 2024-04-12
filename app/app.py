@@ -102,6 +102,8 @@ async def index(tab_name=None):
 				case 'docker_containers':
 					widget['hx-get'] = '/docker_containers'
 					widget['template'] = 'docker_containers.html'
+				case 'iframe':
+					widget['template'] = 'iframe.html'
 				case _:
 					pass
 	

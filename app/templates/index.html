@@ -39,7 +39,7 @@
         <div class="logo"><!-- Placeholder for the logo --></div> 
       </div>
     </div>
-    <div class="row">
+    <div class="row content">
       {% for column in columns %}
       <div class="column">
         {% for widget in column %}
@@ -49,12 +49,13 @@
       {% endfor %}
     </div>
   </div>
-  <div class="footer-status">
-    <p>
-      <a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a> is a 
+  <div class="footer">
+    <div>
+      <a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
+      is a 
       <a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
       &copy; {{ today_date.year }}
-    </p>
+    </div>
   </div>
 </body>
 
