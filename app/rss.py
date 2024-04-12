@@ -26,7 +26,7 @@ class Rss:
 		# check if feed is in self.feeds and that the last updated time is less than 15 minutes ago	
 		if cached_widget and 'last_updated' in cached_widget and (start_time - cached_widget['last_updated']) < 60 * 15:
 			widget['articles'] = cached_widget['articles']
-			print(f"Loaded {widget['name']} from cache")
+			#print(f"Loaded {widget['name']} from cache")
 		else:
 			headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36'}
 			async with aiohttp.ClientSession() as session:
@@ -35,7 +35,7 @@ class Rss:
 						print(f"Failed to load {widget['name']} from {widget['url']} with Status Code: {response.status} Response follows:")
 						print(await response.text())
 					else:
-						print(f"Loaded {widget['name']} with Status Code: {response.status}")
+						#print(f"Loaded {widget['name']} with Status Code: {response.status}")
 						article_limit = widget.get('article_limit', 10)
 						parsed_feed = feedparser.parse(await response.text())
 						
@@ -70,25 +70,3 @@ class Rss:
 			return None
 
 rss = Rss()   
-
-
-
-if __name__ == "__main__":
-	webpage_url = "https://blog.langchain.dev/automating-web-research/"# input("Enter the URL of the webpage: ")
-	
-	rss = Rss()
-	feed_links = rss.find_feed_links(webpage_url)
-	
-	if feed_links:
-		print("Feed Links Found:")
-		for feed_link in feed_links:
-			enties = feedparser.parse(feed_link)
-			for entry in enties.entries:
-				print(entry.title)
-				print(rss.clean_html(entry.get('summary', '')))
-				print()
-
-			print(feed_link)
-else:
-		print("No Feed Links Found on the provided page.")
-

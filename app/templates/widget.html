@@ -4,10 +4,10 @@
   {% endif %}
 >
   <div class="box-header {{ widget.type }}-header">
-    <a href="{{ widget.link }}" target="_blank">{{ widget.name }}</a></div>
+    <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
   <div class="box-content {{ widget.type }}-content">
     <ul>
-      {% for article in widget.articles[:widget.get('article_limit', 10)] %}
+      {% for article in widget.articles %}
       <li>
         <a href="{{ article.link }}" class="{{ widget.type }}-link">
           {% if article.title %}

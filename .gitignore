@@ -1,10 +1,11 @@
 .env
 __pycache__/
-app/feed_cache
-gmail/
-*-spike/
 
+app/feed_cache
 app/configs/*.yml
 !app/configs/.keep
-notebooks/data/
 
+app/static/.*-cache
+app/static/assets
+
+notebooks/data/

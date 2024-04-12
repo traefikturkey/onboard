@@ -1,0 +1,17 @@
+/* Links */
+a, .bookmarks-link, .bookmarks-link:visited {
+  color: #98c379;
+  text-decoration: none;
+}
+
+a:visited {
+  color: #c678dd;
+}
+
+a:hover, a:focus {
+  color: #e06c75;
+}
+
+.box-header-link, .box-header-link:visited, .header a:visited {
+  color: #D3D3D3;
+}

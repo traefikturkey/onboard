@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Flex Layout Example</title>
+  <style>
+    .container {
+      display: flex;
+      flex-direction: column;
+      height: 300px;
+    }
+
+    .row {
+      display: flex;
+      flex-grow: 1;
+      border: 1px solid black;
+    }
+
+    .column {
+      display: flex;
+      flex-grow: 1;
+      flex-direction: column;
+      border-right: 1px solid blue;
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="row">
+      <div class="column">
+        <div class="row"></div>
+        <div class="row"></div>
+      </div>
+      <div class="column"></div>
+      <div class="column"></div>
+    </div>
+    <div class="row"></div>
+    <div class="row"></div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,31 @@
+/* Headers and Tab Bars */
+.header {
+  background-color: #333;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid #555; /* Add bottom border */
+  padding: 0 0.5em;
+}
+
+.header a {
+  color: #d3d3d3;
+  text-decoration: none;
+  padding: 0.5rem 1rem; /* Adjust padding */
+  transition: all 0.3s ease; /* Add transition for smooth hover effect */
+  background-color: #555;
+  line-height: 1.5em;
+}
+
+.header a:first-child {
+  border-bottom-left-radius: 0.25rem; /* Add rounded corner to the first link */
+}
+
+.header a:last-child {
+  border-bottom-right-radius: 0.25rem; /* Add rounded corner to the last link */
+}
+
+.header a:hover {
+  background-color: #444;
+  color: #d3d3d3;
+}

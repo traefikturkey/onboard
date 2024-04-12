@@ -5,15 +5,14 @@ import signal
 from datetime import datetime
 import sys
 from typing import Any
-from flask import Flask, request, render_template
+from flask import Flask, render_template
+from flask_assets import Environment, Bundle
 from flask_caching import Cache
 
 from utils import copy_default_to_configs
 from rss import rss
 from yaml_parser import yaml_parser
 import docker
-
-
 
 copy_default_to_configs()
 
@@ -36,6 +35,17 @@ else:
 cache = Cache(app, config=cache_config)
 page_timeout = int(os.environ.get('ONBOARD_PAGE_TIMEOUT', 600))
 feeds = {}
+
+assets = Environment(app)
+
+css = Bundle(
+    'css/*.css',
+    filters="cssmin",
+    output="assets/common.css"
+)
+assets.register('css_all', css)
+css.build()
+
 
 @app.context_processor
 def inject_current_date():
@@ -62,7 +72,7 @@ def containers():
 
 @app.route('/')
 @app.route('/tab/<tab_name>')
-@cache.cached(timeout=page_timeout)
+@cache.cached(timeout=page_timeout, unless=lambda: yaml_parser.is_layout_modified)
 async def index(tab_name=None):
 	# Load feeds and bookmarks
 	layout = yaml_parser.load_layout()
@@ -83,7 +93,6 @@ async def index(tab_name=None):
 			columns[column_index].append(widget)
 			match widget['type']:
 				case 'bookmarks':
-					widget['article_limit'] = -1
 					widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
 				case 'feed':
 					widget['hx-get'] = '/rss/' + widget['name']
@@ -100,7 +109,7 @@ async def index(tab_name=None):
 	return render_template('index.html', tabs=tabs, columns=columns, headers=headers, current_tab_name=current_tab['name'])
 
 @app.route('/rss/<widget_name>')
-@cache.cached(timeout=page_timeout)
+@cache.cached(timeout=page_timeout, unless=lambda: yaml_parser.is_layout_modified)
 async def widget(widget_name):
 	widget = await rss.load_feed(feeds[widget_name])
 	return render_template('widget.html', widget=widget)

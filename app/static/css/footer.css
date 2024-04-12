@@ -1,0 +1,7 @@
+/* Footer */
+.footer-status {
+  flex-shrink: 0;
+  text-align: center;
+  background-color: #1a1a1c;
+  color: #ddd;
+}

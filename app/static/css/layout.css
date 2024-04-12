@@ -1,0 +1,37 @@
+/* Reset and Basics */
+html, body {
+  height: 100%;
+  margin: 0;
+}
+
+/* Body Styles */
+body {
+  font-family: 'Roboto', Helvetica, sans-serif;
+  font-size: 0.95em; 
+  line-height: 1.25em;
+  color: #D3D3D3;
+  background-color: #2a2a2c;
+}
+
+.container {
+  display: flex;
+  flex: 1 0 auto;
+  flex-direction: column;
+}
+
+/* Row */
+.row {
+  display: flex;
+  flex: 1;
+}
+
+/* Columns and Rows */
+.column {
+  display: flex;
+  flex: 1;
+  flex-grow: 1;
+  flex-direction: column;
+}
+
+
+

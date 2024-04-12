@@ -1,10 +1,12 @@
 aiohttp[speedups]
 argcomplete
 bs4
+cssmin
 docker
 feedparser
 flask-admin
 flask[async]
+flask-assets
 flask-bcrypt
 flask-caching
 flask-minify

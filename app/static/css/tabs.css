@@ -1,0 +1,29 @@
+.tab-bar {
+  display: flex;
+  align-items: flex-end; 
+  margin-top: 1em;
+}
+
+.tab-bar a {
+  color: #d3d3d3;
+  text-decoration: none;
+  padding: 0.5rem 1rem; /* Adjust padding */
+  transition: all 0.3s ease; /* Add transition for smooth hover effect */
+  background-color: #555;
+  margin-right: 0.25rem; /* Add some spacing between tabs */
+  border-top-left-radius: 0.25rem; /* Add rounded corners */
+  border-top-right-radius: 0.25rem;
+  position: relative; /* Required for z-index */
+  z-index: 1; /* Bring tab to the front */
+  margin-bottom: -1px; /* Move tabs up to align with bottom border */
+}
+
+.tab-bar a:hover {
+  background-color: #666;
+  color: #d3d3d3;
+}
+
+.tab-bar a.active {
+  background-color: #2a2a2c;
+  color: #d3d3d3;
+}

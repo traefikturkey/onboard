@@ -14,59 +14,39 @@
   <meta property="og:image:alt" content="">
 
   <script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css') }}">
+  {% assets "css_all" %}
+  <link rel="stylesheet" href="{{ ASSET_URL }}">
+  {% endassets %}
+  
 </head>
 
 <body>
-  <div class="wrapper">
-    <div class="content">
-      <div class="header">
-        <div>
+  <div class="container">
+    <div class="row header">
+      <div class="column">
+        <div class="row">
           {% for header in headers %}
           <a href="{{header.link}}" target="_blank">{{header.name}}</a>
           {% endfor %}
         </div>
-        <div class="logo">OB</div> <!-- Placeholder for the logo -->
-      </div>
-      <div class="tab-bar">
-        {% for tab in tabs %}
-          <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
-        {% endfor %}
-        <div class="tab-buttons">
-          <button class="new-tab-btn">New Tab</button>
-          <button class="edit-tab-btn">Edit Tab</button>
-        </div>
-        <div class="modal">
-          <div class="modal-content">
-            <div>
-              <label for="tabNameInput">Tab Name:</label>
-              <input type="text" id="tabNameInput" placeholder="Enter tab name">
-            </div>
-            <div>
-              <label for="columnSelect">Number of Columns:</label>
-              <select id="columnSelect">
-                <option value="1">1</option>
-                <option value="2">2</option>
-                <option value="3">3</option>
-                <option value="4">4</option>
-                <option value="5">5</option>
-                <option value="6">6</option>
-              </select>
-            </div>
-            
-            <button id="saveBtn">Save</button>
-          </div>
-        </div>
-      </div>
-      <div class="row">
-        {% for column in columns %}
-        <div class="column">
-          {% for widget in column %}
-            {% include widget.get('template', 'widget.html') ignore missing with context %}
+        <div class="row tab-bar">
+          {% for tab in tabs %}
+            <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
           {% endfor %}
         </div>
+      </div>
+      <div class="column">  
+        <div class="logo"><!-- Placeholder for the logo --></div> 
+      </div>
+    </div>
+    <div class="row">
+      {% for column in columns %}
+      <div class="column">
+        {% for widget in column %}
+          {% include widget.get('template', 'widget.html') ignore missing with context %}
         {% endfor %}
       </div>
+      {% endfor %}
     </div>
   </div>
   <div class="footer-status">
