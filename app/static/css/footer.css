@@ -1,13 +1,2 @@
 /* Footer */
-.footer {
-  /* Set the footer to the bottom of the browsers window */
-  width: 100%;
-  background-color: #1a1a1c;
-  position: absolute;
-  bottom: 0;
-  /* Set the footer text to be centered */
-  display: flex;
-  flex-direction: row;
-  justify-content: center;
-  
-}
+
