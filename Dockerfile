@@ -180,7 +180,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --target=${PYTHON_DEPS_PATH} ipykernel docutils jupyter notebook jupyterhub && \
+RUN pip3 install --target=${PYTHON_DEPS_PATH} ipython ipykernel docutils jupyter notebook jupyterhub && \
     pip3 install --target=${PYTHON_DEPS_PATH} watermark pyyaml pylint h5py tensorflow && \
     pip3 install --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
     pip3 install --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
