@@ -1,5 +1,6 @@
 aiohttp[speedups]
 argcomplete
+apscheduler
 bs4
 cssmin
 docker
@@ -18,3 +19,4 @@ lxml==5.1.1
 python-dotenv
 requests
 pyyaml
+w3lib

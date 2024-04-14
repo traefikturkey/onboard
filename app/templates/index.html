@@ -25,13 +25,13 @@
     <div class="row header">
       <div class="column">
         <div class="row">
-          {% for header in headers %}
+          {% for header in layout.headers %}
           <a href="{{header.link}}" target="_blank">{{header.name}}</a>
           {% endfor %}
         </div>
         <div class="row tab-bar">
-          {% for tab in tabs %}
-            <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == current_tab }}">{{tab.name}}</a>
+          {% for tab in layout.tabs %}
+            <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
           {% endfor %}
         </div>
       </div>
@@ -40,7 +40,7 @@
       </div>
     </div>
     <div class="row content">
-      {% for column in columns %}
+      {% for column in layout.columns(tab_name) %}
       <div class="column">
         {% for widget in column %}
           {% include widget.get('template', 'widget.html') ignore missing with context %}

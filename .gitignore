@@ -9,3 +9,5 @@ app/static/.*-cache
 app/static/assets
 
 notebooks/data/
+
+data/

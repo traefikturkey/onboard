@@ -94,11 +94,34 @@ tabs:
       url: "https://twitchy.com/feed"
       column: 3
       position: 2
-  - name: "Docker"
-    columns: 1
+  - name: "Tech"
+    columns: 3
     widgets:
-    - name: "Docker"
-      type: "docker_containers"
+      - name: "Hacker News"
+        type: "feed"
+        summary_enabled: False
+        link: "https://news.ycombinator.com/news"
+        url: "https://hnrss.org/frontpage"
+        column: 1
+        position: 1
+      - name: "Docker"
+        type: "docker_containers"
+        column: 1
+        position: 2
+      - name: "Selfhosted - Rising"
+        type: "feed"
+        summary_enabled: False
+        link: "https://www.reddit.com/r/selfhosted/rising"
+        url: "https://www.reddit.com/r/selfhosted/rising.rss"
+        column: 2
+        position: 1
+      - name: "Selfhosted - Top Today"
+        type: "feed"
+        summary_enabled: False
+        link: "https://www.reddit.com/r/selfhosted/top"
+        url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
+        column: 2
+        position: 2
   - name: "Monitoring"
     columns: 3
     widgets:

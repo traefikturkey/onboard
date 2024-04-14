@@ -13,28 +13,26 @@ body {
   line-height: 1.25em;
   color: #D3D3D3;
   background-color: #2a2a2c;
+  overflow-x: hidden;
 }
 
 .container {
   display: flex;
-  flex: 1 0 auto;
-  flex-direction: column;
-  min-height:100vh;
-  justify-content:space-between;
+	flex: 1 0 auto;
+	flex-direction: column;
+	min-height: 100vh;
 }
-       
 
 /* Row */
 .row {
   display: flex;
+  --num-columns: var(--child-count, 3);
 }
 
 /* Columns and Rows */
 .column {
-  display: flex;
   flex: 1;
-  flex-grow: 1;
-  flex-direction: column;
+  width: calc(100% / var(--num-columns));
 }
 
 .content {
@@ -45,6 +43,6 @@ footer {
   /* Set the footer to the bottom of the browsers window */
   width: 100%;
   background-color: #1a1a1c;
-  justify-content: center;
-  
+  margin-top: auto;
+  text-align: center;
 }
