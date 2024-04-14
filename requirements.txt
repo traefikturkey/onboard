@@ -17,6 +17,7 @@ langchain
 langchain-community
 lxml==5.1.1
 python-dotenv
-requests
 pyyaml
+requests
+url-normalize
 w3lib
