@@ -164,6 +164,8 @@ class RssFeed:
 		}
 		with open(self.json_file, 'w') as f:
 			json.dump(data, f, indent=2)
+   
+		print(f"[{datetime.now()}] Saved {len(all_articles)} articles to {str(self.json_file.resolve())}")
 	
 	@staticmethod
 	def to_snake_case(input_string):
