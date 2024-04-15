@@ -26,6 +26,9 @@ tabs:
       url: "https://cafehayek.com/feed"
       column: 1
       position: 2
+      filters:  
+        strip:
+          - summary: '^Tweet\s*\.{0,3}|\…\s+'
     - name: "Slashdot"
       type: "feed"
       summary_enabled: False
@@ -33,15 +36,34 @@ tabs:
       url: "https://rss.slashdot.org/Slashdot/slashdotMain"
       column: 1
       position: 3
-    - name: "Bookmarks"
-      type: "bookmarks"
+
+    - name: Bookmarks
+      type: bookmarks
       column: 2
       position: 1
       bookmarks:
-      - title: Ali Express
-        url: https://www.aliexpress.com/
-      - title: Amazon
-        url: https://www.amazon.com/
+      - title: Cloudflare
+        url: https://www.cloudflare.com/
+      - title: Codeword Generator
+        url: https://cxxr.github.io/nsa.js/
+      - title: Gists
+        url: https://gist.github.com/
+      - title: Github
+        url: https://github.com/ilude
+      - title: MoneroOcean
+        url: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
+      - title: Teams
+        url: https://teams.microsoft.com/
+      - title: Tailscale
+        url: https://tailscale.com/
+      - title: Thingiverse
+        url: https://www.thingiverse.com/
+
+    - name: AI
+      type: bookmarks
+      column: 2
+      position: 2
+      bookmarks:
       - title: BingGPT
         url: https://www.bing.com/chat
       - title: ChatGPT
@@ -52,30 +74,24 @@ tabs:
         url: https://chat.grok.com/
       - title: PerplexityGPT
         url: https://perplexity.ai/
-      - title: Cloudflare
-        url: https://www.cloudflare.com/
-      - title: Codeword Generator
-        url: https://cxxr.github.io/nsa.js/
+
+    - name: Shopping
+      type: bookmarks
+      column: 2
+      position: 3
+      bookmarks:
+      - title: Ali Express
+        url: https://www.aliexpress.com/
+      - title: Amazon
+        url: https://www.amazon.com/
       - title: Ebay
         url: https://www.ebay.com/
-      - title: Gists
-        url: https://gist.github.com/
-      - title: Github
-        url: https://github.com/ilude
       - title: Is There Any Deal
         url: https://isthereanydeal.com/
-      - title: MoneroOcean
-        url: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
-      - title: Office 365
-        url: https://www.office.com/
       - title: Slickdeals
         url: https://slickdeals.net/
-      - title: Teams
-        url: https://teams.microsoft.com/
-      - title: Tailscale
-        url: https://tailscale.com/
-      - title: Thingiverse
-        url: https://www.thingiverse.com/
+      
+
     - name: "Real Clear Politics"
       type: "feed"
       link: "https://www.realclearpolitics.com/"
@@ -88,6 +104,10 @@ tabs:
       url: "https://instapundit.com/feed/"
       column: 3
       position: 1
+      filters:
+        remove:
+          - title: "#CommissionEarned"
+          - title: "Open Thread"
     - name: "Twitchy"
       type: "feed"
       link: "https://twitchy.com/"
@@ -123,5 +143,10 @@ tabs:
         column: 2
         position: 2
   - name: "Monitoring"
-    columns: 3
+    columns: 1
     widgets:
+      - name: "Homepage"
+        type: "iframe"
+        src: "https://homepage.ilude.com/"
+        column: 1
+        position: 1

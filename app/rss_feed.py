@@ -46,6 +46,32 @@ class RssFeed:
 	def updated_recently(self):
 		return (datetime.now() - self._last_updated).total_seconds() <= 60 * 45
 
+	def apply_filters(self):
+		if 'filters' not in self.widget:
+			return
+ 
+		# using article.id remove duplicates from self.articles
+		self.articles = list(dict((article.id, article) for article in self.articles).values())
+      
+		for article in self.articles[:]:
+			for filter_type in self.widget['filters']:
+				for filter in self.widget['filters'][filter_type]:
+					for attribute in filter:
+						filter_text = filter[attribute]
+						if not hasattr(article, attribute):
+							next
+						match filter_type:
+							case 'remove':
+								if re.search(filter_text, getattr(article, attribute), re.IGNORECASE):
+									self.articles.remove(article)
+							case 'strip':
+									pattern = re.compile(filter_text)
+									result = re.sub(pattern, '', getattr(article, attribute))
+									setattr(article, attribute, result)
+							case _:
+								pass
+      
+
 	def update(self):
 		if len(self.articles) == 0 and self.json_file.exists():
 			with open(self.json_file, 'r') as f:
@@ -53,7 +79,7 @@ class RssFeed:
 				for article in data['articles']:
 					self.articles.append(
 						RssArticle(
-							title = article['title'],
+							original_title = article['title'],
 							link = article['link'],
 							description = article['description'],
 							pub_date = article['pub_date']
@@ -61,6 +87,7 @@ class RssFeed:
 					)
 			
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.json_file))
+			self.apply_filters()
 		elif len(self.articles) == 0:
 			self.download()
 		
@@ -78,7 +105,7 @@ class RssFeed:
 		for entry in feed.entries:
 			self.articles.append(
 				RssArticle(
-					title = entry.title,
+					original_title = entry.title,
 					link = entry.link,
 					description = entry.description,
 					pub_date = entry.get('published', entry.get('updated', formatdate()))
@@ -86,12 +113,10 @@ class RssFeed:
 			)
 
 		self._last_updated = datetime.now()
+		self.apply_filters()
   
 		# sort articles in place by pub_date newest to oldest
 		self.articles.sort(key=lambda a: a.pub_date, reverse=True)
-  
-		# using article.id remove duplicates from self.articles
-		self.articles = list(dict((article.id, article) for article in self.articles).values())
 		
 		data = {
 			'title': self.title,

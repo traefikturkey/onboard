@@ -9,7 +9,7 @@ from w3lib.url import url_query_cleaner
 
 @dataclass
 class RssArticle:
-	title: str
+	original_title: str
 	description: str
 	pub_date: str
 	link: str
@@ -19,7 +19,7 @@ class RssArticle:
 	def __post_init__(self):
 		self.id = self.calculate_sha1_hash(self.link)
 	
-		self.title = re.sub(r'\s+', ' ', self.title.strip())
+		self.title = re.sub(r'\s+', ' ', self.original_title.strip())
 		
 		summary = self.description.replace('\n', ' ').replace('\r', ' ').strip()
 		summary = BeautifulSoup(html.unescape(summary), 'lxml').text
