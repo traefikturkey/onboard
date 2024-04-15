@@ -1,3 +1,4 @@
+from itertools import islice
 from bs4 import BeautifulSoup
 import feedparser
 import html
@@ -15,14 +16,31 @@ from rss_article import RssArticle
 class RssFeed:
 	widget: dict
 	data_dir: Path
-	articles: List[RssArticle] = field(default_factory=list)
+	
  
 	def __post_init__(self):
 		self.title = self.widget['name']
 		self.summary_enabled = self.widget.get('summary_enabled', True)
 		self.feed_url = self.widget['url']
+		self._articles = []
 		self._last_updated = None
+  
+		default_article_display_limit = int(os.environ.get("ONBOARD_DEFAULT_ARTICLE_DISPLAY_LIMIT", 10))
+		self.display_limit = self.widget.get('display_limit', default_article_display_limit)
+  
 		self.update()
+		
+		
+	@property
+	def articles(self) -> List[RssArticle]:
+		return self._articles
+
+	@articles.setter
+	def articles(self, articles:  List[RssArticle]):
+		# filter articles
+		filtered_articles = self.apply_filters(articles)
+		# limit articles to display_limit
+		self._articles = [article for article in islice(filtered_articles, self.display_limit)] 
 	
 	def __getattr__(self, key):
 		if key in self.widget:
@@ -46,12 +64,31 @@ class RssFeed:
 	def updated_recently(self):
 		return (datetime.now() - self._last_updated).total_seconds() <= 60 * 45
 
-	def apply_filters(self):
-		# using article.id remove duplicates from self.articles
-		self.articles = list(dict((article.id, article) for article in self.articles).values())
-  
+	@staticmethod
+	def load_articles(filename: Path) -> list[RssArticle]:
+		articles =[]
+		if filename.exists():
+			with open(filename, 'r') as f:
+				json_articles = json.load(f)['articles']
+			
+				for article in json_articles:
+					articles.append(
+						RssArticle(
+							original_title = article['title'],
+							link = article['link'],
+							description = article['description'],
+							pub_date = article['pub_date']
+						)
+					)
+		
+		return articles
+
+	def apply_filters(self, articles: list[RssArticle]) -> list[RssArticle]:
+		# using article.id remove duplicates from articles
+		articles = list(dict((article.id, article) for article in articles).values())
+	
 		if 'filters' in self.widget:
-			for article in self.articles[:]:
+			for article in articles[:]:
 				for filter_type in self.widget['filters']:
 					for filter in self.widget['filters'][filter_type]:
 						for attribute in filter:
@@ -61,51 +98,25 @@ class RssFeed:
 							match filter_type:
 								case 'remove':
 									if re.search(filter_text, getattr(article, attribute), re.IGNORECASE):
-										self.articles.remove(article)
+										articles.remove(article)
 								case 'strip':
 										pattern = re.compile(filter_text)
 										result = re.sub(pattern, '', getattr(article, attribute))
 										setattr(article, attribute, result)
 								case _:
 									pass
-      
-    # sort articles in place by pub_date newest to oldest
-		self.articles.sort(key=lambda a: a.pub_date, reverse=True)
 			
-
-	def update(self):
-		if len(self.articles) == 0 and self.json_file.exists():
-			with open(self.json_file, 'r') as f:
-				data = json.load(f)
-				for article in data['articles']:
-					self.articles.append(
-						RssArticle(
-							original_title = article['title'],
-							link = article['link'],
-							description = article['description'],
-							pub_date = article['pub_date']
-						)
-					)
-			
-			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.json_file))
-			self.apply_filters()
-			self.save_articles()
-		elif len(self.articles) == 0:
-			self.download()
+		# sort articles in place by pub_date newest to oldest
+		articles.sort(key=lambda a: a.pub_date, reverse=True)
 		
-		if self.updated_recently():
-			print(f"[{datetime.now()}] Not updating {self.title}, too soon.")
-			return
-		else:
-			self.download()
-			print(f"[{datetime.now()}] Updated {self.title}")
-
-	def download(self):
-		feed = feedparser.parse(self.feed_url)
-		self.title = feed.feed.title
-		self.link = feed.feed.link
+		return articles
+	
+	@staticmethod
+	def download(feed_url: str) -> list[RssArticle]:
+		articles = []
+		feed = feedparser.parse(feed_url)
 		for entry in feed.entries:
-			self.articles.append(
+			articles.append(
 				RssArticle(
 					original_title = entry.title,
 					link = entry.link,
@@ -113,12 +124,31 @@ class RssFeed:
 					pub_date = entry.get('published', entry.get('updated', formatdate()))
 				)
 			)
+			
+		return articles
+			
 
-		self._last_updated = datetime.now()
-		self.apply_filters()
-		self.save_articles()
+	def update(self):
+		if len(self.articles) == 0 and self.json_file.exists():
+			self.articles = self.load_articles(self.json_file)
+			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.json_file))
 
-	def save_articles(self):
+		if len(self.articles) == 0 or not self.updated_recently():
+			downloaded_articles = self.download(self.feed_url)
+			self.articles += downloaded_articles
+			self._last_updated = datetime.now()
+			self.save_articles(downloaded_articles)
+			print(f"[{datetime.now()}] Updated {self.title}")
+   
+		else:
+			print(f"[{datetime.now()}] Not updating {self.title}")
+
+	def save_articles(self, articles: list[RssArticle]):
+		# load all existing articles from the json file, and add the new ones
+		# then apply the filters
+		all_articles = self.load_articles(self.json_file) + articles
+		all_articles = self.apply_filters(all_articles)
+		
 		data = {
 			'title': self.title,
 			'link': self.link,
@@ -129,7 +159,7 @@ class RssFeed:
 					'description': article.description,
 					'pub_date': article.pub_date,
 					'id': article.id
-				} for article in self.articles
+				} for article in all_articles
 			]
 		}
 		with open(self.json_file, 'w') as f:
