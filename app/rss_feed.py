@@ -52,7 +52,7 @@ class RssFeed:
  
 		# using article.id remove duplicates from self.articles
 		self.articles = list(dict((article.id, article) for article in self.articles).values())
-      
+			
 		for article in self.articles[:]:
 			for filter_type in self.widget['filters']:
 				for filter in self.widget['filters'][filter_type]:
@@ -71,6 +71,9 @@ class RssFeed:
 							case _:
 								pass
       
+    # sort articles in place by pub_date newest to oldest
+		self.articles.sort(key=lambda a: a.pub_date, reverse=True)
+			
 
 	def update(self):
 		if len(self.articles) == 0 and self.json_file.exists():
@@ -88,6 +91,7 @@ class RssFeed:
 			
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.json_file))
 			self.apply_filters()
+			self.save_articles()
 		elif len(self.articles) == 0:
 			self.download()
 		
@@ -114,9 +118,12 @@ class RssFeed:
 
 		self._last_updated = datetime.now()
 		self.apply_filters()
-  
-		# sort articles in place by pub_date newest to oldest
-		self.articles.sort(key=lambda a: a.pub_date, reverse=True)
+	
+		
+		
+		self.save_articles()
+
+	def save_articles(self):
 		
 		data = {
 			'title': self.title,
