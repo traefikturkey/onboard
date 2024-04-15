@@ -47,29 +47,27 @@ class RssFeed:
 		return (datetime.now() - self._last_updated).total_seconds() <= 60 * 45
 
 	def apply_filters(self):
-		if 'filters' not in self.widget:
-			return
- 
 		# using article.id remove duplicates from self.articles
 		self.articles = list(dict((article.id, article) for article in self.articles).values())
-			
-		for article in self.articles[:]:
-			for filter_type in self.widget['filters']:
-				for filter in self.widget['filters'][filter_type]:
-					for attribute in filter:
-						filter_text = filter[attribute]
-						if not hasattr(article, attribute):
-							next
-						match filter_type:
-							case 'remove':
-								if re.search(filter_text, getattr(article, attribute), re.IGNORECASE):
-									self.articles.remove(article)
-							case 'strip':
-									pattern = re.compile(filter_text)
-									result = re.sub(pattern, '', getattr(article, attribute))
-									setattr(article, attribute, result)
-							case _:
-								pass
+  
+		if 'filters' in self.widget:
+			for article in self.articles[:]:
+				for filter_type in self.widget['filters']:
+					for filter in self.widget['filters'][filter_type]:
+						for attribute in filter:
+							filter_text = filter[attribute]
+							if not hasattr(article, attribute):
+								next
+							match filter_type:
+								case 'remove':
+									if re.search(filter_text, getattr(article, attribute), re.IGNORECASE):
+										self.articles.remove(article)
+								case 'strip':
+										pattern = re.compile(filter_text)
+										result = re.sub(pattern, '', getattr(article, attribute))
+										setattr(article, attribute, result)
+								case _:
+									pass
       
     # sort articles in place by pub_date newest to oldest
 		self.articles.sort(key=lambda a: a.pub_date, reverse=True)
@@ -118,13 +116,9 @@ class RssFeed:
 
 		self._last_updated = datetime.now()
 		self.apply_filters()
-	
-		
-		
 		self.save_articles()
 
 	def save_articles(self):
-		
 		data = {
 			'title': self.title,
 			'link': self.link,
