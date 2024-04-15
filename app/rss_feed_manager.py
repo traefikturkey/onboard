@@ -4,10 +4,10 @@ from pathlib import Path
 from apscheduler.schedulers.background import BackgroundScheduler
 
 class RssFeedManager:
-	def __init__(self, layout, data_dir: str = 'data'):
+	def __init__(self, layout, cache_dir: str = 'data'):
 		self.feeds = {}
 		self.layout = layout
-		self.data_dir = Path(data_dir)
+		self.data_dir = Path(cache_dir)
 		self.data_dir.mkdir(parents=True, exist_ok=True)
 		self.scheduler = BackgroundScheduler()
 	 

@@ -7,7 +7,7 @@ class Layout:
 		pwd = os.path.dirname(os.path.realpath(__file__))
 		self.file_path = os.path.join(pwd, file_path)
 		self.mtime = os.path.getmtime(self.file_path)
-		self.feed_manager = RssFeedManager(self, data_dir='data')
+		self.feed_manager = RssFeedManager(self, cache_dir='cache')
 		self.reload()
 		
 	@property
