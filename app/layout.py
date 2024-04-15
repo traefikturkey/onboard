@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 from rss_feed_manager import RssFeedManager
 import yaml
 
@@ -33,45 +34,33 @@ class Layout:
 		
 		feed_widgets = []
 		for tab in self.tabs:
-			for widget in tab['widgets']:
-				if widget['type'] == 'feed':
-					feed_widgets.append(widget)
+			for column in tab['columns']:
+				for widget in column['widgets']:
+					if widget['type'] == 'feed':
+						feed_widgets.append(widget)
   
 		print('Initializing feed manager with {} feeds'.format(len(feed_widgets)))
 		self.feed_manager.initialize(feed_widgets)
 	 
 		for tab in self.tabs:
-			column_count = tab.get('columns', 1)
-			columns = [[] for _ in range(column_count)]
-			tab['columns'] = columns
-			if not tab['widgets']:
-				next
-		
-			for widget in tab['widgets']:
-				widget['summary_enabled'] = widget.get('summary_enabled', True)
-				column_index = (widget.get('column', 1) - 1) % column_count
+			for column in tab['columns']:
+				if not column['widgets']:
+					next
+				for widget in column['widgets']:
+					widget['summary_enabled'] = widget.get('summary_enabled', True)
+					match widget['type']:
+						case 'bookmarks':
+							widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
+						case 'feed':
+							widget['hx-get'] = '/rss/' + widget['name']
+							self.feed_manager.load(widget)
+						case 'docker_containers':
+							widget['hx-get'] = '/docker_containers'
+							widget['template'] = 'docker_containers.html'
+						case _:
+							if (template_path := Path('templates', f'{widget["type"]}.html')).exists():
+								widget['template'] = template_path.name
 				
-				match widget['type']:
-					case 'bookmarks':
-						widget['articles'] = [{'title': entry['title'], 'link': entry['url']} for entry in widget['bookmarks']]
-						columns[column_index].append(widget)
-					case 'feed':
-						widget['hx-get'] = '/rss/' + widget['name']
-						feed = self.feed_manager.load(widget)
-						columns[column_index].append(feed)
-					case 'docker_events':
-						widget['template'] = 'docker_events.html'
-						columns[column_index].append(widget)
-					case 'docker_containers':
-						widget['hx-get'] = '/docker_containers'
-						widget['template'] = 'docker_containers.html'
-						columns[column_index].append(widget)
-					case 'iframe':
-						widget['template'] = 'iframe.html'
-						columns[column_index].append(widget)
-					case _:
-						columns[column_index].append(widget)
-						pass
 		print("========== Layout reloaded")
 
 	def is_modified(self):

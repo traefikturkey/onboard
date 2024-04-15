@@ -42,7 +42,7 @@
     <div class="row content">
       {% for column in layout.columns(tab_name) %}
       <div class="column">
-        {% for widget in column %}
+        {% for widget in column['widgets'] %}
           {% include widget.get('template', 'widget.html') ignore missing with context %}
         {% endfor %}
       </div>
