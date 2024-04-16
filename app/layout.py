@@ -25,7 +25,10 @@ class Layout:
 	def columns(self, tab_name):
 		current_tab = self.tabs[0] if tab_name is None else next((tab for tab in self.tabs if tab['name'].lower() == tab_name.lower()), self.tabs[0])
 		return current_tab['columns']
-	
+
+	def save_articles(self):
+		self.feed_manager.save_articles()
+ 
 	def reload(self):
 		print("Reloading layout")
 		with open(self.file_path, 'r') as file:

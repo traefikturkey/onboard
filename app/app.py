@@ -2,22 +2,23 @@ import asyncio
 import docker
 import json
 import os
+import secrets
 import signal
 import sys
 from datetime import datetime
 from typing import Any
-from flask import Flask, render_template
+from flask import Flask, flash, redirect, render_template
 from flask_assets import Environment, Bundle
 from flask_caching import Cache
 
 from utils import copy_default_to_configs
-from rss import rss
 from layout import layout
 
 copy_default_to_configs()
 
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
+app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
 
 if os.environ.get("FLASK_DEBUG", "False") == "True":
 	cache_config={
@@ -67,6 +68,13 @@ def events():
 def containers():
 	containers = docker_client.containers.list(filters={'status':'running'})
 	return render_template('docker_containers.html', containers=containers)
+
+@app.route('/save/articles')
+def save_layout():
+	layout.save_articles()
+	flash('Layout articles saved!')
+	return redirect('/')
+	
 
 @app.route('/')
 @app.route('/tab/<tab_name>')

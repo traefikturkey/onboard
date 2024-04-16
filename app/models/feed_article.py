@@ -2,13 +2,16 @@ from dataclasses import dataclass, field
 import hashlib
 import html
 import re
+import warnings
 
-from bs4 import BeautifulSoup
+from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from url_normalize import url_normalize
 from w3lib.url import url_query_cleaner
 
+warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
+
 @dataclass
-class RssArticle:
+class FeedArticle:
 	original_title: str
 	description: str
 	pub_date: str

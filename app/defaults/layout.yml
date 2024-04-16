@@ -11,130 +11,125 @@ headers:
     link: "https://www.youtube.com/"
 
 tabs:
-  - name: "Home"
-    columns:
-    - column:
-      widgets:
-        - name: "Lawrence Person's BattleSwarm Blog"
-          type: "feed"
-          link: "https://www.battleswarmblog.com/"
-          url: "https://www.battleswarmblog.com/?feed=rss2"
-          column: 1
-          position: 1
-        - name: "Cafe Hayek"
-          type: "feed"
-          link: "https://cafehayek.com/"
-          url: "https://cafehayek.com/feed"
-          filters:  
-            strip:
-              - summary: '^Tweet\s*\.{0,3}|\…\s+'
-        - name: "Slashdot"
-          type: "feed"
-          summary_enabled: False
-          link: "https://slashdot.org/"
-          url: "https://rss.slashdot.org/Slashdot/slashdotMain"
-    - column:
-      widgets:
-        - name: Bookmarks
-          type: bookmarks
-          bookmarks:
-          - title: Cloudflare
-            url: https://www.cloudflare.com/
-          - title: Codeword Generator
-            url: https://cxxr.github.io/nsa.js/
-          - title: Gists
-            url: https://gist.github.com/
-          - title: Github
-            url: https://github.com/ilude
-          - title: MoneroOcean
-            url: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
-          - title: Teams
-            url: https://teams.microsoft.com/
-          - title: Tailscale
-            url: https://tailscale.com/
-          - title: Thingiverse
-            url: https://www.thingiverse.com/
+- name: "Home"
+  columns:
+  - column:
+    widgets:
+      - name: "Lawrence Person's BattleSwarm Blog"
+        type: "feed"
+        link: "https://www.battleswarmblog.com/"
+        feed_url: "https://www.battleswarmblog.com/?feed=rss2"
+      - name: "Cafe Hayek"
+        type: "feed"
+        link: "https://cafehayek.com/"
+        feed_url: "https://cafehayek.com/feed"
+        filters:  
+          strip:
+          - summary: '^Tweet\s*\.{0,3}|\…\s+'
+      - name: "Slashdot"
+        type: "feed"
+        summary_enabled: False
+        display_limit: 15
+        link: "https://slashdot.org/"
+        feed_url: "https://rss.slashdot.org/Slashdot/slashdotMain"
+  - column:
+    widgets:
+      - name: Shopping
+        type: bookmarks
+        bookmarks:
+        - name: Ali Express
+          link: https://www.aliexpress.com/
+        - name: Amazon
+          link: https://www.amazon.com/
+        - name: Ebay
+          link: https://www.ebay.com/
+        - name: Is There Any Deal
+          link: https://isthereanydeal.com/
+        - name: Slickdeals
+          link: https://slickdeals.net/
+      
+      - name: AI
+        type: bookmarks
+        bookmarks:
+        - name: BingGPT
+          link: https://www.bing.com/chat
+        - name: ChatGPT
+          link: https://chat.openai.com/
+        - name: ClaudeGPT
+          link: https://claude.ai/chats
+        - name: GrokGPT
+          link: https://chat.grok.com/
+        - name: PerplexityGPT
+          link: https://perplexity.ai/
 
-        - name: AI
-          type: bookmarks
-          bookmarks:
-          - title: BingGPT
-            url: https://www.bing.com/chat
-          - title: ChatGPT
-            url: https://chat.openai.com/
-          - title: ClaudeGPT
-            url: https://claude.ai/chats
-          - title: GrokGPT
-            url: https://chat.grok.com/
-          - title: PerplexityGPT
-            url: https://perplexity.ai/
+      - name: Bookmarks
+        type: bookmarks
+        bookmarks:
+        - name: Cloudflare
+          link: https://www.cloudflare.com/
+        - name: Codeword Generator
+          link: https://cxxr.github.io/nsa.js/
+        - name: Gists
+          link: https://gist.github.com/
+        - name: Github
+          link: https://github.com/ilude
+        - name: MoneroOcean
+          link: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
+        - name: Teams
+          link: https://teams.microsoft.com/
+        - name: Tailscale
+          link: https://tailscale.com/
+        - name: Thingiverse
+          link: https://www.thingiverse.com/
 
-        - name: Shopping
-          type: bookmarks
-          bookmarks:
-          - title: Ali Express
-            url: https://www.aliexpress.com/
-          - title: Amazon
-            url: https://www.amazon.com/
-          - title: Ebay
-            url: https://www.ebay.com/
-          - title: Is There Any Deal
-            url: https://isthereanydeal.com/
-          - title: Slickdeals
-            url: https://slickdeals.net/
-          
+      - name: "Real Clear Politics"
+        type: "feed"
+        link: "https://www.realclearpolitics.com/"
+        feed_url: "https://www.realclearpolitics.com/index.xml"
+  - column:
+    widgets:
+      - name: "Instapundit"
+        type: "feed"
+        link: "https://instapundit.com/"
+        feed_url: "https://instapundit.com/feed/"
+        filters:
+          remove:
+            - title: "#CommissionEarned"
+            - title: "Open Thread"
+        process:
+          - processor: title_editor
+      - name: "Twitchy"
+        type: "feed"
+        link: "https://twitchy.com/"
+        feed_url: "https://twitchy.com/feed"
 
-        - name: "Real Clear Politics"
-          type: "feed"
-          link: "https://www.realclearpolitics.com/"
-          url: "https://www.realclearpolitics.com/index.xml"
-    - column:
-      widgets:
-        - name: "Instapundit"
-          type: "feed"
-          link: "https://instapundit.com/"
-          url: "https://instapundit.com/feed/"
-          column: 3
-          position: 1
-          filters:
-            remove:
-              - title: "#CommissionEarned"
-              - title: "Open Thread"
-        - name: "Twitchy"
-          type: "feed"
-          link: "https://twitchy.com/"
-          url: "https://twitchy.com/feed"
-          column: 3
-          position: 2
-  - name: "Tech"
-    columns:
-    - column:
-      widgets:
-        - name: "Hacker News"
-          type: "feed"
-          summary_enabled: False
-          link: "https://news.ycombinator.com/news"
-          url: "https://hnrss.org/frontpage"
-        - name: "Docker"
-          type: "docker_containers"
-    - column:
-      widgets:
-        - name: "Selfhosted - Rising"
-          type: "feed"
-          summary_enabled: False
-          link: "https://www.reddit.com/r/selfhosted/rising"
-          url: "https://www.reddit.com/r/selfhosted/rising.rss"
-        - name: "Selfhosted - Top Today"
-          type: "feed"
-          summary_enabled: False
-          link: "https://www.reddit.com/r/selfhosted/top"
-          url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
-  - name: "Monitoring"
-    columns: 
-    - column:
-      widgets:
-        - name: "Homepage"
-          type: "iframe"
-          src: "https://homepage.ilude.com/"
-          column: 1
-          position: 1
+- name: "Tech"
+  columns:
+  - column:
+    widgets:
+      - name: "Hacker News"
+        type: "feed"
+        summary_enabled: False
+        link: "https://news.ycombinator.com/news"
+        feed_url: "https://hnrss.org/frontpage"
+      - name: "Docker"
+        type: "docker_containers"
+  - column:
+    widgets:
+      - name: "Selfhosted - Rising"
+        type: "feed"
+        summary_enabled: False
+        link: "https://www.reddit.com/r/selfhosted/rising"
+        feed_url: "https://www.reddit.com/r/selfhosted/rising.rss"
+      - name: "Selfhosted - Top Today"
+        type: "feed"
+        summary_enabled: False
+        link: "https://www.reddit.com/r/selfhosted/top"
+        feed_url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
+- name: "Monitoring"
+  columns: 
+  - column:
+    widgets:
+      - name: "Homepage"
+        type: "iframe"
+        link: "https://homepage.ilude.com/"

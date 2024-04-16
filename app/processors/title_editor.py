@@ -1,12 +1,12 @@
 import re
 import os
-import json
+from app.models.feed_article import FeedArticle
 from langchain_community.llms import Ollama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
 from langchain_core.messages import SystemMessage, HumanMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
-class Instapundit:
+class TitleEditor:
 	def __init__(self):
 		self.ollama_url = os.getenv('OLLAMA_URL')
 		if self.ollama_url:
@@ -39,18 +39,12 @@ class Instapundit:
 			self.chain = chat_prompt | model | parser
 			
 
-	def process(self, widget):
-		for article in widget['articles'][:]:
-			if article['title'] and ('#CommissionEarned' in article['title'] or re.search('Open Thread', article['title'], re.IGNORECASE)):
-				widget['articles'].remove(article)
-				next
-			if not self.ollama_url:
-				article['title'] = article['title'].strip().strip('""')
-			else:
-				data = [{"title": article['original_title'], "summary": article['original_summary']} for article in widget['articles']]
-				rows = self.chain.batch(data, max_concurrency=len(data)//2)
+	def process(self, articles: list[FeedArticle]) -> list[FeedArticle]:
+		if self.ollama_url:
+			data = [{"title": article.original_title, "summary": article.description} for article in articles]
+			rows = self.chain.batch(data, max_concurrency=len(data)//2)
+	
+			for article, row in zip(articles, rows):
+				article.title = row['title']
 		
-				for article, row in zip(widget['articles'], rows):
-					article['title'] = row['title']
-				
-		return widget
+		return articles

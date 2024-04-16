@@ -1,0 +1,24 @@
+.flash-message {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: rgb(148, 86, 86);
+  padding: 1px;
+  text-align: center;
+  z-index: 1000;
+  animation: fadeout 3s forwards;
+}
+
+@keyframes fadeout {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    display: none;
+  }
+}
