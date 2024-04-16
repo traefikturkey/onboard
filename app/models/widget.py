@@ -1,11 +1,10 @@
-from dataclasses import field
 import hashlib
 import os
 from pathlib import Path
 
 class Widget:
 	widget: dict
-	template: str = field(init=False)
+	template: str
 	
 	def __init__(self, widget):
 		self.widget = widget
