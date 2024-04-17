@@ -34,7 +34,8 @@ class Feed(SchedulerWidget):
 		self.summary_enabled = widget.get('summary_enabled', True)
 		self.hx_get = f"/feed/{self.id}"
 	
-		self.cache_path.parent.mkdir(parents=True, exist_ok=True)
+		if not self.cache_path.paren.exists():
+			self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 	
 		items = self.load_cache(self.cache_path)
 		self.items = items[:self.display_limit]
