@@ -16,6 +16,7 @@ hypercorn==0.15.0
 langchain
 langchain-community
 lxml==5.1.1
+python-dateutil
 python-dotenv
 pyyaml
 requests
