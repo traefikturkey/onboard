@@ -1,5 +1,12 @@
 .PHONY: run
 SITE_PACKAGES := $(shell pip show pip | grep '^Location' | cut -d' ' -f2-)
+
+# read and include .devcontainer/.env exporting all variables
+ifneq (,$(wildcard .devcontainer/.env))
+	include .devcontainer/.env
+	export
+endif
+
 run: $(SITE_PACKAGES)
 	python3 app/app.py
 

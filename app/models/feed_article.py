@@ -27,7 +27,10 @@ class FeedArticle:
 		self.id = calculate_sha1_hash(self.link)
 
 		self.original_title = unidecode.unidecode(self.original_title)
-		self.title = re.sub(r'\s+', ' ', self.original_title).strip()
+		self.original_title = re.sub(r'\s+', ' ', self.original_title).strip()
+  
+		if not self.title:
+			self.title = self.original_title
 		
 		summary = self.description.replace('\n', ' ').replace('\r', ' ').strip()
 		summary = BeautifulSoup(html.unescape(summary), 'lxml').text

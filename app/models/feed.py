@@ -45,12 +45,14 @@ class Feed(SchedulerWidget):
 
 		if self.needs_update or self.old_cache_path.exists():
 			# schedule job to run right now
+			print(f'[{datetime.now()}] {self.name} scheduled for immediate update now!')
 			self.scheduler.add_job(self.update, 'date', run_date=datetime.now())
  
 	@property
 	def needs_update(self):
+		force_update = os.getenv("ONBOARD_FEED_FORCE_UPDATE", "False") == "True"
 		# if there is no last_updated time, or if it's more than an hour ago
-		return self._last_updated is None or self._last_updated < datetime.now() - timedelta(hours=1)
+		return force_update or self._last_updated is None or self._last_updated < datetime.now() - timedelta(hours=1)
 
 	@property
 	def old_cache_path(self):
@@ -141,7 +143,7 @@ class Feed(SchedulerWidget):
 				)
 			)
 			
-		return self.apply_filters(articles) 
+		return articles 
 
 	def processors(self, articles: list[FeedArticle]) -> list[FeedArticle]:
 		if 'process' in self.widget:
@@ -160,7 +162,7 @@ class Feed(SchedulerWidget):
 		return articles
 
 	def save_articles(self, articles: list[FeedArticle]):
-		print(f"[{datetime.now()}] Starting cache save for {self.name} to file {self.cache_path}")
+		#print(f"[{datetime.now()}] Starting cache save for {self.name} to file {self.cache_path}")
 	
 		if self.old_cache_path.exists():
 			articles += self.load_cache(self.old_cache_path)
@@ -172,7 +174,9 @@ class Feed(SchedulerWidget):
 	
 		# using article.id remove duplicates from articles
 		all_articles = list(dict((article.id, article) for article in all_articles).values())
-	
+
+		all_articles = self.apply_filters(all_articles)	
+ 
 		all_articles = self.processors(all_articles)
 		
 		# sort articles in place by pub_date newest to oldest
