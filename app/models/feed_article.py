@@ -3,19 +3,22 @@ import html
 import re
 import warnings
 import unidecode
+import datetime
 
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
 from models.utils import calculate_sha1_hash
 from url_normalize import url_normalize
 from w3lib.url import url_query_cleaner
 
+
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 
 @dataclass
 class FeedArticle:
 	original_title: str
+	title: str
 	description: str
-	pub_date: str
+	pub_date: datetime
 	link: str
 	summary: str = None
 	id: str = None
@@ -37,7 +40,7 @@ class FeedArticle:
 			self.summary = None
 		else:
 			self.summary = summary
-	 
+
 
 	@property
 	def link(self):

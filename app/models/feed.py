@@ -1,11 +1,14 @@
+import time
+import dateutil
 import feedparser
 import importlib
 import json
 import os
 import re
 
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from email.utils import formatdate
+from email import utils
 from functools import cached_property
 from pathlib import Path
 
@@ -24,6 +27,7 @@ class Feed(SchedulerWidget):
 	
 	def __init__(self, widget) -> None:
 		super().__init__(widget)
+		self._last_updated = None
 	
 		self.feed_url = widget['feed_url']
 		self.display_limit = widget.get('display_limit', 10)
@@ -32,13 +36,14 @@ class Feed(SchedulerWidget):
 	
 		self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 	
-		self.items = self.load_cache(self.cache_path)
+		items = self.load_cache(self.cache_path)
+		self.items = items[:self.display_limit]
 		if self.items:
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.cache_path))
 	
 		self.scheduler.add_job(self.update, 'cron', name=self.id, hour='*', jitter=20)
 
-		if self.needs_update:
+		if self.needs_update or self.old_cache_path.exists():
 			# schedule job to run right now
 			self.scheduler.add_job(self.update, 'date', run_date=datetime.now())
  
@@ -46,7 +51,11 @@ class Feed(SchedulerWidget):
 	def needs_update(self):
 		# if there is no last_updated time, or if it's more than an hour ago
 		return self._last_updated is None or self._last_updated < datetime.now() - timedelta(hours=1)
- 
+
+	@property
+	def old_cache_path(self):
+		return self.cache_path.parent.joinpath(f"{to_snake_case(self.name)}.json")
+
 	def __iter__(self):
 		for item in self.items:
 			yield item
@@ -80,16 +89,18 @@ class Feed(SchedulerWidget):
 				for article in json_articles:
 					articles.append(
 						FeedArticle(
-							original_title = article['title'],
+							original_title = article.get('original_title', article['title']),
+							title = article['title'],
 							link = article['link'],
 							description = article['description'],
-							pub_date = article['pub_date']
+							pub_date = dateutil.parser.parse(article['pub_date']) 
 						)
 					)
 			print(f"[{datetime.now()}] Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
 		else:
 			print(f"[{datetime.now()}] Failed to load cached articles for {self.name} : file {self.cache_path} does not exist")
 		
+		articles.sort(key=lambda a: a.pub_date, reverse=True)
 		return articles
 
 
@@ -119,12 +130,14 @@ class Feed(SchedulerWidget):
 		articles = []
 		feed = feedparser.parse(feed_url)
 		for entry in feed.entries:
+			pub_date = dateutil.parser.parse(entry.get('published', entry.get('updated', formatdate())))
 			articles.append(
 				FeedArticle(
 					original_title = entry.title,
+					title = entry.title,
 					link = entry.link,
 					description = entry.description,
-					pub_date = entry.get('published', entry.get('updated', formatdate()))
+					pub_date = pub_date
 				)
 			)
 			
@@ -149,10 +162,9 @@ class Feed(SchedulerWidget):
 	def save_articles(self, articles: list[FeedArticle]):
 		print(f"[{datetime.now()}] Starting cache save for {self.name} to file {self.cache_path}")
 	
-		old_cache_path = self.cache_path.parent.joinpath(f"{to_snake_case(self.name)}.json")
-		if old_cache_path.exists():
-			articles += self.load_cache(old_cache_path)
-			old_cache_path.unlink()
+		if self.old_cache_path.exists():
+			articles += self.load_cache(self.old_cache_path)
+			self.old_cache_path.unlink()
 	
 		# load all existing articles from the json file, and add the new ones
 		# then apply the filters
@@ -163,7 +175,7 @@ class Feed(SchedulerWidget):
 	
 		all_articles = self.processors(all_articles)
 		
-	# sort articles in place by pub_date newest to oldest
+		# sort articles in place by pub_date newest to oldest
 		all_articles.sort(key=lambda a: a.pub_date, reverse=True)
 		
 		
@@ -176,7 +188,7 @@ class Feed(SchedulerWidget):
 					'title': article.title,
 					'link': article.link,
 					'description': article.description,
-					'pub_date': article.pub_date,
+					'pub_date': utils.format_datetime(article.pub_date),
 					'id': article.id
 				} for article in all_articles
 			]
