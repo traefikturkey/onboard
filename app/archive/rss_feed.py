@@ -9,7 +9,7 @@ from datetime import datetime
 from email.utils import formatdate
 from pathlib import Path
 from typing import List
-from app.models.feed_article import FeedArticle
+from models.feed_article import FeedArticle
 
 @dataclass
 class RssFeed:

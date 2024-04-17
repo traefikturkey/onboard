@@ -2,62 +2,57 @@
 <html class="no-js" lang="en">
 
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>OnBoard</title>
-  <meta name="description" content="">
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>OnBoard</title>
+	<meta name="description" content="">
 
-  <meta property="og:title" content="OnBoard">
-  <meta property="og:type" content="">
-  <meta property="og:url" content="">
-  <meta property="og:image" content="">
-  <meta property="og:image:alt" content="">
+	<meta property="og:title" content="OnBoard">
+	<meta property="og:type" content="">
+	<meta property="og:url" content="">
+	<meta property="og:image" content="">
+	<meta property="og:image:alt" content="">
 
-  <script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
-  {% assets "css_all" %}
-  <link rel="stylesheet" href="{{ ASSET_URL }}">
-  {% endassets %}
-  
+	<script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
+	{% assets "css_all" %}
+	<link rel="stylesheet" href="{{ ASSET_URL }}">
+	{% endassets %}
+	
 </head>
 
 <body>
-  {% include('flash_message.html') %}
-  <div class="container">
-    <div class="row header">
-      <div class="column">
-        <div class="row">
-          {% for header in layout.headers %}
-          <a href="{{header.link}}" target="_blank">{{header.name}}</a>
-          {% endfor %}
-        </div>
-        <div class="row tab-bar">
-          {% for tab in layout.tabs %}
-            <a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
-          {% endfor %}
-        </div>
-      </div>
-      <div class="column">  
-        <div class="logo"><!-- Placeholder for the logo --></div> 
-      </div>
-    </div>
-    <div class="row content">
-      {% for column in layout.columns(tab_name) %}
-      <div class="column">
-        {% for widget in column['widgets'] %}
-          {% include widget.get('template', 'widget.html') ignore missing with context %}
-        {% endfor %}
-      </div>
-      {% endfor %}
-    </div>
-
-    <footer>
-      <div>
-        <a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
-        is a 
-        <a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
-        &copy; {{ today_date.year }}
-      </div>
-    </footer>
-  </div>
+	{% include('flash_message.html') %}
+	<div class="container">
+		<div class="row header">
+			<div class="column">
+				<div class="row">
+					{% for header in layout.headers %}
+					<a href="{{header.link}}" target="_blank">{{header.name}}</a>
+					{% endfor %}
+				</div>
+				<div class="row tab-bar">
+					{% for tab in layout.tabs %}
+						<a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
+					{% endfor %}
+				</div>
+			</div>
+			<div class="column">  
+				<div class="logo"><!-- Placeholder for the logo --></div> 
+			</div>
+		</div>
+		{% for row in layout.tab(tab_name).rows:  %}
+			{% with row=row %}
+				{% include "row.html" %}
+			{% endwith %}
+		{% endfor %}
+		<footer>
+			<div>
+				<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
+				is a 
+				<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
+				&copy; {{ today_date.year }}
+			</div>
+		</footer>
+	</div>
 </body>
 </html>

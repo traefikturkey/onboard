@@ -2,10 +2,10 @@ import os
 from pathlib import Path
 from rss_feed_manager import RssFeedManager
 import yaml
+from models.utils import pwd
 
 class Layout:
 	def __init__(self, file_path="configs/layout.yml"):
-		pwd = os.path.dirname(os.path.realpath(__file__))
 		self.file_path = os.path.join(pwd, file_path)
 		self.mtime = os.path.getmtime(self.file_path)
 		self.feed_manager = RssFeedManager(self, cache_dir='cache')

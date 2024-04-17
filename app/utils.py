@@ -1,9 +1,9 @@
 import os
 import shutil
 from pathlib import Path
+from models.utils import pwd
 
 def copy_default_to_configs():
-	pwd = os.path.dirname(os.path.abspath(__file__))
 	default_dir = os.path.join(pwd, 'defaults') 
 	config_dir = os.path.join(pwd, 'configs')
  

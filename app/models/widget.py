@@ -1,10 +1,10 @@
-import hashlib
 import os
 from pathlib import Path
 
 class Widget:
 	widget: dict
 	template: str
+	items: list = []
 	
 	def __init__(self, widget):
 		self.widget = widget
@@ -14,6 +14,14 @@ class Widget:
 			self.template = template_path.name
 		else:
 			self.template = 'widget.html'
+   
+	@property 
+	def loaded(self):
+		return self.items and len(self.items) > 0
+	 
+	def __iter__(self):
+		for item in self.items:
+			yield item
 
 	@property
 	def name(self):
@@ -31,11 +39,14 @@ class Widget:
 	def display_limit(self):
 		return self.widget.get('display_limit', 10)
 
-	@staticmethod
-	def calculate_sha1_hash(value: str) -> str:
-		sha1 = hashlib.sha1()
-		sha1.update(value.encode('utf-8'))
-		return sha1.hexdigest()
+	def hasattr(self, name):
+		return hasattr(self, name) or name in self.widget
+
+	def get(self, key, default=None):
+		if hasattr(self, key):
+			return getattr(self, key) or default
+ 
+		return self.widget.get(key, default)
 
 	@staticmethod
 	def from_dict(widget: dict) -> 'Widget':

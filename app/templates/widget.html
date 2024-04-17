@@ -1,28 +1,43 @@
-<div class="box {{ widget.type }}-box"
-  {% if widget['hx-get'] and not widget.articles %}
-    hx-get="{{ widget['hx-get'] }}" hx-trigger="load" hx-swap="outerHTML"
-  {% endif %}
->
-  <div class="box-header {{ widget.type }}-header">
-    <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
-  <div class="box-content {{ widget.type }}-content">
-    <ul>
-      {% for article in widget.articles %}
-      <li>
-        <a href="{{ article.link }}" class="{{ widget.type }}-link">
-          {% if article.title %}
-            {{ article.title }}
-          {% else %}
-            No Title
-          {% endif %}
-        </a>
-        {% if widget.summary_enabled and article.summary %}
-        <div class="summary {{ widget.type }}">{{ article.summary }}</div>
-        {% endif %}
-      </li>
-      {% else %}
-      <li>Loading...</li>
-      {% endfor %}
-    </ul>
+{% if not skip_htmx and widget.hasattr('hx_get') %}
+  <div class="box {{ widget.type }}-box" hx-get="{{ widget.hx_get }}" hx-trigger="load" hx-swap="outerHTML">
+    <div class="box {{ widget.type }}-box">
+      <div class="box-header {{ widget.type }}-header">
+        <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
+      <div class="box-content {{ widget.type }}-content">
+        <ul>
+          {% set name = widget.name %}
+          <li>Loading...</li>
+        </ul>
+      </div>
+    </div>
   </div>
-</div>
+{% else %}
+  <div class="box {{ widget.type }}-box">
+    <div class="box-header {{ widget.type }}-header">
+      <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
+    <div class="box-content {{ widget.type }}-content">
+      <ul>
+        {% set name = widget.name %}
+        {% for article in widget %}
+        <li>
+          <a href="{{ article.link }}" class="{{ widget.type }}-link">
+            {% if article.name %}
+              {{ article.name }}
+            {% elif article.title %}
+              {{ article.title }}
+            {% else %}
+              No Title
+            {% endif %}
+          </a>
+          {% if widget.summary_enabled and article.summary %}
+          <div class="summary {{ widget.type }}">{{ article.summary }}</div>
+          {% endif %}
+        </li>
+        {% else %}
+        <li>Loading...</li>
+        {% endfor %}
+      </ul>
+    </div>
+  </div>
+{% endif %}
+  

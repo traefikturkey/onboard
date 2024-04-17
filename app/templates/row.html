@@ -1,0 +1,17 @@
+<div class="row content">
+  {% for column in row.columns %}
+    <div class="column">
+      {% if column.has_rows %}
+        {% for row in column.rows %}
+          {% with row=row %}
+            {% include "row.html" %}
+          {% endwith %}
+        {% endfor %}
+      {% else %}
+        {% for widget in column.widgets %}
+          {% include widget.template ignore missing with context %}
+        {% endfor %}
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>

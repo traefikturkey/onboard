@@ -19,5 +19,6 @@ lxml==5.1.1
 python-dotenv
 pyyaml
 requests
+unidecode
 url-normalize
 w3lib

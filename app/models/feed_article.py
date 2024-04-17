@@ -1,10 +1,11 @@
-from dataclasses import dataclass, field
-import hashlib
+from dataclasses import dataclass
 import html
 import re
 import warnings
+import unidecode
 
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
+from models.utils import calculate_sha1_hash
 from url_normalize import url_normalize
 from w3lib.url import url_query_cleaner
 
@@ -17,12 +18,13 @@ class FeedArticle:
 	pub_date: str
 	link: str
 	summary: str = None
-	id: str = field(init=False)
+	id: str = None
 
 	def __post_init__(self):
-		self.id = self.calculate_sha1_hash(self.link)
-	
-		self.title = re.sub(r'\s+', ' ', self.original_title.strip())
+		self.id = calculate_sha1_hash(self.link)
+
+		self.original_title = unidecode.unidecode(self.original_title)
+		self.title = re.sub(r'\s+', ' ', self.original_title).strip()
 		
 		summary = self.description.replace('\n', ' ').replace('\r', ' ').strip()
 		summary = BeautifulSoup(html.unescape(summary), 'lxml').text
@@ -48,10 +50,4 @@ class FeedArticle:
 			cleaned_url, parameterlist=['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content'], remove=True
 		)
 		self._link = cleaned_url
-		self.id = self.calculate_sha1_hash(self._link)
-	
-	@staticmethod
-	def calculate_sha1_hash(url: str) -> str:
-		sha1 = hashlib.sha1()
-		sha1.update(url.encode('utf-8'))
-		return sha1.hexdigest()
+		self.id = calculate_sha1_hash(self._link)

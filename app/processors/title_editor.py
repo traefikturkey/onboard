@@ -1,9 +1,8 @@
-import re
 import os
-from app.models.feed_article import FeedArticle
+from models.feed_article import FeedArticle
 from langchain_community.llms import Ollama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
-from langchain_core.messages import SystemMessage, HumanMessage
+from langchain_core.messages import SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 
 class TitleEditor:
@@ -41,10 +40,17 @@ class TitleEditor:
 
 	def process(self, articles: list[FeedArticle]) -> list[FeedArticle]:
 		if self.ollama_url:
-			data = [{"title": article.original_title, "summary": article.description} for article in articles]
-			rows = self.chain.batch(data, max_concurrency=len(data)//2)
+			# data = [{"title": article.original_title, "summary": article.description} for article in articles]
+			# rows = self.chain.batch(data, max_concurrency=len(data)//2)
+			count = 1
+			try:
+				for article in articles:
+					#print("Processing article " + str(count) + " of " + str(len(articles)))
+					result = self.chain.invoke({"title": article.original_title, "summary": article.description})
+					article.title = result['title']
+					count += 1
+			except Exception as ex:
+				print(f"Error: {ex} for {article.original_title}")
 	
-			for article, row in zip(articles, rows):
-				article.title = row['title']
 		
 		return articles
