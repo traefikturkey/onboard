@@ -11,10 +11,109 @@ headers:
     link: "https://www.youtube.com/"
 
 tabs:
-- name: "Home"
-  columns:
-  - column:
-    widgets:
+- tab: "Home"
+  rows:
+  - row:
+    columns:
+    - column:
+      widgets:
+      - name: Shopping
+        type: bookmarks
+        display_header: False
+        bookmarks:
+        - name: Ali Express
+          link: https://www.aliexpress.com/
+        - name: Amazon
+          link: https://www.amazon.com/
+        - name: Ebay
+          link: https://www.ebay.com/
+        - name: Humble Bundle
+          link: https://www.humblebundle.com/books
+        - name: Is There Any Deal
+          link: https://isthereanydeal.com/
+        - name: Slickdeals
+          link: https://slickdeals.net/
+
+    - column:
+      widgets:
+      - name: AI
+        type: bookmarks
+        display_header: False
+        bookmarks:
+        - name: Bing
+          link: https://www.bing.com/chat
+        - name: ChatGPT
+          link: https://chat.openai.com/
+        - name: Claude
+          link: https://claude.ai/chats
+        - name: Grok
+          link: https://chat.grok.com/
+        - name: Perplexity
+          link: https://perplexity.ai/
+        - name: Reka
+          link: https://chat.reka.ai/
+
+    - column:
+      widgets:
+      - name: Bookmarks
+        type: bookmarks
+        display_header: False
+        bookmarks:
+        - name: Cloudflare
+          link: https://www.cloudflare.com/
+        - name: Codeword Generator
+          link: https://cxxr.github.io/nsa.js/
+        - name: MoneroOcean
+          link: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
+        - name: Teams
+          link: https://teams.microsoft.com/
+        - name: Tailscale
+          link: https://login.tailscale.com/admin/
+        - name: Thingiverse
+          link: https://www.thingiverse.com/
+      
+    - column:
+      widgets:
+      - name: Network
+        type: bookmarks
+        display_header: False
+        bookmarks:
+        - name: Dozzle - ilude.com
+          link: https://dozzle.ilude.com/
+        - name: Dozzle - traefikturkey.com
+          link: https://dozzle.traefikturkey.com/
+        - name: Frigate
+          link: https://login.tailscale.com/admin/
+        - name: Proxmox - ilude.com
+          link: https://pve.ilude.com:8006/
+        - name: Proxmox - traefikturkey.com
+          link: https://pve-patriot.ilude.com:8006/
+        - name: Vaultwarden
+          link: https://vaultwarden.ilude.com/
+    
+    - column:
+      widgets:
+      - name: Code
+        type: bookmarks
+        display_header: False
+        bookmarks:
+        - name: Gists
+          link: https://gist.github.com/
+        - name: Github
+          link: https://github.com/ilude
+        - name: Onramp - Rearden
+          link: vscode://vscode-remote/ssh-remote+anvil@rearden.ilude.com/apps/onramp
+        - name: Onramp - Patriot
+          link: vscode://vscode-remote/ssh-remote+anvil@patriot-onramp.ilude.com/apps/onramp
+        - name: OnBoard
+          link: vscode://vscode-remote/ssh-remote+anvil@patriot-onramp.ilude.com/apps/onboard
+        - name: Ontology
+          link: vscode://vscode-remote/ssh-remote+anvil@rearden.ilude.com/apps/ontology
+        
+  - row:
+    columns:
+    - column:
+      widgets:
       - name: "Lawrence Person's BattleSwarm Blog"
         type: "feed"
         link: "https://www.battleswarmblog.com/"
@@ -26,68 +125,22 @@ tabs:
         filters:  
           strip:
           - summary: '^Tweet\s*\.{0,3}|\…\s+'
+        
+    - column:
+      widgets:
+      - name: "Real Clear Politics"
+        type: "feed"
+        link: "https://www.realclearpolitics.com/"
+        feed_url: "https://www.realclearpolitics.com/index.xml"
       - name: "Slashdot"
         type: "feed"
         summary_enabled: False
         display_limit: 15
         link: "https://slashdot.org/"
         feed_url: "https://rss.slashdot.org/Slashdot/slashdotMain"
-  - column:
-    widgets:
-      - name: Shopping
-        type: bookmarks
-        bookmarks:
-        - name: Ali Express
-          link: https://www.aliexpress.com/
-        - name: Amazon
-          link: https://www.amazon.com/
-        - name: Ebay
-          link: https://www.ebay.com/
-        - name: Is There Any Deal
-          link: https://isthereanydeal.com/
-        - name: Slickdeals
-          link: https://slickdeals.net/
-      
-      - name: AI
-        type: bookmarks
-        bookmarks:
-        - name: BingGPT
-          link: https://www.bing.com/chat
-        - name: ChatGPT
-          link: https://chat.openai.com/
-        - name: ClaudeGPT
-          link: https://claude.ai/chats
-        - name: GrokGPT
-          link: https://chat.grok.com/
-        - name: PerplexityGPT
-          link: https://perplexity.ai/
 
-      - name: Bookmarks
-        type: bookmarks
-        bookmarks:
-        - name: Cloudflare
-          link: https://www.cloudflare.com/
-        - name: Codeword Generator
-          link: https://cxxr.github.io/nsa.js/
-        - name: Gists
-          link: https://gist.github.com/
-        - name: Github
-          link: https://github.com/ilude
-        - name: MoneroOcean
-          link: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
-        - name: Teams
-          link: https://teams.microsoft.com/
-        - name: Tailscale
-          link: https://tailscale.com/
-        - name: Thingiverse
-          link: https://www.thingiverse.com/
-
-      - name: "Real Clear Politics"
-        type: "feed"
-        link: "https://www.realclearpolitics.com/"
-        feed_url: "https://www.realclearpolitics.com/index.xml"
-  - column:
-    widgets:
+    - column:
+      widgets:
       - name: "Instapundit"
         type: "feed"
         link: "https://instapundit.com/"
@@ -102,8 +155,8 @@ tabs:
         type: "feed"
         link: "https://twitchy.com/"
         feed_url: "https://twitchy.com/feed"
-
-- name: "Tech"
+      
+- tab: "Tech"
   columns:
   - column:
     widgets:
@@ -114,6 +167,7 @@ tabs:
         feed_url: "https://hnrss.org/frontpage"
       - name: "Docker"
         type: "docker_containers"
+
   - column:
     widgets:
       - name: "Selfhosted - Rising"
@@ -126,10 +180,11 @@ tabs:
         summary_enabled: False
         link: "https://www.reddit.com/r/selfhosted/top"
         feed_url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
-- name: "Monitoring"
+
+- tab: "Monitoring"
   columns: 
   - column:
     widgets:
       - name: "Homepage"
         type: "iframe"
-        link: "https://homepage.ilude.com/"
+        src: "https://homepage.ilude.com/"
