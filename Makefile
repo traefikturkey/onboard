@@ -17,7 +17,7 @@ $(SITE_PACKAGES): requirements.txt
 	touch requirements.txt
 
 
-build-image:
+build:
 	docker build --target production -t ghcr.io/traefikturkey/onboard:latest .
 
 push-image: build-image
