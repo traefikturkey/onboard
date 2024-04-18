@@ -34,7 +34,7 @@ class TitleEditor:
       # format chat prompt
       system_prompt = SystemMessage(content=("""
         You are an expert news article title editor.
-        Use the provided title and summary to write a concise and accurate title that is concise, informative and avoids sounding like clickbait. 
+        Use the provided title and summary to write a concise and accurate title that is informative and avoids sounding like clickbait. 
         Do not include links or urls in the title.
         Title should be as short as possible, aim to be less that 70 characters long.
         Title should have an absolute minimum of punctuation and use at most one all capitalized word at the start of the title.
@@ -57,10 +57,10 @@ class TitleEditor:
       total = len(needs_processed)
       for count, article in enumerate(needs_processed, start=1):
         try:
-            result = self.chain.invoke({"title": article.original_title, "summary": article.description})
-            article.title = result['title']
-            article.processed = self.script_hash
-            logger.debug(f"{count}/{total}: {article.processed != self.script_hash} current hash: {self.script_hash} processed hash: {article.processed}")
+          logger.debug(f"{count}/{total}: {article.processed != self.script_hash} current hash: {self.script_hash} processed hash: {article.processed}")
+          result = self.chain.invoke({"title": article.original_title, "summary": article.description})
+          article.title = result['title']
+          article.processed = self.script_hash
         except Exception as ex:
           print(f"Error: {ex} for {article.original_title}")
           needs_processed.remove(article)

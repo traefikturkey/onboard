@@ -57,12 +57,12 @@ class Feed(SchedulerWidget):
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.cache_path))
 	
 		logger.debug(f"creating cron job for {self.name}")
-		self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
+		job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
 		
 		if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
 			# schedule job to run right now
 			logging.debug(f"{self.name} scheduled {self.name} for immediate update now!")
-			self.scheduler.add_job(self.update, 'date', name=f'{self.id} - {self.name} - update', run_date=datetime.now(), max_instances=1)
+			job.modify(next_run_time=datetime.now())
 		#else:
 			# logger.debug(f"scheduled for {self.name} immediate processing now")
 			# self.scheduler.add_job(self.process, 'date', name=f'{self.id} - {self.name} - process', run_date=datetime.now(), max_instances=1)
