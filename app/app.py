@@ -4,11 +4,10 @@ import secrets
 import signal
 import sys
 from datetime import datetime
-from typing import Any
 from flask import Flask, render_template
 from flask_assets import Environment, Bundle
 from flask_caching import Cache
-
+from typing import Any
 from utils import copy_default_to_configs
 
 copy_default_to_configs()
@@ -56,7 +55,8 @@ def inject_current_date():
 @cache.cached(timeout=page_timeout, unless=lambda: layout.is_modified)
 def index(tab_name=None):
 	# Load feeds and bookmarks
-	layout.reload()	
+	if layout.is_modified():
+		layout.reload()	
 
 	return render_template('index.html', layout=layout, tab_name=tab_name, skip_htmx=False)
 

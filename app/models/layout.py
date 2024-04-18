@@ -7,22 +7,34 @@ from models.utils import pwd
 import yaml
 from models.utils import from_list
 
+logger = logging.getLogger(__name__)
+
 class Layout:
 	headers: list['Bookmark'] = []
 	tabs: list['Tab'] = []
  
 	def __init__(self, config_file: str = "configs/layout.yml"):
+		logger.setLevel(logging.DEBUG)
 		self.config_path = pwd.joinpath(config_file) 
 		self.reload()
 	
+ 
 	def stop_scheduler(self):
 		scheduler = SchedulerWidget.getScheduler()
 		if scheduler and scheduler.running:
 			scheduler.shutdown()
 
+
 	def is_modified(self):
-		return self.mtime > self.last_reload
+		modified = self.mtime > self.last_reload
+		logger.debug(f"Layout modified: {modified} mtime: {self.mtime} last_reload: {self.last_reload}")
+		return modified
 	
+ 
+	@property
+	def mtime(self):
+		return os.path.getmtime(self.config_path)
+ 
  
 	def reload(self):
 		from models.tab import Tab
@@ -39,10 +51,6 @@ class Layout:
 		self.feed_hash = {}
 		logging.debug("Layout reloaded!")
 
-
-	@property
-	def mtime(self):
-		return os.path.getmtime(self.config_path)
 
 
 	def tab(self, name: str) -> 'Tab':
@@ -78,5 +86,6 @@ class Layout:
 				self.feed_hash[feed.id] = feed
 	
 		return self.feed_hash[feed_id]
+
 	
 layout = Layout()
