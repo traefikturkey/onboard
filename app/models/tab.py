@@ -9,7 +9,7 @@ class Tab:
 		from models.column import Column
 		from models.row import Row
 		tab = Tab()
-		tab.name = dictionary['name']
+		tab.name = dictionary['tab']
 		if 'rows' in dictionary:
 			tab.rows = from_list(Row.from_dict, dictionary['rows'])
 		else:

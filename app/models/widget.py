@@ -1,5 +1,7 @@
 import os
 from pathlib import Path
+from models.utils import pwd
+
 
 class Widget:
 	widget: dict
@@ -8,8 +10,8 @@ class Widget:
 	
 	def __init__(self, widget):
 		self.widget = widget
-
-		template_path = Path(os.path.join('templates', self.__class__.__name__.lower() + '.html'))
+		
+		template_path = pwd.joinpath('templates', self.__class__.__name__.lower() + '.html')
 		if template_path.exists():
 			self.template = template_path.name
 		else:
@@ -51,11 +53,15 @@ class Widget:
 	@staticmethod
 	def from_dict(widget: dict) -> 'Widget':
 		from models.bookmarks import Bookmarks
+		from models.iframe import Iframe
 		from models.feed import Feed
+  
 		match widget['type']:
 			case 'feed':
 				return Feed(widget)
 			case 'bookmarks':
 				return Bookmarks(widget)
+			case 'iframe':
+				return Iframe(widget)
 			case _:
 				return Widget(widget)
