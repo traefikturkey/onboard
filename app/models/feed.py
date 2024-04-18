@@ -1,10 +1,11 @@
+from collections import defaultdict
 import time
 import dateutil
 import feedparser
 import importlib
 import json
+import logging
 import os
-import re
 
 from datetime import datetime, timedelta, timezone
 from email.utils import formatdate
@@ -17,7 +18,7 @@ from models.feed_article import FeedArticle
 from models.scheduler_widget import SchedulerWidget
 from models.utils import calculate_sha1_hash, to_snake_case, pwd
 
-
+logger = logging.getLogger(__name__)
 class Feed(SchedulerWidget):
 	feed_url: str
 	id: str = None
@@ -28,26 +29,43 @@ class Feed(SchedulerWidget):
 	def __init__(self, widget) -> None:
 		super().__init__(widget)
 		self._last_updated = None
+		logger.setLevel(logging.DEBUG)
 	
 		self.feed_url = widget['feed_url']
 		self.display_limit = widget.get('display_limit', 10)
 		self.summary_enabled = widget.get('summary_enabled', True)
 		self.hx_get = f"/feed/{self.id}"
 	
+		self._filters = []
+		if 'filters' in widget:
+			for filter_type in self.widget['filters']:
+				for filter in self.widget['filters'][filter_type]:
+					for attribute in filter:
+						filter_text = filter[attribute]
+						self.filters.append({
+							"type": filter_type,
+							"text": filter_text,
+							"attribute": attribute
+						})
+	
 		if not self.cache_path.parent.exists():
 			self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 	
 		items = self.load_cache(self.cache_path)
-		self.items = items[:self.display_limit]
+		self.items = self.filter_removed_objects(items, self.display_limit)
 		if self.items:
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.cache_path))
 	
-		self.scheduler.add_job(self.update, 'cron', name=self.id, hour='*', jitter=20)
-
-		if self.needs_update or self.old_cache_path.exists():
+		# logger.debug(f"creating cron job for {self.name}")
+		# self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
+		
+		if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
 			# schedule job to run right now
-			print(f'[{datetime.now()}] {self.name} scheduled for immediate update now!')
-			self.scheduler.add_job(self.update, 'date', run_date=datetime.now())
+			logging.debug(f"{self.name} scheduled {self.name} for immediate update now!")
+			self.scheduler.add_job(self.update, 'date', name=f'{self.id} - {self.name} - update', run_date=datetime.now(), max_instances=1)
+		#else:
+			# logger.debug(f"scheduled for {self.name} immediate processing now")
+			# self.scheduler.add_job(self.process, 'date', name=f'{self.id} - {self.name} - process', run_date=datetime.now(), max_instances=1)
  
 	@property
 	def needs_update(self):
@@ -56,11 +74,20 @@ class Feed(SchedulerWidget):
 		return force_update or self._last_updated is None or self._last_updated < datetime.now() - timedelta(hours=1)
 
 	@property
+	def filters(self):
+		return self._filters
+
+	@property
 	def old_cache_path(self):
 		return self.cache_path.parent.joinpath(f"{to_snake_case(self.name)}.json")
 
 	def __iter__(self):
 		for item in self.items:
+			yield item
+	 
+	@property
+	def all_items(self):
+		for item in self.load_cache(self.cache_path):
 			yield item
  	
 	@cached_property
@@ -75,13 +102,31 @@ class Feed(SchedulerWidget):
 	def feed_url(self, url: str):
 		self._url = url
 		self.id = calculate_sha1_hash(url)
+	
+	def filter_removed_objects(self, articles: list['FeedArticle'], display_limit: int=None):
+		"""
+		Filters a list of objects and returns a new list with objects where 'removed' is False.
+		
+		Parameters:
+		objects_list (list): A list of objects with a 'removed' property.
+		display_limit (int, optional): The maximum number of objects to return. If not provided, all objects are returned.
+		
+		Returns:
+		list: A new list with objects where 'removed' is False, up to the specified display limit.
+		"""
+		filtered_objects = list(filter(lambda obj: not obj.removed, articles))
+		
+		if display_limit is not None:
+				return filtered_objects[:display_limit]
+		else:
+				return filtered_objects
 
 	def update(self):
 		articles = self.download(self.feed_url)
 		articles = self.save_articles(articles)
-		self.items = articles[:self.display_limit]
+		self.items = self.filter_removed_objects(articles, self.display_limit)
 		self._last_updated = datetime.now()
-		print(f"[{datetime.now()}] Updated {self.name}")
+		logging.debug(f"Updated {self.name}")
 
 	def load_cache(self, cache_path: Path) -> list[FeedArticle]:
 		articles = []
@@ -96,38 +141,18 @@ class Feed(SchedulerWidget):
 							title = article['title'],
 							link = article['link'],
 							description = article['description'],
-							pub_date = dateutil.parser.parse(article['pub_date']) 
+							pub_date = dateutil.parser.parse(article['pub_date']),
+							processed = article.get('processed', None),
+							feed = self
 						)
 					)
-			print(f"[{datetime.now()}] Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
+			logging.debug(f"Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
 		else:
-			print(f"[{datetime.now()}] Failed to load cached articles for {self.name} : file {self.cache_path} does not exist")
-		
+			logging.debug(f"Failed to load cached articles for {self.name} : file {self.cache_path} does not exist")
+
 		articles.sort(key=lambda a: a.pub_date, reverse=True)
 		return articles
 
-
-	def apply_filters(self, articles: list[FeedArticle]) -> list[FeedArticle]:
-		if 'filters' in self.widget:
-			for article in articles[:]:
-				for filter_type in self.widget['filters']:
-					for filter in self.widget['filters'][filter_type]:
-						for attribute in filter:
-							filter_text = filter[attribute]
-							if not hasattr(article, attribute):
-								next
-							match filter_type:
-								case 'remove':
-									if re.search(filter_text, getattr(article, attribute), re.IGNORECASE):
-										articles.remove(article)
-								case 'strip':
-										pattern = re.compile(filter_text)
-										result = re.sub(pattern, '', getattr(article, attribute))
-										setattr(article, attribute, result)
-								case _:
-									pass
-		
-		return articles
 
 	def download(self, feed_url: str) -> list[FeedArticle]:
 		articles = []
@@ -140,11 +165,16 @@ class Feed(SchedulerWidget):
 					title = entry.title,
 					link = entry.link,
 					description = entry.description,
-					pub_date = pub_date
+					pub_date = pub_date,
+					processed = None,
+					feed = self
 				)
 			)
 			
 		return articles 
+
+	def process(self):
+		self.items = self.processors(self.items)
 
 	def processors(self, articles: list[FeedArticle]) -> list[FeedArticle]:
 		if 'process' in self.widget:
@@ -162,9 +192,30 @@ class Feed(SchedulerWidget):
 		
 		return articles
 
+
+	def remove_duplicate_articles(self, articles):
+			"""
+			Removes articles with duplicate IDs, keeping the one with the 'processed' attribute set if it exists.
+			
+			Parameters:
+			articles (list): A list of article objects, each with 'id' and 'processed' properties.
+			
+			Returns:
+			list: A new list with articles where duplicate IDs have been removed, keeping the one with 'processed' set.
+			"""
+			# Create a dictionary to group articles by their ID
+			article_dict = defaultdict(list)
+			for article in articles:
+					article_dict[article.id].append(article)
+			
+			# Filter the articles, keeping the one with 'processed' set if it exists
+			return [
+					next((a for a in articles_list if a.processed is not None), articles_list[0])
+					for articles_list in article_dict.values()
+			]
+
 	def save_articles(self, articles: list[FeedArticle]):
-		#print(f"[{datetime.now()}] Starting cache save for {self.name} to file {self.cache_path}")
-	
+
 		if self.old_cache_path.exists():
 			articles += self.load_cache(self.old_cache_path)
 			self.old_cache_path.unlink()
@@ -174,9 +225,10 @@ class Feed(SchedulerWidget):
 		all_articles = self.load_cache(self.cache_path) + articles
 	
 		# using article.id remove duplicates from articles
-		all_articles = list(dict((article.id, article) for article in all_articles).values())
+		all_articles = self.remove_duplicate_articles(all_articles)
 
-		all_articles = self.apply_filters(all_articles)	
+		#all_articles = self.apply_filters(all_articles)
+		all_articles = self.filter_removed_objects(all_articles)
  
 		all_articles = self.processors(all_articles)
 		
@@ -194,13 +246,14 @@ class Feed(SchedulerWidget):
 					'link': article.link,
 					'description': article.description,
 					'pub_date': utils.format_datetime(article.pub_date),
-					'id': article.id
+					'id': article.id,
+					'processed': article.processed
 				} for article in all_articles
 			]
 		}
 		with open(self.cache_path, 'w') as f:
 			json.dump(data, f, indent=2)
 	 
-		print(f"[{datetime.now()}] Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}")
+		logger.debug(f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}")
 		return all_articles
 	

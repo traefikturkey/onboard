@@ -21,10 +21,10 @@
         {% for article in widget %}
         <li>
           <a href="{{ article.link }}" class="{{ widget.type }}-link">
-            {% if article.name %}
-              {{ article.name }}
-            {% elif article.title %}
+            {% if article.title %}
               {{ article.title }}
+            {% elif article.name %}
+              {{ article.name }}
             {% else %}
               No Title
             {% endif %}

@@ -1,4 +1,5 @@
-from functools import cached_property
+
+import logging
 import os
 from models.scheduler_widget import SchedulerWidget
 from models.utils import pwd
@@ -26,6 +27,8 @@ class Layout:
 	def reload(self):
 		from models.tab import Tab
 		from models.Bookmark import Bookmark
+		scheduler = SchedulerWidget.getScheduler()
+		scheduler.remove_all_jobs()
 	
 		with open(self.config_path, 'r') as file:
 			content = yaml.safe_load(file)
@@ -34,7 +37,7 @@ class Layout:
 
 		self.last_reload = self.mtime
 		self.feed_hash = {}
-		print("Layout reloaded!")
+		logging.debug("Layout reloaded!")
 
 
 	@property

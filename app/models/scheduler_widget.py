@@ -1,6 +1,8 @@
-from datetime import datetime
 from models.widget import Widget
-from apscheduler.schedulers.background import BackgroundScheduler
+from apscheduler.events import EVENT_JOB_EXECUTED, EVENT_JOB_ERROR 
+from apscheduler.schedulers.background import Event, BackgroundScheduler
+
+import logging
 
 class SchedulerWidget(Widget):
 	__scheduler = None
@@ -13,9 +15,21 @@ class SchedulerWidget(Widget):
 		return SchedulerWidget.getScheduler()
  
 	@staticmethod
-	def getScheduler():
+	def getScheduler() -> BackgroundScheduler:
 			if SchedulerWidget.__scheduler == None:
 				SchedulerWidget.__scheduler = BackgroundScheduler()
 				SchedulerWidget.__scheduler.start()
-				print(f'[{datetime.now()}] Scheduler started')
+				logging.info('Scheduler started')
+
+				async def listener(event: Event) -> None:
+					print(f"Received {event.__class__.__name__}")
+     
+				# def my_listener(event):
+				# 	if event.exception:
+				# 			print('The job crashed :(')
+				# 	else:
+				# 			print('The job worked :)' + str(event.job_id))
+
+				# SchedulerWidget.__scheduler.add_listener(my_listener, EVENT_JOB_EXECUTED | EVENT_JOB_ERROR)
+    
 			return SchedulerWidget.__scheduler
