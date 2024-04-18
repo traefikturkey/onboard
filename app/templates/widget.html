@@ -1,8 +1,9 @@
 {% if not skip_htmx and widget.hasattr('hx_get') %}
   <div class="box {{ widget.type }}-box" hx-get="{{ widget.hx_get }}" hx-trigger="load" hx-swap="outerHTML">
     <div class="box {{ widget.type }}-box">
-      <div class="box-header {{ widget.type }}-header">
-        <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
+      <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
+        <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a>
+      </div>
       <div class="box-content {{ widget.type }}-content">
         <ul>
           {% set name = widget.name %}
@@ -13,7 +14,7 @@
   </div>
 {% else %}
   <div class="box {{ widget.type }}-box">
-    <div class="box-header {{ widget.type }}-header">
+    <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
       <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
     <div class="box-content {{ widget.type }}-content">
       <ul>

@@ -38,6 +38,10 @@ class Widget:
 		return self.widget.get('link', '')
 
 	@property
+	def display_header(self):
+		return self.widget.get('display_header', True)
+
+	@property
 	def display_limit(self):
 		return self.widget.get('display_limit', 10)
 

@@ -44,9 +44,7 @@ ul li:last-child {
 
 /* Content Boxes */
 .box-content {
-  border-left: 0.063em solid #444; /* Rounded from 0.0625em */
-  border-right: 0.063em solid #444; /* Rounded from 0.0625em */
-  border-bottom: 0.063em solid #444; /* Rounded from 0.0625em */
+  border: 0.063em solid #444; /* Rounded from 0.0625em */
 }
 
 /* Scrollbar Styling */
