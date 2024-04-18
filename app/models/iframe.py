@@ -1,6 +1,5 @@
 from models.widget import Widget
 
-
 class Iframe(Widget):
 	src: str
 	
