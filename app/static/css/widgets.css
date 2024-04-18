@@ -12,7 +12,7 @@
 
 /* List Items */
 ul li {
-  border-bottom: 0.063em solid #737373; /* Rounded from 0.0625em */
+  border-bottom: 0.063em solid #444; /* Rounded from 0.0625em */
   list-style: none outside none;
   margin: 0.3em 0.3em; /* 8px converted to 0.5em */
   padding-bottom: 0.3em;
