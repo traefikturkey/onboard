@@ -53,7 +53,7 @@ def inject_current_date():
 
 @app.route('/')
 @app.route('/tab/<tab_name>')
-#@cache.cached(timeout=page_timeout, unless=lambda: layout.is_modified)
+@cache.cached(timeout=page_timeout, unless=lambda: layout.is_modified)
 def index(tab_name=None):
 	# Load feeds and bookmarks
 	layout.reload()	
