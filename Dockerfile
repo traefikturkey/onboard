@@ -134,6 +134,9 @@ COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 
 ENV FLASK_ENV=production
 
+RUN mkdir /cache && \
+    chown -R ${USER}:${USER} /cache
+
 CMD [ "python3", "app.py" ]
 
 ##############################
