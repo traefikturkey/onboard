@@ -48,10 +48,6 @@ class TitleEditor:
       self.chain = chat_prompt | model | parser
       
       self.script_hash = calculate_sha1_hash(f"{system_prompt.content}{model_name}{model_temp}") 
-  
-  def set_processed(self, article, script_hash):
-    article.processed = script_hash
-    return article
 
   def process(self, articles: list[FeedArticle]) -> list[FeedArticle]:
     if self.ollama_url:
@@ -59,15 +55,14 @@ class TitleEditor:
       needs_processed = list(filter(lambda article: article.processed != self.script_hash, articles))
       
       total = len(needs_processed)
-      try:
-        for count, article in enumerate(needs_processed, start=1):
-          result = self.chain.invoke({"title": article.original_title, "summary": article.description})
-          article.title = result['title']
-          logger.debug(f"{count}/{total}: {article.processed != self.script_hash} current hash: {self.script_hash} processed hash: {article.processed}")
-      except Exception as ex:
-        print(f"Error: {ex} for {article.original_title}")
-        needs_processed.remove(article)
-        
-      articles = list(map(lambda article: self.set_processed(article, self.script_hash), articles))
+      for count, article in enumerate(needs_processed, start=1):
+        try:
+            result = self.chain.invoke({"title": article.original_title, "summary": article.description})
+            article.title = result['title']
+            article.processed = self.script_hash
+            logger.debug(f"{count}/{total}: {article.processed != self.script_hash} current hash: {self.script_hash} processed hash: {article.processed}")
+        except Exception as ex:
+          print(f"Error: {ex} for {article.original_title}")
+          needs_processed.remove(article)
         
     return articles

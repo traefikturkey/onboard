@@ -52,12 +52,12 @@ class Feed(SchedulerWidget):
 			self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 	
 		items = self.load_cache(self.cache_path)
-		self.items = self.filter_removed_objects(items, self.display_limit)
+		self.items = items[:self.display_limit] if items else []
 		if self.items:
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.cache_path))
 	
-		# logger.debug(f"creating cron job for {self.name}")
-		# self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
+		logger.debug(f"creating cron job for {self.name}")
+		self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
 		
 		if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
 			# schedule job to run right now
@@ -103,28 +103,12 @@ class Feed(SchedulerWidget):
 		self._url = url
 		self.id = calculate_sha1_hash(url)
 	
-	def filter_removed_objects(self, articles: list['FeedArticle'], display_limit: int=None):
-		"""
-		Filters a list of objects and returns a new list with objects where 'removed' is False.
-		
-		Parameters:
-		objects_list (list): A list of objects with a 'removed' property.
-		display_limit (int, optional): The maximum number of objects to return. If not provided, all objects are returned.
-		
-		Returns:
-		list: A new list with objects where 'removed' is False, up to the specified display limit.
-		"""
-		filtered_objects = list(filter(lambda obj: not obj.removed, articles))
-		
-		if display_limit is not None:
-				return filtered_objects[:display_limit]
-		else:
-				return filtered_objects
+	
 
 	def update(self):
 		articles = self.download(self.feed_url)
 		articles = self.save_articles(articles)
-		self.items = self.filter_removed_objects(articles, self.display_limit)
+		self.items = articles[:self.display_limit]
 		self._last_updated = datetime.now()
 		logging.debug(f"Updated {self.name}")
 
@@ -193,6 +177,7 @@ class Feed(SchedulerWidget):
 		return articles
 
 
+
 	def remove_duplicate_articles(self, articles):
 			"""
 			Removes articles with duplicate IDs, keeping the one with the 'processed' attribute set if it exists.
@@ -203,6 +188,10 @@ class Feed(SchedulerWidget):
 			Returns:
 			list: A new list with articles where duplicate IDs have been removed, keeping the one with 'processed' set.
 			"""
+   
+			# Filters a list of objects and returns a new list with objects where 'removed' is False.
+			articles = list(filter(lambda obj: not obj.removed, articles))
+   
 			# Create a dictionary to group articles by their ID
 			article_dict = defaultdict(list)
 			for article in articles:
@@ -226,9 +215,6 @@ class Feed(SchedulerWidget):
 	
 		# using article.id remove duplicates from articles
 		all_articles = self.remove_duplicate_articles(all_articles)
-
-		#all_articles = self.apply_filters(all_articles)
-		all_articles = self.filter_removed_objects(all_articles)
  
 		all_articles = self.processors(all_articles)
 		
