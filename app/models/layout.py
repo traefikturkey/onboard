@@ -62,7 +62,7 @@ class Layout:
  
 	def get_feeds(self, columns: 'Column') -> list['Feed']:
 		feeds = []
-		if columns.has_rows:
+		if columns.rows:
 			for row in columns.rows:
 				for column in row.columns:
 					feeds += self.process_rows(column)

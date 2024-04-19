@@ -1,7 +1,7 @@
 <div class="row content">
   {% for column in row.columns %}
     <div class="column">
-      {% if column.has_rows %}
+      {% if column.rows %}
         {% for row in column.rows %}
           {% with row=row %}
             {% include "row.html" %}

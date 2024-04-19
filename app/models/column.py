@@ -4,10 +4,6 @@ from models.utils import from_list
 class Column:
 	rows: list['Row'] = []
 	widgets: list['Widget'] = []
- 
-	@property
-	def has_rows(self) -> bool:
-		return len(self.rows) > 0
 
 	@staticmethod
 	def from_dict(dictionary: dict) -> 'Column':
