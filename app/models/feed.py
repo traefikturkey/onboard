@@ -15,24 +15,21 @@ from pathlib import Path
 
 from models.noop_feed_processor import NoOpFeedProcessor
 from models.feed_article import FeedArticle
-from models.scheduler_widget import SchedulerWidget
 from models.utils import calculate_sha1_hash, to_snake_case, pwd
+from models.widget import Widget
 
 logger = logging.getLogger(__name__)
-class Feed(SchedulerWidget):
+logger.setLevel(logging.DEBUG)
+
+class Feed(Widget):
 	feed_url: str
-	id: str = None
-	display_limit: int = 10
 	summary_enabled: bool = True
 	hx_get: str = None
 	
 	def __init__(self, widget) -> None:
 		super().__init__(widget)
-		self._last_updated = None
-		logger.setLevel(logging.DEBUG)
-	
+		
 		self.feed_url = widget['feed_url']
-		self.display_limit = widget.get('display_limit', 10)
 		self.summary_enabled = widget.get('summary_enabled', True)
 		self.hx_get = f"/feed/{self.id}"
 	
@@ -42,7 +39,7 @@ class Feed(SchedulerWidget):
 				for filter in self.widget['filters'][filter_type]:
 					for attribute in filter:
 						filter_text = filter[attribute]
-						self.filters.append({
+						self._filters.append({
 							"type": filter_type,
 							"text": filter_text,
 							"attribute": attribute
@@ -51,10 +48,11 @@ class Feed(SchedulerWidget):
 		if not self.cache_path.parent.exists():
 			self.cache_path.parent.mkdir(parents=True, exist_ok=True)
 	
-		items = self.load_cache(self.cache_path)
-		self.items = items[:self.display_limit] if items else []
+		self.items = self.load_cache(self.cache_path)
 		if self.items:
 			self._last_updated = datetime.fromtimestamp(os.path.getmtime(self.cache_path))
+		else:
+			self._last_updated = None
 	
 		logger.debug(f"creating cron job for {self.name}")
 		job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
@@ -80,15 +78,6 @@ class Feed(SchedulerWidget):
 	@property
 	def old_cache_path(self):
 		return self.cache_path.parent.joinpath(f"{to_snake_case(self.name)}.json")
-
-	def __iter__(self):
-		for item in self.items:
-			yield item
-	 
-	@property
-	def all_items(self):
-		for item in self.load_cache(self.cache_path):
-			yield item
  	
 	@cached_property
 	def cache_path(self):
@@ -107,8 +96,7 @@ class Feed(SchedulerWidget):
 
 	def update(self):
 		articles = self.download(self.feed_url)
-		articles = self.save_articles(articles)
-		self.items = articles[:self.display_limit]
+		self.items = self.save_articles(articles)
 		self._last_updated = datetime.now()
 		logging.debug(f"Updated {self.name}")
 
@@ -127,7 +115,7 @@ class Feed(SchedulerWidget):
 							description = article['description'],
 							pub_date = dateutil.parser.parse(article['pub_date']),
 							processed = article.get('processed', None),
-							feed = self
+							parent = self
 						)
 					)
 			logging.debug(f"Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
@@ -151,7 +139,7 @@ class Feed(SchedulerWidget):
 					description = entry.description,
 					pub_date = pub_date,
 					processed = None,
-					feed = self
+					parent = self
 				)
 			)
 			

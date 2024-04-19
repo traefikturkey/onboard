@@ -17,6 +17,7 @@
     "llms",
     "mikestead",
     "Monero",
+    "msclkid",
     "mustexist",
     "nologo",
     "ollama",
@@ -27,6 +28,7 @@
     "Tailscale",
     "Thingiverse",
     "yamlpath",
+    "yclid",
     "zcompdump"
   ],
   "python.analysis.extraPaths": [

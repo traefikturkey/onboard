@@ -19,9 +19,10 @@
     <div class="box-content {{ widget.type }}-content">
       <ul>
         {% set name = widget.name %}
-        {% for article in widget %}
+        {% for article in widget.display_items %}
         <li>
-          <a href="{{ article.link }}" class="{{ widget.type }}-link">
+          {% set link = article.tracking_link if article.tracking_link else article.link %}
+          <a href="{{ link }}" class="{{ widget.type }}-link">
             {% if article.title %}
               {{ article.title }}
             {% elif article.name %}

@@ -4,6 +4,8 @@ import os
 from pathlib import Path
 import re
 from typing import Any, List, TypeVar, Callable, Type, cast
+
+import unidecode
 T = TypeVar("T")
 
 pwd = Path(os.path.dirname(os.path.realpath(__file__))).parent
@@ -13,9 +15,13 @@ def from_str(x: Any) -> str:
 	return x
 
 
-def from_list(f: Callable[[Any], T], x: Any) -> List[T]:
+def from_list(f: Callable[[Any], T], x: Any, parent: Any = None) -> List[T]:
 	assert isinstance(x, list)
-	return [f(y) for y in x]
+	if parent is None:
+		return [f(y) for y in x]
+	else:
+		return [f(y, parent) for y in x]
+
 
 
 def from_none(x: Any) -> Any:
@@ -45,6 +51,9 @@ def from_bool(x: Any) -> bool:
 def from_int(x: Any) -> int:
 	assert isinstance(x, int) and not isinstance(x, bool)
 	return x
+
+def normalize_text(text: str) -> str:
+	return re.sub(r'\s+|\n|\r', ' ', unidecode.unidecode(text)).strip()
 
 def calculate_sha1_hash(value: str) -> str:
 		sha1 = hashlib.sha1()

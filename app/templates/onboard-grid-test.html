@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title></title>
+	<style type="text/css">
+
+/* Root Variables w/media query example */
+
+:root {
+	--grid-columns: 3;
+	--common-gap: 1rem;
+	--content-max-height: 45vh;
+	--font-size: 1rem;
+	--font-line-height: 1.25em;
+	--color-text: light-dark(black, white);
+	--color-bg: light-dark(white, #003C43);
+	--color-text-header: white;
+	--color-bg-header: #135D66;
+	--color-bg-list-even: light-dark(#f2f2f2, #135D66);
+}
+
+@media (max-width: 800px) {
+	:root {
+		--grid-columns: 2;
+	}
+}
+
+@media (max-width: 500px) {
+	:root {
+		--grid-columns: 1;
+		--content-max-height: none;
+	}
+}
+
+/* Simple CSS Reset */
+
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+body {
+	margin: unset;
+}
+
+html {
+	color-scheme: light dark;
+}
+
+button,
+input,
+textarea,
+select {
+	font: inherit;
+}
+
+img,
+picture,
+svg,
+canvas {
+	display: block;
+	max-inline-size: 100%;
+	block-size: auto;
+}
+
+/* Body Styles */
+
+body {
+  font-family: 'Roboto', Helvetica, sans-serif;
+  font-size: var(--font-size, 0.95em);
+  line-height: var(--font-line-height, 1.25em);
+}
+
+/* Body Grid type {content, footer} */
+
+body {
+  min-height: 100vh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+  color:var(--color-text);
+  background-color:var(--color-bg);
+}
+
+/* Content section */
+
+content > section {
+	margin-bottom: var(--common-gap);
+}
+
+section {
+	margin: var(--common-gap);
+}
+
+/* RSS Feed and items */
+
+section#rss-feed {
+	display: grid;
+	grid-template-columns: repeat(var(--grid-columns, 3), 1fr);
+	gap: var(--common-gap);
+}
+
+section#rss-feed > div {
+	border: 1px solid var(--color-bg-header);
+}
+
+.rss-feed-header {
+	padding: 0;
+	margin: 0;
+	background-color: var(--color-bg-header);
+	color: var(--color-text-header);
+	padding: 0.5rem 1rem;
+}
+
+/* list content */
+
+.list-content {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	max-height: var(--content-max-height);
+	overflow: hidden;
+	overflow: scroll;
+}
+
+.list-content li {
+	padding: var(--common-gap);
+}
+
+.list-content li:nth-child(even) {
+	background-color: var(--color-bg-list-even);
+}
+
+/* Footer */
+
+footer {
+  background-color: #1a1a1c;
+  text-align: center;
+  padding: var(--common-gap);
+}
+
+	</style>
+</head>
+
+<body>
+
+<!-- HTML Content -->
+
+<content>
+	<section id="rss-feed"></section>
+</content>
+
+<!-- HTML Footer -->
+
+<footer>
+	<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
+	is a 
+	<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
+	&copy; 2024
+</footer>
+
+<!-- Dummy content bellow -->
+
+<template id="template-element">
+	<div class="rss-feed-source">
+			<h3 class="rss-feed-header">Source Header</h3>
+			<ul class="list-content">
+				<li>Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+				tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+				quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo
+				consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse
+				cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non
+				proident, sunt in culpa qui officia deserunt mollit anim id est laborum.</li>
+			</ul>
+		</div>
+</template>
+
+<script type="text/javascript">
+document.addEventListener('DOMContentLoaded', (e) => {
+	// const items = 0
+	const rss_feed = document.getElementById("rss-feed")
+	const template = document.getElementById("template-element")
+
+	for (var i = 6 - 1; i >= 0; i--) {
+		const element = template.content.cloneNode(true)
+		const ul = element.querySelector('ul');
+		const items = Math.floor(Math.random() * 6) + 1
+		for (var x = items - 1; x >= 0; x--) {
+			const li = ul.children[0].cloneNode(true);
+			ul.append(li)		
+		}
+	
+		rss_feed.append(element)
+	}
+})
+</script>
+
+</body>
+</html>

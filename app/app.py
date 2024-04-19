@@ -1,14 +1,18 @@
 import asyncio
+import logging
 import os
 import secrets
 import signal
 import sys
 from datetime import datetime
-from flask import Flask, render_template
+from flask import Flask, make_response, redirect, render_template
 from flask_assets import Environment, Bundle
 from flask_caching import Cache
 from typing import Any
+from services.link_tracker import link_tracker
 from utils import copy_default_to_configs
+
+logger = logging.getLogger(__name__)
 
 copy_default_to_configs()
 
@@ -17,6 +21,7 @@ from models.layout import layout
 app = Flask(__name__)
 app.config['JSONIFY_PRETTYPRINT_REGULAR'] = True
 app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
+
 
 if os.environ.get("FLASK_DEBUG", "False") == "True":
 	cache_config={
@@ -67,6 +72,23 @@ def feed(feed_id):
 	feed = layout.get_feed(feed_id)
 	return render_template(feed.template, widget=feed, skip_htmx=True)
 
+
+@app.route('/click_events')
+def click_events():
+	df = link_tracker.get_click_events()
+	html = df.to_html(classes='data', index=False)
+	response = make_response(html)
+	response.headers["Content-Type"] = "text/html"
+	return response
+
+@app.route('/redirect/<feed_id>/<link_id>')
+def track(feed_id, link_id):
+	link = layout.get_link(feed_id, link_id)
+ 
+	link_tracker.track_click_event(feed_id, link_id, link)
+ 
+	logger.info(f"redirecting to {link}")
+	return redirect(link, code=302)
 
 
 ###############################################################################
