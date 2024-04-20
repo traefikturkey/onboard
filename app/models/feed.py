@@ -30,6 +30,7 @@ class Feed(Widget):
 		super().__init__(widget)
 		
 		self.feed_url = widget['feed_url']
+		self.display_limit = widget.get('display_limit', 10)
 		self.summary_enabled = widget.get('summary_enabled', True)
 		self.hx_get = f"/feed/{self.id}"
 	

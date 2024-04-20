@@ -80,13 +80,13 @@ tabs:
         bookmarks:
         - name: Dozzle - ilude.com
           link: https://dozzle.ilude.com/
-        - name: Dozzle - traefikturkey.com
-          link: https://dozzle.traefikturkey.com/
+        - name: Dozzle - traefikturkey.icu
+          link: https://dozzle.traefikturkey.icu/
         - name: Frigate
           link: https://frigate.traefikturkey.icu/
         - name: Proxmox - ilude.com
           link: https://pve.ilude.com:8006/
-        - name: Proxmox - traefikturkey.com
+        - name: Proxmox - traefikturkey.icu
           link: https://pve-patriot.ilude.com:8006/
         - name: Vaultwarden
           link: https://vaultwarden.ilude.com/
@@ -166,30 +166,59 @@ tabs:
   columns:
   - column:
     widgets:
-      - name: "Hacker News"
-        type: "feed"
-        summary_enabled: False
-        link: "https://news.ycombinator.com/news"
-        feed_url: "https://hnrss.org/frontpage"
-      - name: "Ars Technica"
-        type: "feed"
-        display_limit: 12
-        summary_enabled: False
-        link: "https://arstechnica.com/"
-        feed_url: "https://feeds.arstechnica.com/arstechnica/index"
+    - name: "Hacker News"
+      type: "feed"
+      summary_enabled: False
+      link: "https://news.ycombinator.com/news"
+      feed_url: "https://hnrss.org/frontpage"
+    - name: "Ars Technica"
+      type: "feed"
+      display_limit: 12
+      summary_enabled: False
+      link: "https://arstechnica.com/"
+      feed_url: "https://feeds.arstechnica.com/arstechnica/index"
+    - name: "TechCrunch"
+      type: "feed"
+      display_limit: 12
+      summary_enabled: False
+      link: "https://techcrunch.com/"
+      feed_url: "https://techcrunch.com/feed/"
 
   - column:
     widgets:
-      - name: "Selfhosted - Rising"
-        type: "feed"
-        summary_enabled: False
-        link: "https://www.reddit.com/r/selfhosted/rising"
-        feed_url: "https://www.reddit.com/r/selfhosted/rising.rss"
-      - name: "Selfhosted - Top Today"
-        type: "feed"
-        summary_enabled: False
-        link: "https://www.reddit.com/r/selfhosted/top"
-        feed_url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
+    - name: "Selfhosted - Rising"
+      type: "feed"
+      summary_enabled: False
+      link: "https://www.reddit.com/r/selfhosted/rising"
+      feed_url: "https://www.reddit.com/r/selfhosted/rising.rss"
+    - name: "Selfhosted - Top Today"
+      type: "feed"
+      summary_enabled: False
+      link: "https://www.reddit.com/r/selfhosted/top"
+      feed_url: "https://www.reddit.com/r/selfhosted/top.rss?t=day"
+    - name: "Backblaze - Blog"
+      type: "feed"
+      summary_enabled: False
+      link: "https://www.backblaze.com/blog/"
+      feed_url: "https://www.backblaze.com/blog/feed/"
+
+  - column:
+    widgets:
+    - name: "Cloudflare - Blog"
+      type: "feed"
+      summary_enabled: False
+      link: "https://blog.cloudflare.com/"
+      feed_url: "https://blog.cloudflare.com/rss"
+    - name: "9to5Linux"
+      type: "feed"
+      summary_enabled: False
+      link: "https://9to5linux.com/"
+      feed_url: "https://9to5linux.com/feed"
+    - name: "Home Network Guy"
+      type: "feed"
+      summary_enabled: False
+      link: "https://homenetworkguy.com/"
+      feed_url: "https://homenetworkguy.com/index.xml"
 
 - tab: "Monitoring"
   columns: 
