@@ -1,17 +1,17 @@
-
 from models.utils import from_list
+import models.row
+import models.widget
 
 class Column:
-	rows: list['Row'] = []
-	widgets: list['Widget'] = []
+	
+	rows: list['models.row.Row'] = []
+	widgets: list['models.widget.Widget'] = []
 
 	@staticmethod
 	def from_dict(dictionary: dict) -> 'Column':
-		from models.row import Row
-		from models.widget import Widget
 		column = Column()
 		if 'rows' in dictionary:
-			column.rows = from_list(Row.from_dict, dictionary['rows'])
+			column.rows = from_list(models.row.Row.from_dict, dictionary['rows'])
 		if	'widgets' in dictionary:
-			column.widgets = from_list(Widget.from_dict, dictionary['widgets'])
+			column.widgets = from_list(models.widget.Widget.from_dict, dictionary['widgets'])
 		return column

@@ -1,20 +1,21 @@
 
 import logging
 import os
-from models.column import Column
-from models.row import Row
-from models.scheduler import Scheduler
-from models.utils import pwd
-
 import yaml
-from models.utils import from_list
+from models.bookmark import Bookmark
+from models.row import Row
+from models.column import Column
+from models.scheduler import Scheduler
+from models.tab import Tab
+from models.feed import Feed
+from models.utils import from_list, pwd
 
 logger = logging.getLogger(__name__)
 
 class Layout:
 	id: str = 'layout'
-	headers: list['Bookmark'] = []
-	tabs: list['Tab'] = []
+	headers: list[Bookmark] = []
+	tabs: list[Tab] = []
  
 	def __init__(self, config_file: str = "configs/layout.yml"):
 		logger.setLevel(logging.DEBUG)
@@ -38,8 +39,6 @@ class Layout:
  
  
 	def reload(self):
-		from models.tab import Tab
-		from models.bookmark import Bookmark
 		Scheduler.clear_jobs()
 	
 		with open(self.config_path, 'r') as file:
@@ -53,14 +52,14 @@ class Layout:
 
 
 
-	def tab(self, name: str) -> 'Tab':
+	def tab(self, name: str) -> Tab:
 		if name is None:
 			return self.tabs[0]
 		
 		return next((tab for tab in self.tabs if tab.name.lower() == name.lower()), self.tabs[0])
  
  
-	def get_feeds(self, columns: 'Column') -> list['Feed']:
+	def get_feeds(self, columns: Column) -> list[Feed]:
 		feeds = []
 		if columns.rows:
 			for row in columns.rows:
@@ -74,7 +73,7 @@ class Layout:
 		return feeds
 		 
 	 
-	def get_feed(self, feed_id: str) -> 'Feed':
+	def get_feed(self, feed_id: str) -> Feed:
 		if not self.feed_hash:
 			feeds = []
 			for tab in self.tabs:

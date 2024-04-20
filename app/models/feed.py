@@ -1,5 +1,4 @@
-from collections import defaultdict
-import time
+
 import dateutil
 import feedparser
 import importlib
@@ -7,16 +6,17 @@ import json
 import logging
 import os
 
-from datetime import datetime, timedelta, timezone
-from email.utils import formatdate
+from collections import defaultdict
+from datetime import datetime, timedelta
 from email import utils
+from email.utils import formatdate
 from functools import cached_property
 from pathlib import Path
 
-from models.noop_feed_processor import NoOpFeedProcessor
-from models.feed_article import FeedArticle
-from models.utils import calculate_sha1_hash, to_snake_case, pwd
+from models.utils import calculate_sha1_hash, pwd, to_snake_case
 from models.widget import Widget
+from models.feed_article import FeedArticle
+from models.noop_feed_processor import NoOpFeedProcessor
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
