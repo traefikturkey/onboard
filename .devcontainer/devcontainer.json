@@ -35,22 +35,28 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "jeff-hykin.better-dockerfile-syntax",
-        "ms-azuretools.vscode-docker",
-        "ms-vsliveshare.vsliveshare",
-        "mikestead.dotenv",
-        "EditorConfig.EditorConfig",
-        "redhat.vscode-yaml",
-        "redhat.ansible",
-        "ms-toolsai.jupyter",
-        "ms-python.autopep8",
-        "streetsidesoftware.code-spell-checker",
         "eamodio.gitlens",
-        "nhoizey.gremlins",
+        "EditorConfig.EditorConfig",
         "esbenp.prettier-vscode",
-        "peakchen90.open-html-in-browser"
+        "jeff-hykin.better-dockerfile-syntax",
+        "mikestead.dotenv",
+        "ms-azuretools.vscode-docker",
+        "ms-toolsai.jupyter",
+        "ms-vsliveshare.vsliveshare",
+        "nhoizey.gremlins",
+        "peakchen90.open-html-in-browser",
+        "redhat.ansible",
+        "redhat.vscode-yaml",
+        "ms-python.black-formatter",
+        "ms-python.isort"
       ],
       "settings": {
+        "[python]": {
+          "editor.defaultFormatter": "ms-python.black-formatter",
+          "editor.detectIndentation": false,
+          "editor.insertSpaces": false,
+          "editor.tabSize": 2
+        },
         "files.exclude": {
           "**/.dotnet": true,
           "**/.zcompdump": true
