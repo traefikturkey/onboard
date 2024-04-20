@@ -46,8 +46,8 @@ tabs:
           link: https://chat.openai.com/
         - name: Claude
           link: https://claude.ai/chats
-        - name: Grok
-          link: https://chat.grok.com/
+        - name: Groq
+          link: https://chat.groq.com/
         - name: Perplexity
           link: https://perplexity.ai/
         - name: Reka
