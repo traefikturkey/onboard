@@ -2,7 +2,7 @@
 __pycache__/
 
 app/feed_cache
-app/configs/
+app/configs/*
 !app/configs/.keep
 
 app/static/.*-cache
