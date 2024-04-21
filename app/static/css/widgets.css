@@ -63,8 +63,8 @@ ul li:last-child {
 
 /* Feed Content */
 .feed-content {
-  max-height: 23.75em;
-  min-height: 23.75em;
+  max-height: 300px;
+  min-height: 300px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: #666 #333;
