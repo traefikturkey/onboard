@@ -51,7 +51,10 @@ css.build()
 
 @app.context_processor
 def inject_current_date():
-	return {'today_date': datetime.now()}
+	return {
+		'today_date': datetime.now(),
+		'site_title':	os.environ.get('ONBOARD_SITE_TITLE', 'OnBoard'),
+	}
 
 
 

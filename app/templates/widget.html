@@ -20,19 +20,14 @@
       <ul>
         {% set name = widget.name %}
         {% for article in widget.display_items %}
-        <li>
+        <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item" x-data="{ summary_open: false }">
           {% set link = article.tracking_link if article.tracking_link else article.link %}
-          <a href="{{ link }}" class="{{ widget.type }}-link">
-            {% if article.title %}
-              {{ article.title }}
-            {% elif article.name %}
-              {{ article.name }}
-            {% else %}
-              No Title
-            {% endif %}
-          </a>
-          {% if widget.summary_enabled and article.summary %}
-          <div class="summary {{ widget.type }}">{{ article.summary }}</div>
+          <a href="{{ link }}" class="{{ widget.type }}-link">{{ article.name }}</a>
+          {% if article.summary %}
+          <div class="widget-item-toolbar">
+            <i class="fas fa-chevron-down" @click="summary_open = ! summary_open" :class="summary_open ? 'fa-right' : ''"></i>
+          </div>
+          <div class="summary {{ widget.type }}" x-show="summary_open" @click.outside="summary_open = false" x-transition >{{ article.summary }}</div>
           {% endif %}
         </li>
         {% else %}

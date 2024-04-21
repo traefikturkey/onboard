@@ -1,21 +1,37 @@
 <html>
 <head>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
+    <style>
+
+        .fas {
+            vertical-align: middle;
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900; /* This ensures the solid style is used */
+            font-size: 0.8em;          
+        }
+
+        .fa-chevron-down {
+            transition: transform 0.3s ease-in-out;
+            transform: rotate(-90deg);
+        }
+
+        .fa-right {
+            transform: rotate(0deg) !important;
+        }
+    </style>
 </head>
 <body>
-    <h1 x-data="{ message: 'I ❤️ Alpine' }" x-text="message"></h1>
-
-    <div x-data="{ count: 0 }">
-    <button x-on:click="count++">Increment</button>
-  
-    <span x-text="count"></span>
-
-
-    <div x-data="{ open: false }">
-      <button @click="open = ! open">Toggle</button>
-    
-      <div x-show="open" @click.outside="open = false">Contents...</div>
+    <div x-data="{ open: false }" style="border: 1px solid #ccc; min-height: 1.5em; "> 
+        <i class="fas fa-chevron-down"  @click="open = ! open" :class="open ? 'fa-right' : ''" ></i>
+        <span>&nbsp;</span>
+        <span x-show="open" 
+            x-transition:enter.duration.300ms
+            x-transition:leave.duration.2000ms>
+            Hello 👋
+        </span>
     </div>
-  </div>
+</div>
+  
 </body>
 </html>

@@ -59,3 +59,6 @@ class FeedArticle(WidgetItem):
 					setattr(self, filter['attribute'], result)
 				case _:
 					pass
+
+		# this is important for template display
+		self.name = self.title
