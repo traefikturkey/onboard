@@ -1,8 +1,6 @@
-import base64
-import hashlib
 import logging
 import os
-from functools import cached_property
+from pathlib import Path
 from models.feed_article import FeedArticle
 from langchain_community.llms import Ollama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
@@ -10,12 +8,21 @@ from langchain_core.messages import SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 from models.utils import calculate_sha1_hash
 
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+# create console handler
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
+
+# Add console handler to logger
+logger.addHandler(consoleHandler)
 
 class TitleEditor:
   def __init__(self):
     self.ollama_url = os.getenv('OLLAMA_URL')
-    logger.setLevel(logging.DEBUG)
     if self.ollama_url:
       parser = StructuredOutputParser.from_response_schemas(
         [ResponseSchema(name="title", description="title of the article")]
@@ -36,14 +43,15 @@ class TitleEditor:
         You are an expert news article title editor.
         Use the provided title and summary to write a concise and accurate title that is informative and avoids sounding like clickbait. 
         Do not include links or urls in the title.
-        Title should be as short as possible, aim to be less that 70 characters long.
-        Title should have an absolute minimum of punctuation and use at most one all capitalized word at the start of the title.
+        Do not editorialize the title, even if the title and description do.                                 
+        Title must be as short as possible, aim to be less that 70 characters long.
+        Title must have an absolute minimum of punctuation and NOT use words that are all upper case.
         """))
       user_prompt = HumanMessagePromptTemplate(prompt=prompt)
       
       chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
       model_name = "dolphin-mistral"
-      model_temp = 0.0
+      model_temp = 0.2
       model = Ollama(base_url=self.ollama_url, model=model_name, keep_alive=5, temperature=model_temp)
       self.chain = chat_prompt | model | parser
       
@@ -57,12 +65,12 @@ class TitleEditor:
       total = len(needs_processed)
       for count, article in enumerate(needs_processed, start=1):
         try:
-          logger.debug(f"{count}/{total}: {article.processed != self.script_hash} current hash: {self.script_hash} processed hash: {article.processed}")
+          logger.info(f"Processing title {count}/{total}: {article.original_title}")
           result = self.chain.invoke({"title": article.original_title, "summary": article.description})
           article.title = result['title']
           article.processed = self.script_hash
         except Exception as ex:
-          print(f"Error: {ex} for {article.original_title}")
-          needs_processed.remove(article)
+          logger.error(f"Error: {ex} for {article.original_title}")
+          #needs_processed.remove(article)
         
     return articles

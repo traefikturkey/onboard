@@ -30,7 +30,7 @@ class FeedArticle(WidgetItem):
 		else:
 			self.title = self.original_title
 
-		self.description = description
+		self.description = normalize_text(description)
 		self.pub_date = pub_date
 		self.processed = processed
 

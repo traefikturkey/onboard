@@ -10,6 +10,16 @@ from models.feed import Feed
 from models.utils import from_list, pwd
 
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.propagate = False
+
+# create console handler
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
+
+# Add console handler to logger
+logger.addHandler(consoleHandler)
+
 
 class Layout:
 	id: str = 'layout'
@@ -17,7 +27,6 @@ class Layout:
 	tabs: list[Tab] = []
  
 	def __init__(self, config_file: str = "configs/layout.yml"):
-		logger.setLevel(logging.DEBUG)
 		self.config_path = pwd.joinpath(config_file) 
 		self.reload()
 	
@@ -38,6 +47,7 @@ class Layout:
  
  
 	def reload(self):
+		logger.debug("==== Starting reload...")
 		Scheduler.clear_jobs()
 	
 		with open(self.config_path, 'r') as file:
@@ -47,9 +57,7 @@ class Layout:
 
 		self.last_reload = self.mtime
 		self.feed_hash = {}
-		logging.debug("Layout reloaded!")
-
-
+		logger.debug("==== Layout reloaded!")
 
 	def tab(self, name: str) -> Tab:
 		if name is None:

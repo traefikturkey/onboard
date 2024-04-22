@@ -18,8 +18,10 @@ from models.widget import Widget
 from models.feed_article import FeedArticle
 from models.noop_feed_processor import NoOpFeedProcessor
 
+#logger = getLogger(__name__, logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
+logger.setLevel(logging.INFO)
+
 
 class Feed(Widget):
 	feed_url: str
@@ -55,16 +57,17 @@ class Feed(Widget):
 		else:
 			self._last_updated = None
 	
-		logger.debug(f"creating cron job for {self.name}")
-		job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
-		
-		if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
-			# schedule job to run right now
-			logging.debug(f"{self.name} scheduled {self.name} for immediate update now!")
-			job.modify(next_run_time=datetime.now())
-		#else:
-			# logger.debug(f"scheduled for {self.name} immediate processing now")
-			# self.scheduler.add_job(self.process, 'date', name=f'{self.id} - {self.name} - process', run_date=datetime.now(), max_instances=1)
+		if self.scheduler.running:
+			job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
+			logger.debug(f"{logging.getLevelName(logger.level)} creating cron job for {self.name} {job.id}")
+			
+			if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
+				# schedule job to run right now
+				logging.debug(f"{logging.getLevelName(logger.level)} {self.name} scheduled {self.name} for immediate update now!")
+				job.modify(next_run_time=datetime.now())
+			#else:
+				# logger.debug(f"scheduled for {self.name} immediate processing now")
+				# self.scheduler.add_job(self.process, 'date', name=f'{self.id} - {self.name} - process', run_date=datetime.now(), max_instances=1)
  
 	@property
 	def needs_update(self):
@@ -229,6 +232,6 @@ class Feed(Widget):
 		with open(self.cache_path, 'w') as f:
 			json.dump(data, f, indent=2)
 	 
-		logger.debug(f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}")
+		logger.info(f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}")
 		return all_articles
 	

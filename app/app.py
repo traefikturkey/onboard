@@ -12,7 +12,18 @@ from typing import Any
 from services.link_tracker import link_tracker
 from utils import copy_default_to_configs
 
+logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARN)
+
 logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
+logger.propagate = False
+
+# create console handler
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
+
+# Add console handler to logger
+logger.addHandler(consoleHandler)
 
 copy_default_to_configs()
 
@@ -105,7 +116,7 @@ if __name__ == '__main__':
 	development = bool(os.environ.get("FLASK_ENV", "development")  == "development")
 	if development:
 		app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
-		print ("Shutting down...")
+		logger.info("Shutting down...")
 		layout.stop_scheduler()
 		sys.exit()
 	else:
@@ -116,7 +127,7 @@ if __name__ == '__main__':
 			shutdown_event = asyncio.Event()
 
 			def _signal_handler(*_: Any) -> None:
-				print ("Shutting down...")
+				logger.info("Shutting down...")
 				layout.stop_scheduler()
 				shutdown_event.set()
 
@@ -131,7 +142,7 @@ if __name__ == '__main__':
 					serve(app, config, shutdown_trigger=shutdown_event.wait)
 			)
 		except KeyboardInterrupt:
-			print ("\nShutting down...")
+			logger.info("\nShutting down...")
 			layout.stop_scheduler()
 			sys.exit()
 	

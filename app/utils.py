@@ -1,7 +1,19 @@
+import logging
 import os
 import shutil
 from pathlib import Path
 from models.utils import pwd
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.propagate = False
+
+# create console handler
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
+
+# Add console handler to logger
+logger.addHandler(consoleHandler)
 
 def copy_default_to_configs():
 	default_dir = os.path.join(pwd, 'defaults') 
@@ -19,10 +31,8 @@ def copy_default_to_configs():
 			dst = os.path.join(config_dir, file)
 			shutil.copy2(src, dst)
 			files_copied += 1
-			print(f"File {file} copied successfully from {default_dir} to {config_dir}.")
+			logger.info(f"File {file} copied successfully from {default_dir} to {config_dir}.")
 	
-	if files_copied > 0:
-		print(f"Default files synced from {default_dir} to {config_dir}.")
-	else:
-		print(f"No files copied from {default_dir} to {config_dir}.")    
+	if files_copied == 0:
+		logger.info(f"No files copied from {default_dir} to {config_dir}.")    
 

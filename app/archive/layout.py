@@ -3,6 +3,15 @@ from pathlib import Path
 from rss_feed_manager import RssFeedManager
 import yaml
 from models.utils import pwd
+import logging
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
+logger.propagate = False
+
+# create console handler
+consoleHandler = logging.StreamHandler()
+consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
 
 class Layout:
 	def __init__(self, file_path="configs/layout.yml"):
@@ -30,7 +39,7 @@ class Layout:
 		self.feed_manager.save_articles()
  
 	def reload(self):
-		print("Reloading layout")
+		logger.debug("Reloading layout")
 		with open(self.file_path, 'r') as file:
 			self.contents = yaml.safe_load(file)
 		self.mtime = os.path.getmtime(self.file_path)
@@ -42,7 +51,7 @@ class Layout:
 					if widget['type'] == 'feed':
 						feed_widgets.append(widget)
   
-		print('Initializing feed manager with {} feeds'.format(len(feed_widgets)))
+		logger.debug('Initializing feed manager with {} feeds'.format(len(feed_widgets)))
 		self.feed_manager.initialize(feed_widgets)
 	 
 		for tab in self.tabs:
@@ -64,11 +73,11 @@ class Layout:
 							if (template_path := Path('templates', f'{widget["type"]}.html')).exists():
 								widget['template'] = template_path.name
 				
-		print("========== Layout reloaded")
+		logger.debug("========== Layout reloaded")
 
 	def is_modified(self):
 		result = os.path.getmtime(self.file_path) > self.mtime
-		print("========== Layout modified: " + str(result))
+		logger.debug("========== Layout modified: " + str(result))
 		return result
 
 	def current_tab(self, tab_name):
