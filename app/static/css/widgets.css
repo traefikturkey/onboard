@@ -74,6 +74,22 @@ ul li:last-child {
   color: #a885fac7;
 }
 
+.widget-item {
+  position: relative; /* Make the parent container a positioning context */
+}
+
+.feed-link {
+  position: relative; /* Make the anchor tag a positioning context */
+  z-index: 1; /* Ensure the anchor tag is on top of the toolbar */
+}
+
+.widget-item-toolbar {
+  position: absolute; /* Position the toolbar absolutely */
+  top: 0; /* Align the toolbar to the top of its parent container */
+  right: 0; /* Align the toolbar to the right of its parent container */
+  z-index: 2; /* Ensure the toolbar is on top of the anchor tag */
+}
+
 .summary {
   padding: 0.188em 0; 
 }
