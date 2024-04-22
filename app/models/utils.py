@@ -54,7 +54,10 @@ def from_int(x: Any) -> int:
 	return x
 
 def normalize_text(text: str) -> str:
-	return re.sub(r'\s+|\n|\r', ' ', unidecode.unidecode(text)).strip()
+	text = unidecode.unidecode(text)
+	text = re.sub(r'&#8220;|&#8221;', '"', text)
+	text = re.sub(r'&#8217;|&#8216;', "'", text)
+	return re.sub(r'\s+|\n|\r', ' ',text).strip()
 
 def calculate_sha1_hash(value: str) -> str:
 		sha1 = hashlib.sha1()
