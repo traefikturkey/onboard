@@ -3,10 +3,6 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import logging
 
-logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-
-
 class Scheduler:
 	__scheduler = None
 
@@ -21,12 +17,19 @@ class Scheduler:
 		Scheduler.getScheduler().remove_all_jobs()
 
 	@staticmethod
+	def start():
+		Scheduler.__scheduler.start()
+		logging.info('Scheduler started!')
+
+	@staticmethod
 	def getScheduler() -> BackgroundScheduler:
 		if Scheduler.__scheduler == None:
 			Scheduler.__scheduler = BackgroundScheduler()
 
-			if os.environ.get('WERKZEUG_RUN_MAIN') == 'true':
-				Scheduler.__scheduler.start()
-				logger.info('Scheduler started!')
+			if bool(os.environ.get("FLASK_ENV", "development")  == "development"):
+				if bool(os.environ.get('WERKZEUG_RUN_MAIN')):
+					Scheduler.start()
+			elif not Scheduler.__scheduler.running:
+				Scheduler.start()
 	
 		return Scheduler.__scheduler

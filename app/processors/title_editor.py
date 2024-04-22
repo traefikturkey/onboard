@@ -50,7 +50,8 @@ class TitleEditor:
       user_prompt = HumanMessagePromptTemplate(prompt=prompt)
       
       chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
-      model_name = "dolphin-mistral"
+      #model_name = "dolphin-mistral"
+      model_name = "dolphin-llama3"
       model_temp = 0.2
       model = Ollama(base_url=self.ollama_url, model=model_name, keep_alive=5, temperature=model_temp)
       self.chain = chat_prompt | model | parser
