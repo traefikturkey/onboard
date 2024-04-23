@@ -115,8 +115,11 @@ if __name__ == '__main__':
 	development = bool(os.environ.get("FLASK_ENV", "development")  == "development")
 	if development:
 		app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
-		logger.info("Shutting down...")
-		layout.stop_scheduler()
+		if bool(os.environ.get('WERKZEUG_RUN_MAIN')):
+			print("")
+			layout.stop_scheduler()
+			app.logger.info("Shutting down...")
+	
 		sys.exit()
 	else:
 		try:
