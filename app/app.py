@@ -16,14 +16,6 @@ logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARN)
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
-logger.propagate = False
-
-# create console handler
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
-
-# Add console handler to logger
-logger.addHandler(consoleHandler)
 
 copy_default_to_configs()
 
@@ -84,6 +76,7 @@ def index(tab_name=None):
 @app.route('/feed/<feed_id>')
 def feed(feed_id):
 	feed = layout.get_feed(feed_id)
+	#logger.debug(f"{feed.name} - {feed.display_items[0].title}")
 	return render_template(feed.template, widget=feed, skip_htmx=True)
 
 
@@ -103,6 +96,12 @@ def track(feed_id, link_id):
  
 	logger.info(f"redirecting to {link}")
 	return redirect(link, code=302)
+
+
+@app.route('/feed/<feed_id>/refresh')
+def refresh(feed_id):
+	layout.refresh_feed(feed_id)
+	return redirect('/', code=302)
 
 
 ###############################################################################

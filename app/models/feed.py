@@ -18,9 +18,8 @@ from models.widget import Widget
 from models.feed_article import FeedArticle
 from models.noop_feed_processor import NoOpFeedProcessor
 
-#logger = getLogger(__name__, logging.DEBUG)
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
+logger.setLevel(logging.DEBUG)
 
 
 class Feed(Widget):
@@ -58,51 +57,52 @@ class Feed(Widget):
 			self._last_updated = None
 	
 		if self.scheduler.running:
-			job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=20, max_instances=1)
-			logger.debug(f"{logging.getLevelName(logger.level)} creating cron job for {self.name} {job.id}")
+			self.job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=30, max_instances=1)
+			logger.debug(f"Feed: {self.name} cron job for scheduled with job id: {self.job.id}")
 			
-			if self.needs_update or self.old_cache_path.exists() or self.name == "Instapundit":
-				# schedule job to run right now
-				logging.debug(f"{logging.getLevelName(logger.level)} {self.name} scheduled {self.name} for immediate update now!")
-				job.modify(next_run_time=datetime.now())
-			#else:
-				# logger.debug(f"scheduled for {self.name} immediate processing now")
-				# self.scheduler.add_job(self.process, 'date', name=f'{self.id} - {self.name} - process', run_date=datetime.now(), max_instances=1)
- 
+			if self.needs_update or self.name == "Instapundit":
+				self.refresh()
+
+	def refresh(self):
+		if self.job:
+			logging.debug(f"Feed: {self.name} scheduled for immediate update now!")
+			self.job.modify(next_run_time=datetime.now())
+		else:
+			logging.warn(f"Feed: {self.name} does not have a scheduled job!")
+		
+
 	@property
 	def needs_update(self):
-		force_update = os.getenv("ONBOARD_FEED_FORCE_UPDATE", "False") == "True"
-		# if there is no last_updated time, or if it's more than an hour ago
-		return force_update or self._last_updated is None or self._last_updated < datetime.now() - timedelta(hours=1)
+		force_update = bool(os.getenv("ONBOARD_FEED_FORCE_UPDATE", "False"))
+		# if there is no last_updated time, or if it's more 10 minutes ago, then force an update
+		return force_update or self.last_updated is None or self.last_updated < datetime.now() - timedelta(minutes=10)
+
 
 	@property
 	def filters(self):
 		return self._filters
 
-	@property
-	def old_cache_path(self):
-		return self.cache_path.parent.joinpath(f"{to_snake_case(self.name)}.json")
- 	
+
 	@cached_property
 	def cache_path(self):
 		return pwd.joinpath(os.getenv("ONBOARD_FEED_CACHE_DIR", "../cache"), f"{self.id}.json").resolve()
 	
+
 	@property
 	def feed_url(self) -> str:
 		return self._url
 	
+
 	@feed_url.setter
 	def feed_url(self, url: str):
 		self._url = url
 		self.id = calculate_sha1_hash(url)
 	
-	
 
 	def update(self):
 		articles = self.download(self.feed_url)
 		self.items = self.save_articles(articles)
-		self._last_updated = datetime.now()
-		logging.debug(f"Updated {self.name}")
+
 
 	def load_cache(self, cache_path: Path) -> list[FeedArticle]:
 		articles = []
@@ -169,21 +169,10 @@ class Feed(Widget):
 		return articles
 
 
-
 	def remove_duplicate_articles(self, articles):
-			"""
-			Removes articles with duplicate IDs, keeping the one with the 'processed' attribute set if it exists.
-			
-			Parameters:
-			articles (list): A list of article objects, each with 'id' and 'processed' properties.
-			
-			Returns:
-			list: A new list with articles where duplicate IDs have been removed, keeping the one with 'processed' set.
-			"""
-   
 			# Filters a list of objects and returns a new list with objects where 'removed' is False.
 			articles = list(filter(lambda obj: not obj.removed, articles))
-   
+	 
 			# Create a dictionary to group articles by their ID
 			article_dict = defaultdict(list)
 			for article in articles:
@@ -195,12 +184,8 @@ class Feed(Widget):
 					for articles_list in article_dict.values()
 			]
 
-	def save_articles(self, articles: list[FeedArticle]):
 
-		if self.old_cache_path.exists():
-			articles += self.load_cache(self.old_cache_path)
-			self.old_cache_path.unlink()
-	
+	def save_articles(self, articles: list[FeedArticle]):	
 		# load all existing articles from the json file, and add the new ones
 		# then apply the filters
 		all_articles = self.load_cache(self.cache_path) + articles

@@ -10,15 +10,7 @@ from models.feed import Feed
 from models.utils import from_list, pwd
 
 logger = logging.getLogger(__name__)
-logger.setLevel(logging.INFO)
-logger.propagate = False
-
-# create console handler
-consoleHandler = logging.StreamHandler()
-consoleHandler.setFormatter(logging.Formatter(fmt='%(asctime)s - %(message)s'))
-
-# Add console handler to logger
-logger.addHandler(consoleHandler)
+logger.setLevel(logging.DEBUG)
 
 
 class Layout:
@@ -37,7 +29,7 @@ class Layout:
 
 	def is_modified(self):
 		modified = self.mtime > self.last_reload
-		logger.debug(f"Layout modified: {modified} mtime: {self.mtime} last_reload: {self.last_reload}")
+		logger.info(f"Layout modified?: {modified}")
 		return modified
 	
  
@@ -47,7 +39,7 @@ class Layout:
  
  
 	def reload(self):
-		logger.debug("==== Starting reload...")
+		logger.debug("Beginning Layout reload...")
 		Scheduler.clear_jobs()
 	
 		with open(self.config_path, 'r') as file:
@@ -57,7 +49,7 @@ class Layout:
 
 		self.last_reload = self.mtime
 		self.feed_hash = {}
-		logger.debug("==== Layout reloaded!")
+		logger.debug("Completed Layout reload!")
 
 	def tab(self, name: str) -> Tab:
 		if name is None:
@@ -92,6 +84,10 @@ class Layout:
 				self.feed_hash[feed.id] = feed
 	
 		return self.feed_hash[feed_id]
+	
+	def refresh_feeds(self, feed_id: str):
+		feed = self.get_feed(feed_id)
+		feed.refresh()
 
 	def find_link(self, row: Row, widget_id: str, link_id: str) -> str:
 		for column in row.columns:

@@ -1,15 +1,18 @@
+from datetime import datetime
+import logging
 import os
 from pathlib import Path
 from models.scheduler import Scheduler
 from models.exceptions import IDException
 from models.utils import calculate_sha1_hash, pwd
 
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.DEBUG)
 
 class Widget:
 	widget: dict
 	display_limit: int = None
 	template: str = 'widget.html'
-	items: list = []
 	link: str = None
 	id: str = None
 	
@@ -39,6 +42,19 @@ class Widget:
 	@property
 	def scheduler(self):
 		return Scheduler.getScheduler()
+	
+	@property
+	def last_updated(self):
+		return self._last_updated or None
+
+	@property
+	def items(self):
+		return self._items or []
+	
+	@items.setter
+	def items(self, items):
+		self._items = items
+		self._last_updated = datetime.now()
 	 
 	def __iter__(self):
 		for item in self.items:

@@ -3,7 +3,6 @@ import re
 import warnings
 from models.utils import normalize_text
 from models.widget_item import WidgetItem
-import unidecode
 import datetime
 
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
@@ -59,6 +58,11 @@ class FeedArticle(WidgetItem):
 					setattr(self, filter['attribute'], result)
 				case _:
 					pass
-
-		# this is important for template display
-		self.name = self.title
+	
+	@property
+	def name(self) -> str:
+		return self.title
+	
+	@name.setter
+	def name(self, name: str):
+		self.title = name

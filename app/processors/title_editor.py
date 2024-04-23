@@ -1,6 +1,9 @@
+from datetime import datetime, timedelta
 import logging
 import os
 from pathlib import Path
+
+from pytz import utc
 from models.feed_article import FeedArticle
 from langchain_community.llms import Ollama
 from langchain.prompts import ChatPromptTemplate, PromptTemplate, HumanMessagePromptTemplate
@@ -41,9 +44,10 @@ class TitleEditor:
 				You are an expert news article title editor.
 				Use the provided title and summary to write a concise and accurate title that is informative and avoids sounding like clickbait. 
 				Do not include links or urls in the title.
-				Do not editorialize the title, even if the title and description do.                                 
-				Title must be as short as possible, aim to be less that 70 characters long.
-				Title must have an absolute minimum of punctuation and NOT use words that are all upper case.
+				Do not editorialize the title, even if the provided title and summary do.                                 
+				title MUST be as short as possible, aim to be less that 70 characters long.
+				title MUST have an absolute minimum of punctuation. 
+				title MUST NOT use words that are all capitalized. NO SHOUTING!
 				Only return the title in the requested format!																	
 				"""))
 			user_prompt = HumanMessagePromptTemplate(prompt=prompt)
@@ -61,6 +65,9 @@ class TitleEditor:
 		if self.ollama_url:
 			
 			needs_processed = list(filter(lambda article: article.processed != self.script_hash, articles))
+			if len(needs_processed) > 10:
+				needs_processed = list(filter(lambda article: article.pub_date.replace(tzinfo=utc) >= (datetime.now() - timedelta(days=1)).replace(tzinfo=utc), articles))
+
 			
 			total = len(needs_processed)
 			for count, article in enumerate(needs_processed, start=1):

@@ -19,7 +19,6 @@ class Scheduler:
 	@staticmethod
 	def start():
 		Scheduler.__scheduler.start()
-		logging.info('Scheduler started!')
 
 	@staticmethod
 	def getScheduler() -> BackgroundScheduler:
