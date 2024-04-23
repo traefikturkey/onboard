@@ -20,12 +20,12 @@
       <ul>
         {% set name = widget.name %}
         {% for article in widget.display_items %}
-        <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item" x-data="{ summary_open: false }">
+        <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item" x-data="{ summary_open: false }" @click="summary_open = ! summary_open">
           {% set link = article.tracking_link if article.tracking_link else article.link %}
           <a href="{{ link }}" class="{{ widget.type }}-link">{{ article.name }}</a>
           {% if article.summary %}
           <div class="widget-item-toolbar">
-            <i class="fas fa-chevron-down" @click="summary_open = ! summary_open" :class="summary_open ? 'fa-right' : ''"></i>
+            <i class="fas fa-chevron-down" :class="summary_open ? 'fa-right' : ''"></i>
           </div>
           <div class="summary {{ widget.type }}" x-show="summary_open" @click.outside="summary_open = false" x-transition >{{ article.summary }}</div>
           {% endif %}

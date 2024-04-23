@@ -60,7 +60,7 @@ class Feed(Widget):
 			self.job = self.scheduler.add_job(self.update, 'cron', name=f'{self.id} - {self.name} - cron', hour='*', jitter=30, max_instances=1)
 			logger.debug(f"Feed: {self.name} cron job for scheduled with job id: {self.job.id}")
 			
-			if self.needs_update or self.name == "Instapundit":
+			if self.needs_update:
 				self.refresh()
 
 	def refresh(self):
