@@ -53,11 +53,16 @@ class TitleEditor:
 			user_prompt = HumanMessagePromptTemplate(prompt=prompt)
 			
 			chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
-			model_name = "dolphin-mistral"
-			#model_name = "dolphin-llama3"
+			
+			model_name = "dolphin-llama3"
 			model_temp = 0.0
-			model = Ollama(base_url=self.ollama_url, model=model_name, keep_alive=5, temperature=model_temp)
-			self.chain = chat_prompt | model | parser
+			llama3_model = Ollama(base_url=self.ollama_url, model=model_name, keep_alive=5, temperature=model_temp)
+			self.llama3_chain = chat_prompt | llama3_model | parser
+
+			model_name = "dolphin-mistral"
+			model_temp = 0.0
+			mistral_model = Ollama(base_url=self.ollama_url, model=model_name, keep_alive=5, temperature=model_temp)
+			self.mistral_chain = chat_prompt | mistral_model | parser
 			
 			self.script_hash = calculate_sha1_hash(f"{system_prompt.content}{model_name}{model_temp}") 
 
@@ -71,13 +76,15 @@ class TitleEditor:
 			
 			total = len(needs_processed)
 			for count, article in enumerate(needs_processed, start=1):
-				try:
-					logger.info(f"Processing title {count}/{total}: {article.original_title}")
-					result = self.chain.invoke({"title": article.original_title, "summary": article.description}) #, config={'callbacks': [ConsoleCallbackHandler()]})
-					article.title = result['title']
-					article.processed = self.script_hash
-				except Exception as ex:
-					logger.error(f"Error: {ex} for {article.original_title}")
+				for chain in [self.llama3_chain, self.mistral_chain]:
+					try:
+						logger.info(f"Processing title {count}/{total}: {article.original_title}")
+						result = chain.invoke({"title": article.original_title, "summary": article.description}) #, config={'callbacks': [ConsoleCallbackHandler()]})
+						article.title = result['title']
+						article.processed = self.script_hash
+						break
+					except Exception as ex:
+						logger.error(f"Error: {ex} for {article.original_title}")
 					#needs_processed.remove(article)
 				
 		return articles
