@@ -1,6 +1,6 @@
 - name: Set permissions on ~/.ssh
   file:
-    path: "'~/.ssh' }}"
+    path: '~/.ssh'
     state: directory
     owner: "{{ lookup('env', 'USER') }}"
     group: "{{ lookup('env', 'USER') }}"
