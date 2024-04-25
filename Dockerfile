@@ -42,7 +42,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopenblas-dev \
     locales \
     make \
-    sudo \
     tzdata \
     zsh && \
     # cleanup
@@ -59,6 +58,8 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     echo "PS1='\h:\$(pwd) \$ '" >> /etc/zshenv && \
     mkdir -p ${PROJECT_PATH} && \
     chown -R ${USER}:${USER} ${PROJECT_PATH} && \
+    # set the shell for root too
+    chsh -s /bin/${TERM_SHELL} && \
     # https://www.jeffgeerling.com/blog/2023/how-solve-error-externally-managed-environment-when-installing-pip3
     rm -rf /usr/lib/python${PYTHON_VERSION}/EXTERNALLY-MANAGED 
 
@@ -154,6 +155,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     ripgrep \
     rsync \
     sshpass \
+    sudo \
     tar \
     tree \
     util-linux \
@@ -163,7 +165,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoremove -fy && \
     apt-get clean && \
     apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/* 
+    rm -rf /var/lib/apt/lists/* && \
+    echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
+    chmod 0440 /etc/sudoers.d/${USER} 
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     graphviz \
@@ -183,17 +187,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-RUN pip3 install --target=${PYTHON_DEPS_PATH} ipython ipykernel docutils jupyter notebook jupyterhub && \
-    pip3 install --target=${PYTHON_DEPS_PATH} watermark pyyaml pylint h5py tensorflow && \
-    pip3 install --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz opencv-python-headless imutils keras && \
-    pip3 install --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy scikit-learn duckdb sqlalchemy pyautogui requests_cache statsmodels
-      
-COPY .devcontainer/requirements.txt requirements.txt
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} -r requirements.txt && \
-    rm -rf requirements.txt
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn scipy==1.11.0 watermark
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
+#RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
 
-RUN echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
-    chmod 0440 /etc/sudoers.d/${USER} 
+RUN LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml && \
+    LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/install-docker.yml
 
 USER ${USER}
   
