@@ -14,7 +14,7 @@
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "build": { 
     "context": "..",
-    "dockerfile": "../Dockerfile",
+    "dockerfile": "../Dockerfile.alpine",
     "target": "devcontainer",
     "args": {
       "PROJECT_NAME": "${localWorkspaceFolderBasename}",
