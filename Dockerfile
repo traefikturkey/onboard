@@ -169,6 +169,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
+COPY .devcontainer .devcontainer
+
+RUN LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml && \
+    LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/install-docker.yml
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
     graphviz \
     imagemagick \
@@ -191,9 +196,6 @@ RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipyke
 RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
 RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
 #RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
-
-RUN LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml && \
-    LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/install-docker.yml
 
 USER ${USER}
   

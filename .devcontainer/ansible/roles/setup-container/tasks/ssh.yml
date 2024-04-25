@@ -1,20 +1,23 @@
-- name: et permissions on ~/.ssh
+- name: Set permissions on ~/.ssh
   file:
-    path: "{{ lookup('env', 'HOME') + '/.ssh' }}"
+    path: "'~/.ssh' }}"
     state: directory
     owner: "{{ lookup('env', 'USER') }}"
     group: "{{ lookup('env', 'USER') }}"
     recurse: true 
     mode: '0700'
+  become: true
 
 - name: Set permissions for ~/.ssh files
+  
   file:
     path: "{{ item }}"
     mode: '0600'
     owner: "{{ lookup('env', 'USER') }}"
     group: "{{ lookup('env', 'USER') }}"
+  become: true
   with_fileglob:
-    - "{{ lookup('env', 'HOME') }}/.ssh/*"
+    - "~/.ssh/*"
 
 - name: Setup and start ssh-agent
   shell: |

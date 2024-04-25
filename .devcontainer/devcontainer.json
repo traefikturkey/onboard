@@ -51,22 +51,10 @@
         "ms-python.isort"
       ],
       "settings": {
-        "[python]": {
-          "editor.defaultFormatter": "ms-python.black-formatter",
-          "editor.detectIndentation": false,
-          "editor.insertSpaces": false,
-          "editor.tabSize": 2
-        },
-        "files.exclude": {
-          "**/.dotnet": true,
-          "**/.zcompdump": true
-        },
         "dev.containers.copyGitConfig": false,
         "dev.containers.gitCredentialHelperConfigLocation": "system",
-        "editor.tabSize": 2,
         "files.readonlyFromPermissions": true,
         "python.analysis.extraPaths": [ "${containerWorkspaceFolder}/app" ],
-        "terminal.external.windowsExec": "C:\\Program Files\\PowerShell\\7\\pwsh.exe",
         "terminal.integrated.defaultProfile.linux": "zsh",
         "terminal.integrated.defaultProfile.windows": "pwsh",
         "terminal.integrated.profiles.linux": {
@@ -88,7 +76,7 @@
         },
         "terminal.integrated.tabs.description": "",
         "terminal.integrated.tabs.title": "${local}${separator}${cwdFolder}${separator}${process}",
-        "window.title": "${localWorkspaceFolderBasename}"
+        "window.title": "${localWorkspaceFolderBasename} ${process}"
       }
     }
   }

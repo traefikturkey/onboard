@@ -3,16 +3,6 @@
   hosts: localhost
   connection: local 
   gather_facts: true
-  vars:
-    # docker defaults
-    docker_edition: 'ce'
-    docker_package_state: present
-    docker_service_manage: false
-    docker_install_compose_plugin: true
-    docker_compose_package: docker-compose-plugin
-    docker_compose_package_state: present
-
-    docker_users:
-      - "{{ lookup('env', 'USER') }}"
+  ignore_errors: true
   roles:
     - role: setup-container
