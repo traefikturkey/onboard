@@ -17,6 +17,12 @@
 
 	<script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<script>
+    // Add Font Awesome icons
+    var script = document.createElement('script');
+    script.src = 'https://use.fontawesome.com/releases/v5.15.3/js/all.js';
+    document.head.appendChild(script);
+  </script>
 
 	<link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
 	{% assets "css_all" %}
@@ -26,6 +32,32 @@
 
 <body>
 	{% include('flash_message.html') %}
+	<div id="bookmarkBar">
+    <ul>
+      <li>
+        <a href="#">
+          <i class="fa fa-folder"></i>
+          Folder 1
+        </a>
+        <ul>
+          <li><a href="#"><i class="fa fa-link"></i> Link 1</a></li>
+          <li><a href="#"><i class="fa fa-link"></i> Link 2</a></li>
+          <li><a href="#"><i class="fa fa-link"></i> Link 3</a></li>
+        </ul>
+      </li>
+      <li>
+        <a href="#">
+          <i class="fa fa-folder"></i>
+          Folder 2
+        </a>
+        <ul>
+          <li><a href="#"><i class="fa fa-link"></i> Link 4</a></li>
+          <li><a href="#"><i class="fa fa-link"></i> Link 5</a></li>
+        </ul>
+      </li>
+      <li><a href="#"><i class="fa fa-link"></i> Link 6</a></li>
+    </ul>
+  </div>
 	<div class="container">
 		<div class="row header">
 			<div class="column">

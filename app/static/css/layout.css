@@ -6,21 +6,23 @@ html, body {
   padding: 0;
 }
 
-/* Body Styles */
 body {
-  font-family: 'Roboto', Helvetica, sans-serif;
-  font-size: 0.95em; 
+  margin: 0;
+  padding: 0;
+  font-family: 'Roboto', sans-serif;
+  font-size: 14px;
   line-height: 1.25em;
   color: #D3D3D3;
   background-color: #2a2a2c;
   overflow-x: hidden;
+  padding-top: calc(var(--bookmark-bar-height)); /* Reference the variable */
 }
 
 .container {
   display: flex;
-	flex: 1 0 auto;
-	flex-direction: column;
-	min-height: 100vh;
+  flex: 1 0 auto;
+  flex-direction: column;
+  min-height: calc(100vh - var(--bookmark-bar-height)); /* Reference the variable */
 }
 
 /* Row */
@@ -45,4 +47,68 @@ footer {
   background-color: #1a1a1c;
   margin-top: auto;
   text-align: center;
+}
+
+:root {
+  --bookmark-bar-height: 30px; /* Define the height of the bookmark bar */
+}
+
+#bookmarkBar {
+  background-color: #2c2c2c;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  height: var(--bookmark-bar-height);
+  font-size: 12px;
+  padding-left: 4px;
+}
+
+#bookmarkBar ul {
+  list-style-type: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+}
+
+#bookmarkBar li {
+  position: relative;
+  border-bottom: 0;
+  margin: 0;
+}
+
+#bookmarkBar a {
+  display: block;
+  color: #ddd;
+  text-decoration: none;
+  padding: 8px;
+}
+
+#bookmarkBar a i {
+  margin-right: 5px;
+}
+
+#bookmarkBar a .fa-folder {
+  color: #eece00;
+}
+
+#bookmarkBar ul ul {
+  display: none;
+  position: absolute;
+  background-color: #2c2c2c;
+  min-width: 160px;
+  box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+  z-index: 1;
+  top: var(--bookmark-bar-height);
+  border: 1px solid #525252; /* Add a light outline */
+  border-radius: 5px; /* Add rounded corners */
+}
+
+#bookmarkBar ul li:hover > ul {
+  display: block;
+}
+
+#content {
+  padding-top: 36px;
 }
