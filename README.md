@@ -1,7 +1,1 @@
-[![Build and Publish Docker Image](https://github.com/ilude/onboard/actions/workflows/docker-publish.yml/badge.svg)](https://github.com/ilude/onboard/actions/workflows/docker-publish.yml)
-
-Run:
-```
-docker run -p 5000:5000 --rm ghcr.io/traefikturkey/onboard:latest
-```
-Access http://localhost:5000
+![pied-piper](https://github.com/traefikturkey/onetime/assets/219478/bcfa3f1c-8fa4-4bb9-9ce4-079208b76b51)
