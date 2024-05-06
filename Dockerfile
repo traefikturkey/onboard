@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.4
-ARG PYTHON_VERSION=3.12
+ARG PYTHON_VERSION=3.12-slim-bookworm
 
-FROM python:${PYTHON_VERSION}-slim-bookworm as base
+FROM python:${PYTHON_VERSION} as base
 LABEL maintainer="Mike Glenn <mglenn@ilude.com>"
 
 ARG PUID=${PUID:-1000}
@@ -58,6 +58,7 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     echo "PS1='\h:\$(pwd) \$ '" >> /etc/zshenv && \
     mkdir -p ${PROJECT_PATH} && \
     chown -R ${USER}:${USER} ${PROJECT_PATH} && \
+    chown -R ${USER}:${USER} ${HOME} && \
     # set the shell for root too
     chsh -s /bin/${TERM_SHELL} && \
     # https://www.jeffgeerling.com/blog/2023/how-solve-error-externally-managed-environment-when-installing-pip3
@@ -125,6 +126,7 @@ RUN pip3 install --upgrade pip && \
     pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} -r requirements.txt && \
     rm -rf requirements.txt
 
+
 ##############################
 # Begin production 
 ##############################
@@ -141,9 +143,44 @@ RUN mkdir /cache && \
 CMD [ "python3", "app.py" ]
 
 ##############################
+# Begin jupyter-devcontainer 
+##############################
+FROM build as jupyter-devcontainer
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    graphviz \
+    imagemagick \
+    libffi-dev \
+    libjpeg-dev \
+    libpng-dev \
+    libpq-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    gnuplot \
+    gnuplot-x11 \
+    libzmq3-dev && \
+    apt-get autoremove -fy && \
+    apt-get clean && \
+    apt-get autoclean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+##############################
+# Begin jupyter-builder 
+##############################
+FROM jupyter-devcontainer as jupyter-builder
+
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn scipy==1.11.0 watermark
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
+RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
+#RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
+
+##############################
 # Begin devcontainer 
 ##############################
-FROM build as devcontainer
+FROM jupyter-devcontainer as devcontainer
+
+COPY --from=jupyter-builder --chown=${USER}:${USER}	${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ansible \
@@ -169,35 +206,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
-COPY .devcontainer .devcontainer
+USER ${USER}
 
+COPY .devcontainer .devcontainer
 RUN LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml && \
     LC_ALL=C.UTF-8 ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/install-docker.yml
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    graphviz \
-    imagemagick \
-    libffi-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libpq-dev \
-    libssl-dev \
-    libxml2-dev \
-    libxslt-dev \
-    gnuplot \
-    gnuplot-x11 \
-    libzmq3-dev && \
-    apt-get autoremove -fy && \
-    apt-get clean && \
-    apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn scipy==1.11.0 watermark
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
-#RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
-
-USER ${USER}
   
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]

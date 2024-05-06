@@ -22,7 +22,7 @@
     }
   },
   "initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
-  "updateContentCommand": "make ansible",
+  //"updateContentCommand": "make ansible",
   //"postAttachCommand": "zsh -l",
   "runArgs": ["--name","${localWorkspaceFolderBasename}_devcontainer", "--hostname","${localWorkspaceFolderBasename}", "--env-file",".devcontainer/.env", "--gpus","all"],
   "mounts": [

@@ -3,6 +3,5 @@
   hosts: localhost
   connection: local 
   gather_facts: true
-  ignore_errors: true
   roles:
     - role: setup-container
