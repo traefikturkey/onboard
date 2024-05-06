@@ -20,10 +20,9 @@ class Widget:
 		self.widget = widget
 
 		self.display_limit = widget.get('display_limit', None)	
- 
-		class_name = Path(os.path.basename(__file__)).stem
-		template_path = pwd.joinpath('templates', class_name + '.html')
-		if not self.template and template_path.exists():
+
+		template_path = pwd.joinpath('templates', self.__class__.__name__.lower() + '.html')
+		if template_path.exists():
 			self.template = template_path.name
 	 
 		if not self.id:
