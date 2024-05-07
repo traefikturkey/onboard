@@ -11,7 +11,10 @@
         {% include('bookmark_bar.html') %}
       {% endwith %}
     {% else %}
-      <a href="{{ bookmark.href }}"><i class="fa fa-link"></i>{{ bookmark.name }}</a>
+      <a href="{{ bookmark.href }}">
+        <i class="fa fa-link"></i>
+        {{ bookmark.name }}
+      </a>
     {% endif %}
     </li>
   {% endfor %}
