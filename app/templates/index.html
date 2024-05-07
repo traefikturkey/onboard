@@ -29,34 +29,10 @@
 	<link rel="stylesheet" href="{{ ASSET_URL }}">
 	{% endassets %}
 </head>
-
 <body>
 	{% include('flash_message.html') %}
 	<div id="bookmarkBar">
-    <ul>
-      <li>
-        <a href="#">
-          <i class="fa fa-folder"></i>
-          Folder 1
-        </a>
-        <ul>
-          <li><a href="#"><i class="fa fa-link"></i> Link 1</a></li>
-          <li><a href="#"><i class="fa fa-link"></i> Link 2</a></li>
-          <li><a href="#"><i class="fa fa-link"></i> Link 3</a></li>
-        </ul>
-      </li>
-      <li>
-        <a href="#">
-          <i class="fa fa-folder"></i>
-          Folder 2
-        </a>
-        <ul>
-          <li><a href="#"><i class="fa fa-link"></i> Link 4</a></li>
-          <li><a href="#"><i class="fa fa-link"></i> Link 5</a></li>
-        </ul>
-      </li>
-      <li><a href="#"><i class="fa fa-link"></i> Link 6</a></li>
-    </ul>
+		{% include 'bookmark_bar.html' ignore missing with context %}
   </div>
 	<div class="container">
 		<div class="row header">

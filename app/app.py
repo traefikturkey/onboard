@@ -1,4 +1,5 @@
 import asyncio
+import json
 import logging
 import os
 import secrets
@@ -11,6 +12,7 @@ from flask_caching import Cache
 from typing import Any
 from services.link_tracker import link_tracker
 from utils import copy_default_to_configs
+from models.utils import pwd
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARN)
 
@@ -52,6 +54,8 @@ css = Bundle(
 assets.register('css_all', css)
 css.build()
 
+	
+
 @app.context_processor
 def inject_current_date():
 	return {
@@ -59,7 +63,13 @@ def inject_current_date():
 		'site_title':	os.environ.get('ONBOARD_SITE_TITLE', 'OnBoard'),
 	}
 
-
+def load_bookmarks():
+	try:
+		with open(pwd.joinpath('configs/bookmarks.json'), 'r', encoding='utf-8') as f:
+			return json.load(f)	
+	except Exception as ex:
+		logger.error(f"Error: {ex} loading bookmarks")
+		return None
 
 @app.route('/')
 @app.route('/tab/<tab_name>')
@@ -69,9 +79,9 @@ def index(tab_name=None):
 	if layout.is_modified():
 		layout.reload()	
 
-	return render_template('index.html', layout=layout, tab_name=tab_name, skip_htmx=False)
+	bookmarks = load_bookmarks()
 
-
+	return render_template('index.html', bookmarks = bookmarks, layout=layout, tab_name=tab_name, skip_htmx=False)
 
 @app.route('/feed/<feed_id>')
 def feed(feed_id):
