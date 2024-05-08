@@ -23,8 +23,17 @@ class Layout:
   tabs: list[Tab] = []
   bookmark_bar: list[dict] = []
 
-  def __init__(self, config_file: str = "configs/layout.yml"):
+  def __init__(self, config_file: str = "configs/layout.yml", bookmarks_bar_file: str = "configs/bookmarks_bar.json"):
     self.config_path = pwd.joinpath(config_file)
+    self.bookmark_bar_path = pwd.joinpath(bookmarks_bar_file)
+
+    try:
+      if not os.path.exists(pwd.joinpath('configs/bookmarks.json')):
+        with open(pwd.joinpath('configs/bookmarks.json'), 'w', encoding='utf-8') as f:
+          json.dump([], f)
+    except Exception as ex:
+      logger.error(f"Error: {ex} creating empty bookmark bar file at {self.bookmark_bar_path}")
+
     self.favicon_finder = FaviconFinder()
     self.reload()
 
@@ -71,9 +80,6 @@ class Layout:
     self.bookmark_bar = self.load_bookmarks()
 
     bookmarks = self.bookmark_iterator(self.bookmark_bar)
-
-    print(f"================= Found {len(bookmarks)} bookmarks")
-
     self.favicon_finder.fetch_from_iterator(bookmarks)
 
     logger.debug("Completed Layout reload!")
