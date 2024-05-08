@@ -3,32 +3,42 @@ from apscheduler.schedulers.background import BackgroundScheduler
 
 import logging
 
+
 class Scheduler:
-	__scheduler = None
+  __scheduler = None
 
-	@staticmethod
-	def shutdown():
-		scheduler = Scheduler.getScheduler()
-		if scheduler and scheduler.running:
-			scheduler.shutdown()
-	 
-	@staticmethod
-	def	clear_jobs():
-		Scheduler.getScheduler().remove_all_jobs()
+  @staticmethod
+  def shutdown():
+    scheduler = Scheduler.getScheduler()
+    if scheduler and scheduler.running:
+      scheduler.shutdown()
 
-	@staticmethod
-	def start():
-		Scheduler.__scheduler.start()
+  @staticmethod
+  def clear_jobs():
+    Scheduler.getScheduler().remove_all_jobs()
 
-	@staticmethod
-	def getScheduler() -> BackgroundScheduler:
-		if Scheduler.__scheduler == None:
-			Scheduler.__scheduler = BackgroundScheduler()
+  @staticmethod
+  def start():
+    Scheduler.__scheduler.start()
 
-			if bool(os.environ.get("FLASK_ENV", "development")  == "development"):
-				if bool(os.environ.get('WERKZEUG_RUN_MAIN')):
-					Scheduler.start()
-			elif not Scheduler.__scheduler.running:
-				Scheduler.start()
-	
-		return Scheduler.__scheduler
+  @staticmethod
+  def getScheduler() -> BackgroundScheduler:
+    if Scheduler.__scheduler == None:
+      Scheduler.__scheduler = BackgroundScheduler({
+        'apscheduler.executors.default': {
+          'class': 'apscheduler.executors.pool:ThreadPoolExecutor',
+          'max_workers': '20'
+        },
+        'apscheduler.executors.processpool': {
+          'type': 'processpool',
+          'max_workers': '12'
+        }
+      })
+
+      if bool(os.environ.get("FLASK_ENV", "development") == "development"):
+        if bool(os.environ.get('WERKZEUG_RUN_MAIN')):
+          Scheduler.start()
+      elif not Scheduler.__scheduler.running:
+        Scheduler.start()
+
+    return Scheduler.__scheduler

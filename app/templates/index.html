@@ -32,7 +32,9 @@
 <body>
 	{% include('flash_message.html') %}
 	<div id="bookmarkBar">
-		{% include 'bookmark_bar.html' ignore missing with context %}
+		{% with bookmarks = layout.bookmark_bar %}
+			{% include 'bookmark_bar.html' ignore missing with context %}
+		{% endwith %}
   </div>
 	<div class="container">
 		<div class="row header">

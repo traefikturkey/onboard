@@ -5,7 +5,7 @@
 #bookmarkBar {
   background-color: #2c2c2c;
   width: 100%;
-  position: fixed;
+  position: absolute;
   top: 0;
   left: 0;
   z-index: 1000;
@@ -26,6 +26,7 @@
   border-bottom: 0;
   margin: 0;
   padding: 4px 0px;
+  height: var(--bookmark-bar-height);
 }
 
 #bookmarkBar a {
@@ -40,8 +41,21 @@
   margin-right: 5px;
 }
 
+#bookmarkBar li:hover > a {
+  
+  background-color: #525252;
+}
+
 #bookmarkBar a .fa-folder {
   color: #eece00;
+  padding-right: 2px;
+}
+
+#bookmarkBar a img {
+  max-width: 12px;
+  max-height: 12px;
+  padding-right: 2px;
+  vertical-align: text-bottom;
 }
 
 #bookmarkBar ul ul {
@@ -65,4 +79,5 @@
 
 #bookmarkBar li:hover > ul {
   display: block;
+  background-color: #2c2c2c;
 }

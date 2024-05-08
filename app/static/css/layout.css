@@ -22,7 +22,7 @@ body {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
-  min-height: calc(100vh - var(--bookmark-bar-height)); /* Reference the variable */
+  min-height: calc(100vh); /* Reference the variable */
 }
 
 /* Row */

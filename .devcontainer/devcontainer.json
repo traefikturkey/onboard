@@ -48,7 +48,8 @@
         "redhat.ansible",
         "redhat.vscode-yaml",
         "ms-python.black-formatter",
-        "ms-python.isort"
+        "ms-python.isort",
+        "ms-python.autopep8"
       ],
       "settings": {
         "dev.containers.copyGitConfig": false,
