@@ -27,11 +27,11 @@ class Scheduler:
       Scheduler.__scheduler = BackgroundScheduler({
         'apscheduler.executors.default': {
           'class': 'apscheduler.executors.pool:ThreadPoolExecutor',
-          'max_workers': '20'
+          'max_workers': '5'
         },
         'apscheduler.executors.processpool': {
           'type': 'processpool',
-          'max_workers': '12'
+          'max_workers': '5'
         }
       })
 
