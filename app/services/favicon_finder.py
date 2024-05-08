@@ -19,7 +19,7 @@ class FaviconFinder:
     self.full_cache_path = pwd.joinpath(cache_dir)
     self.full_cache_path.mkdir(parents=True, exist_ok=True)
     self.relative_cache_path = f"/{cache_dir}"
-    self.processed_domains = set()
+    self.processed_domains = list()
     self.processed_domains_file = pwd.joinpath('configs/processed_domains.json')
     self.load_processed_domains()
 
