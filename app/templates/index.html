@@ -17,15 +17,25 @@
 
 	<script defer src="https://unpkg.com/htmx.org@1.6.1/dist/htmx.min.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<script>
+    // Add Font Awesome icons
+    var script = document.createElement('script');
+    script.src = 'https://use.fontawesome.com/releases/v5.15.3/js/all.js';
+    document.head.appendChild(script);
+  </script>
 
 	<link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
 	{% assets "css_all" %}
 	<link rel="stylesheet" href="{{ ASSET_URL }}">
 	{% endassets %}
 </head>
-
 <body>
 	{% include('flash_message.html') %}
+	<div id="bookmarkBar">
+		{% with bookmarks = layout.bookmark_bar %}
+			{% include 'bookmark_bar.html' ignore missing with context %}
+		{% endwith %}
+  </div>
 	<div class="container">
 		<div class="row header">
 			<div class="column">

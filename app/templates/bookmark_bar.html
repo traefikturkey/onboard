@@ -1,0 +1,25 @@
+{% if bookmarks %}
+<ul>
+{% for bookmark in bookmarks %}
+  <li>
+    {% if bookmark.contents %}
+      <a href="#">
+        <i class="fa fa-folder"></i> {{ bookmark.name }}
+      </a>
+      {% with bookmarks = bookmark.contents %}
+        {% include('bookmark_bar.html') %}
+      {% endwith %}
+    {% else %}
+      <a href="{{ bookmark.href }}">
+        {% if favicon_exists(bookmark.href) %}
+          <img src="{{ bookmark.favicon }}" alt="{{ bookmark.name }}">
+        {% else %}
+          <i class="fa fa-link"></i>
+        {% endif %}
+        {{ bookmark.name }}
+      </a>
+    {% endif %}
+  </li>
+{% endfor %}
+</ul>
+{% endif %}
