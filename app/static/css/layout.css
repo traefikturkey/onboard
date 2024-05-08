@@ -15,14 +15,14 @@ body {
   color: #D3D3D3;
   background-color: #2a2a2c;
   overflow-x: hidden;
-  padding-top: calc(var(--bookmark-bar-height)); /* Reference the variable */
+  
 }
 
 .container {
   display: flex;
   flex: 1 0 auto;
   flex-direction: column;
-  min-height: calc(100vh); /* Reference the variable */
+  min-height: calc(100vh); 
 }
 
 /* Row */
