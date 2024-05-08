@@ -28,8 +28,8 @@ class Layout:
     self.bookmark_bar_path = pwd.joinpath(bookmarks_bar_file)
 
     try:
-      if not os.path.exists(pwd.joinpath('configs/bookmarks.json')):
-        with open(pwd.joinpath('configs/bookmarks.json'), 'w', encoding='utf-8') as f:
+      if not os.path.exists(pwd.joinpath(self.bookmark_bar_path)):
+        with open(pwd.joinpath(self.bookmark_bar_path), 'w', encoding='utf-8') as f:
           json.dump([], f)
     except Exception as ex:
       logger.error(f"Error: {ex} creating empty bookmark bar file at {self.bookmark_bar_path}")
@@ -39,10 +39,10 @@ class Layout:
 
   def load_bookmarks(self):
     try:
-      with open(pwd.joinpath('configs/bookmarks.json'), 'r', encoding='utf-8') as f:
+      with open(pwd.joinpath(self.bookmark_bar_path), 'r', encoding='utf-8') as f:
         return json.load(f)
     except Exception as ex:
-      logger.error(f"Error: {ex} loading bookmarks")
+      logger.error(f"Error: Loading bookmark bar file from {self.bookmark_bar_path}", ex)
       return None
 
   def stop_scheduler(self):

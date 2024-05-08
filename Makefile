@@ -15,7 +15,7 @@ reqs:	$(SITE_PACKAGES)
 
 $(SITE_PACKAGES): requirements.txt
 	pip install -r requirements.txt
-	touch requirements.txt
+	-sudo touch $(SITE_PACKAGES)
 
 ansible:
 	sudo chown -R ${USER}:${USER} ~/

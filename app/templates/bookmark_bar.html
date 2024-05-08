@@ -11,8 +11,9 @@
       {% endwith %}
     {% else %}
       <a href="{{ bookmark.href }}">
-        {% if favicon_exists(bookmark.href) %}
-          <img src="{{ bookmark.favicon }}" alt="{{ bookmark.name }}">
+        {% set favicon_url = favicon_exists(bookmark.href) %}
+        {% if favicon_url %}
+          <img src="{{ favicon_url }}" alt="{{ bookmark.name }}">
         {% else %}
           <i class="fa fa-link"></i>
         {% endif %}

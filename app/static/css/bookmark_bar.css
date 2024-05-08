@@ -5,9 +5,6 @@
 #bookmarkBar {
   background-color: #2c2c2c;
   width: 100%;
-  position: absolute;
-  top: 0;
-  left: 0;
   z-index: 1000;
   height: var(--bookmark-bar-height);
   font-size: 12px;
