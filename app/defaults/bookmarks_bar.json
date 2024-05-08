@@ -1,0 +1,26 @@
+[
+  {
+    "name": "Gmail",
+    "href": "https://mail.google.com/mail/u/0/#inbox",
+    "favicon": "/static/assets/icons/google.com.favicon.ico",
+    "add_date": "1587496250"
+  },
+  {
+    "name": "YouTube",
+    "href": "https://www.youtube.com/",
+    "favicon": "/static/assets/icons/youtube.com.favicon.ico",
+    "add_date": "1563757631"
+  },
+  {
+    "name": "Reddit",
+    "href": "https://www.reddit.com/",
+    "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+    "add_date": "1566479421"
+  },
+  {
+    "name": "Kanban - agpm-demo",
+    "href": "https://tree.taiga.io/project/ilude-agpm-demo/kanban",
+    "favicon": "/static/assets/icons/taiga.io.favicon.ico",
+    "add_date": "1713923017"
+  }
+]
