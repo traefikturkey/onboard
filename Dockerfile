@@ -140,6 +140,7 @@ ENV FLASK_ENV=production
 RUN mkdir /cache && \
     chown -R ${USER}:${USER} /cache && \
     mkdir -p /app/static/icons && \
+    mkdir -p /app/static/assets &&\
     chown -R ${USER}:${USER} /app/static
 
 CMD [ "python3", "app.py" ]
