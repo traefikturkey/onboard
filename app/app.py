@@ -107,11 +107,16 @@ def refresh(feed_id):
   return redirect('/', code=302)
 
 
+@app.route('/api/healthcheck')
+def healthcheck():
+  return 'OK', 200
+
 ###############################################################################
 #
 # Main Startup Code
 #
 ###############################################################################
+
 
 if __name__ == '__main__':
   port = int(os.environ.get("FLASK_PORT", os.environ.get("ONBOARD_PORT", 9830)))

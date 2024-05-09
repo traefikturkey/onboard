@@ -34,7 +34,6 @@ ENV TERM_SHELL=${TERM_SHELL}
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
-    bash-completion \
     ca-certificates \
     curl \
     gosu \
@@ -43,7 +42,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     locales \
     make \
     tzdata \
-    zsh && \
+    wget && \
     # cleanup
     apt-get autoremove -fy && \
     apt-get clean && \
@@ -110,8 +109,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     openssl \
     openssh-client \
     sqlite3 \
-    libsqlite3-dev \
-    wget && \
+    libsqlite3-dev && \
     apt-get autoremove -fy && \
     apt-get clean && \
     apt-get autoclean -y && \
@@ -142,6 +140,10 @@ RUN mkdir /cache && \
     mkdir -p /app/static/icons && \
     mkdir -p /app/static/assets &&\
     chown -R ${USER}:${USER} /app/static
+
+HEALTHCHECK --interval=10s --timeout=3s --start-period=20s \
+    CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$PORT/api/healthcheck || exit 1
+  
 
 CMD [ "python3", "app.py" ]
 
@@ -187,6 +189,7 @@ COPY --from=jupyter-builder --chown=${USER}:${USER}	${PYTHON_DEPS_PATH} ${PYTHON
 
 RUN apt-get update && apt-get install -y --no-install-recommends \
     ansible \
+    bash-completion \
     dnsutils \
     exa \
     iproute2 \
@@ -200,6 +203,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tree \
     util-linux \
     yq \
+    zsh \
     zsh-autosuggestions \
     zsh-syntax-highlighting && \
     apt-get autoremove -fy && \
