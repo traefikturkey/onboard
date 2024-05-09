@@ -33,6 +33,8 @@
     "zcompdump"
   ],
   "python.analysis.extraPaths": [
+    "./app",
+    "./app/services",
     "./app"
   ]
 }

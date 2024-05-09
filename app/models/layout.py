@@ -1,10 +1,8 @@
-from asyncio import tasks
-import asyncio
 import json
 import logging
 import os
-from services.favicon_finder import FaviconFinder
 import yaml
+from services.favicon_store import FaviconStore
 from models.bookmark import Bookmark
 from models.row import Row
 from models.column import Column
@@ -19,8 +17,8 @@ logger.setLevel(logging.DEBUG)
 
 class Layout:
   id: str = 'layout'
-  headers: list[Bookmark] = []
   tabs: list[Tab] = []
+  headers: list[Bookmark] = []
   bookmark_bar: list[dict] = []
 
   def __init__(self, config_file: str = "configs/layout.yml", bookmarks_bar_file: str = "configs/bookmarks_bar.json"):
@@ -34,7 +32,7 @@ class Layout:
     except Exception as ex:
       logger.error(f"Error: {ex} creating empty bookmark bar file at {self.bookmark_bar_path}")
 
-    self.favicon_finder = FaviconFinder()
+    self.favicon_store = FaviconStore()
     self.reload()
 
   def load_bookmarks(self):
@@ -57,10 +55,10 @@ class Layout:
   def mtime(self):
     return os.path.getmtime(self.config_path)
 
-  def bookmark_iterator(self, bookmarks, urls=[]):
+  def bookmarks_list(self, bookmarks, urls=[]):
     for bookmark in bookmarks:
       if 'contents' in bookmark:
-        self.bookmark_iterator(bookmark['contents'], urls)
+        self.bookmarks_list(bookmark['contents'], urls)
       elif 'href' in bookmark:
         urls.append(bookmark['href'])
     return urls
@@ -78,9 +76,9 @@ class Layout:
     self.feed_hash = {}
 
     self.bookmark_bar = self.load_bookmarks()
-
-    bookmarks = self.bookmark_iterator(self.bookmark_bar)
-    self.favicon_finder.fetch_from_iterator(bookmarks)
+    bookmarks = self.bookmarks_list(self.bookmark_bar)
+    logger.debug("====== Layout calling fetch favicons!")
+    self.favicon_store.fetch_favicons_from(bookmarks)
 
     logger.debug("Completed Layout reload!")
 
