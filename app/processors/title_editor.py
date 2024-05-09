@@ -79,6 +79,7 @@ class TitleEditor:
         for chain in [self.llama3_chain, self.mistral_chain]:
           try:
             logger.info(f"Processing title {count}/{total}: {article.original_title}")
+            logger.debug(f"{self.script_hash}|{article.processed}")
             # , config={'callbacks': [ConsoleCallbackHandler()]})
             result = chain.invoke({"title": article.original_title, "summary": article.description})
             article.title = result['title']
