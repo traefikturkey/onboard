@@ -21,6 +21,7 @@ pillow
 python-dateutil
 python-dotenv
 pyyaml
+redis
 requests
 unidecode
 url-normalize

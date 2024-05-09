@@ -35,6 +35,7 @@
   "python.analysis.extraPaths": [
     "./app",
     "./app/services",
+    "./app",
     "./app"
   ]
 }

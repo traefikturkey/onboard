@@ -56,11 +56,10 @@ css.build()
 
 @app.context_processor
 def inject_current_date():
-  favicon_finder = models.layout.FaviconFinder()
   return {
     'today_date': datetime.now(),
     'site_title': os.environ.get('ONBOARD_SITE_TITLE', 'OnBoard'),
-    'favicon_exists': favicon_finder.favicon_exists,
+    'favicon_path': layout.favicon_path,
   }
 
 

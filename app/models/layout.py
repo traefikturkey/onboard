@@ -46,6 +46,9 @@ class Layout:
   def stop_scheduler(self):
     Scheduler.shutdown()
 
+  def favicon_path(self, url):
+    return self.favicon_store.icon_path(url)
+
   def is_modified(self):
     modified = self.mtime > self.last_reload
     logger.info(f"Layout modified?: {modified}")

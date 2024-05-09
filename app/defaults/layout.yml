@@ -85,9 +85,9 @@ tabs:
         - name: Frigate
           link: https://frigate.traefikturkey.icu/
         - name: Proxmox - ilude.com
-          link: https://pve.ilude.com:8006/
+          link: 'https://pve.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
         - name: Proxmox - traefikturkey.icu
-          link: https://pve-patriot.ilude.com:8006/
+          link: 'https://pve-patriot.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
         - name: Vaultwarden
           link: https://vaultwarden.ilude.com/
     
@@ -118,13 +118,17 @@ tabs:
         type: "feed"
         link: "https://www.battleswarmblog.com/"
         feed_url: "https://www.battleswarmblog.com/?feed=rss2"
-      - name: "Cafe Hayek"
+      - name: "Slashdot"
         type: "feed"
-        link: "https://cafehayek.com/"
-        feed_url: "https://cafehayek.com/feed"
-        filters:  
-          strip:
-          - summary: '^Tweet\s*\.{0,3}|\…\s+'
+        summary_enabled: False
+        link: "https://slashdot.org/"
+        feed_url: "https://rss.slashdot.org/Slashdot/slashdotMain"
+      - name: "Phoronix"
+        type: "feed"
+        summary_enabled: False
+        link: "https://www.phoronix.com"
+        feed_url: "https://www.phoronix.com/rss.php"
+      
         
     - column:
       widgets:
@@ -135,16 +139,14 @@ tabs:
       - name: "Krebs on Security"
         type: "feed"
         summary_enabled: False
-        display_limit: 12
         link: "https://krebsonsecurity.com/"
         feed_url: "https://krebsonsecurity.com/feed/"
-      - name: "Slashdot"
+      - name: "Linux Hint"
         type: "feed"
         summary_enabled: False
-        display_limit: 12
-        link: "https://slashdot.org/"
-        feed_url: "https://rss.slashdot.org/Slashdot/slashdotMain"
-
+        link: "https://linuxhint.com/"
+        feed_url: "https://linuxhint.com/feed/"
+  
     - column:
       widgets:
       - name: "Instapundit"
@@ -161,6 +163,13 @@ tabs:
         type: "feed"
         link: "https://twitchy.com/"
         feed_url: "https://twitchy.com/feed"
+      - name: "Cafe Hayek"
+        type: "feed"
+        link: "https://cafehayek.com/"
+        feed_url: "https://cafehayek.com/feed"
+        filters:  
+          strip:
+          - summary: '^Tweet\s*\.{0,3}|\…\s+'
       
 - tab: "Tech"
   columns:

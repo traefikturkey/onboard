@@ -10,4 +10,4 @@ app/static/assets
 
 notebooks/data/
 
-cache/
+app/.working/

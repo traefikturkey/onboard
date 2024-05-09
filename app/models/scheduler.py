@@ -30,8 +30,8 @@ class Scheduler:
           'max_workers': '5'
         },
         'apscheduler.executors.processpool': {
-          'type': 'processpool',
-          'max_workers': '5'
+          'class': 'apscheduler.executors.pool:ThreadPoolExecutor',
+          'max_workers': '20'
         }
       })
 

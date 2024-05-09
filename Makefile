@@ -1,5 +1,5 @@
 .SUFFIXES:
-SITE_PACKAGES := $(shell pip show pip | grep '^Location' | cut -d' ' -f2-)
+SITE_PACKAGES   := $(shell pip show pip | grep '^Location' | cut -d' ' -f2-)
 
 # read and include .devcontainer/.env exporting all variables
 ifneq (,$(wildcard .devcontainer/.env))
@@ -7,8 +7,16 @@ ifneq (,$(wildcard .devcontainer/.env))
 	export
 endif
 
+ifneq (,$(wildcard .env))
+	include .env
+	export
+endif
+
+
 .PHONY: run reqs ansible
 run: $(SITE_PACKAGES)
+	@clear
+	-@killall python3 3>&1 1>/dev/null 2>&3 || true
 	python3 app/app.py
 
 reqs:	$(SITE_PACKAGES)
