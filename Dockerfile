@@ -141,7 +141,7 @@ RUN mkdir /cache && \
     mkdir -p /app/static/assets &&\
     chown -R ${USER}:${USER} /app/static
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=20s \
+HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$PORT/api/healthcheck || exit 1
   
 
