@@ -70,9 +70,9 @@ class TitleEditor:
     if self.ollama_url:
 
       needs_processed = list(filter(lambda article: article.processed != self.script_hash, articles))
-      if len(needs_processed) > 10:
-        needs_processed = list(filter(lambda article: article.pub_date.replace(tzinfo=utc) >=
-                               (datetime.now() - timedelta(days=1)).replace(tzinfo=utc), articles))
+      # if len(needs_processed) > 10:
+      #   needs_processed = list(filter(lambda article: article.pub_date.replace(tzinfo=utc) >=
+      #                          (datetime.now() - timedelta(days=1)).replace(tzinfo=utc), needs_processed))
 
       total = len(needs_processed)
       for count, article in enumerate(needs_processed, start=1):
