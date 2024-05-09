@@ -18,6 +18,9 @@ ENV PROJECT_NAME=${PROJECT_NAME}
 ARG PROJECT_PATH=/app
 ENV PROJECT_PATH=${PROJECT_PATH}
 
+ARG ONBOARD_PORT=9830
+ENV ONBOARD_PORT=${ONBOARD_PORT}
+
 ENV PYTHON_DEPS_PATH=/dependencies
 ENV PYTHONPATH="${PYTHONPATH}:${PYTHON_DEPS_PATH}"
 ENV PYTHONUNBUFFERED=TRUE
@@ -142,7 +145,7 @@ RUN mkdir /cache && \
     chown -R ${USER}:${USER} /app/static
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
-    CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$PORT/api/healthcheck || exit 1
+    CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
   
 
 CMD [ "python3", "app.py" ]
