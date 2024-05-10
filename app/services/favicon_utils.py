@@ -79,13 +79,11 @@ def _download(url, icon_dir, icon_url):
       logger.debug(f"saving {url} as {filename}")
     else:
       filename = pwd.joinpath(icon_dir, favicon_failed_filename(url))
-      with open(filename, 'wb') as file:
-        file.write(f'response_code: {response.status_code} content-type: {response.headers.get("content-type", "")}')
+      print(f'response_code: {response.status_code} content-type: {response.headers.get("content-type", "")}', file=open(filename, 'w'))
       logger.debug(f"Marking {url} as failed with {filename}")
   except Exception as ex:
     filename = pwd.joinpath(icon_dir, favicon_failed_filename(url))
-    with open(filename, 'wb') as file:
-      file.write(f'Error: {ex}')
+    print(f'Error: {ex}', file=open(filename, 'w'))
     logger.debug(f"Marking {url} as failed with {filename}")
 
   logger.debug(f"_download({icon_url}) completed")
