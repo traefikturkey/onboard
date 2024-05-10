@@ -1,8 +1,7 @@
 import os
 import re
 import logging
-from services.redis_store import RedisStore
-from services.favicon_utils import base, download_favicon, get_favicon_filename, normalize_domain
+from services.favicon_utils import base, download_favicon, favicon_failed_filename, favicon_filename
 from models.scheduler import Scheduler
 from models.utils import pwd
 
@@ -16,7 +15,6 @@ class FaviconStore:
     self.icon_dir = pwd.joinpath(icon_dir).resolve()
     self.icon_dir.mkdir(parents=True, exist_ok=True)
 
-    self.redis_store = RedisStore()
     self.ip_pattern = re.compile(
         r"^(?:(?:https?://)?(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}"
         r"(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\d{1,5})?(?:\/)?$"
@@ -30,13 +28,17 @@ class FaviconStore:
     if not url:
       return None
 
-    favicon_filename = get_favicon_filename(url)
-    favicon_relative_path = f"{self.relative_icon_dir}/{favicon_filename}"
+    filename = favicon_filename(url)
+    favicon_relative_path = f"{self.relative_icon_dir}/{filename}"
 
     if pwd.joinpath(favicon_relative_path).exists():
       return f"/{favicon_relative_path}"
     else:
       return None
+
+  def favicon_failed(self, url) -> bool:
+    favicon_filename = favicon_failed_filename(url)
+    return pwd.joinpath(self.relative_icon_dir, favicon_filename).exists()
 
   def fetch_favicons_from(self, urls):
     base_urls = sorted(set(map(lambda url: base(url), urls)))
@@ -71,5 +73,5 @@ class FaviconStore:
         not url
         or bool(self.ip_pattern.match(url))
         or self.icon_path(url)
-        or self.redis_store.is_domain_processed(normalize_domain(url))
+        or self.favicon_failed(url)
     )

@@ -2,8 +2,8 @@ import logging
 import os
 import requests
 from bs4 import BeautifulSoup
-from services.redis_store import RedisStore
 from urllib.parse import urljoin, urlparse
+from models.utils import pwd
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
@@ -25,8 +25,12 @@ def base(url):
     return url
 
 
-def get_favicon_filename(url):
+def favicon_filename(url):
   return f"{normalize_domain(url)}.favicon.ico"
+
+
+def favicon_failed_filename(url):
+  return f"{normalize_domain(url)}.failed"
 
 
 def make_request(url):
@@ -36,8 +40,8 @@ def make_request(url):
   return requests.get(url, headers=request_headers, allow_redirects=True, timeout=5)
 
 
-def favicon_path(icon_path, url):
-  favicon_filename = get_favicon_filename(url)
+def favicon_path(icon_path, favicon_filename):
+  favicon_filename = favicon_filename(url)
   return os.path.join(icon_path, favicon_filename)
 
 
@@ -66,22 +70,22 @@ def download_favicon(url, icon_dir):
 
 
 def _download(url, icon_dir, icon_url):
-  redis_store = RedisStore()
   try:
     response = make_request(icon_url)
-
     if response.status_code == 200 and response.headers.get('content-type', '').lower().startswith('image/'):
-      filename = favicon_path(icon_dir, url)
-      with open(favicon_path(icon_dir, url), 'wb') as file:
+      filename = pwd.joinpath(icon_dir, favicon_filename(url))
+      with open(filename, 'wb') as file:
         file.write(response.content)
       logger.debug(f"saving {url} as {filename}")
     else:
-      redis_store.save_processed_domain(
-          normalize_domain(url),
-          reason=f'response_code: {response.status_code} content-type: {response.headers.get("content-type", "")}'
-      )
-      logger.debug(f"issues {url} complete")
+      filename = pwd.joinpath(icon_dir, favicon_failed_filename(url))
+      with open(filename, 'wb') as file:
+        file.write(f'response_code: {response.status_code} content-type: {response.headers.get("content-type", "")}')
+      logger.debug(f"Marking {url} as failed with {filename}")
   except Exception as ex:
-    redis_store.save_processed_domain(normalize_domain(url), reason=f'{ex}')
+    filename = pwd.joinpath(icon_dir, favicon_failed_filename(url))
+    with open(filename, 'wb') as file:
+      file.write(f'Error: {ex}')
+    logger.debug(f"Marking {url} as failed with {filename}")
 
   logger.debug(f"_download({icon_url}) completed")

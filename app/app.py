@@ -12,7 +12,6 @@ from flask_caching import Cache
 from typing import Any
 from services.link_tracker import link_tracker
 from utils import copy_default_to_configs
-from models.utils import pwd
 
 logging.basicConfig(format='%(asctime)s - %(message)s', level=logging.WARN)
 
