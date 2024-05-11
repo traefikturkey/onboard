@@ -2,6 +2,7 @@ import json
 import logging
 import os
 import yaml
+from services.bookmark_bar_manager import BookmarkBarManager
 from services.favicon_store import FaviconStore
 from models.bookmark import Bookmark
 from models.row import Row
@@ -19,29 +20,21 @@ class Layout:
   id: str = 'layout'
   tabs: list[Tab] = []
   headers: list[Bookmark] = []
-  bookmark_bar: list[dict] = []
 
-  def __init__(self, config_file: str = "configs/layout.yml", bookmarks_bar_file: str = "configs/bookmarks_bar.json"):
+  def __init__(self, config_file: str = "configs/layout.yml"):
     self.config_path = pwd.joinpath(config_file)
-    self.bookmark_bar_path = pwd.joinpath(bookmarks_bar_file)
 
-    try:
-      if not os.path.exists(pwd.joinpath(self.bookmark_bar_path)):
-        with open(pwd.joinpath(self.bookmark_bar_path), 'w', encoding='utf-8') as f:
-          json.dump([], f)
-    except Exception as ex:
-      logger.error(f"Error: {ex} creating empty bookmark bar file at {self.bookmark_bar_path}")
+    self.bar_manager = BookmarkBarManager()
 
-    self.favicon_store = FaviconStore()
     self.reload()
 
-  def load_bookmarks(self):
-    try:
-      with open(pwd.joinpath(self.bookmark_bar_path), 'r', encoding='utf-8') as f:
-        return json.load(f)
-    except Exception as ex:
-      logger.error(f"Error: Loading bookmark bar file from {self.bookmark_bar_path}", ex)
-      return None
+  @property
+  def bookmark_bar(self):
+    return self.bar_manager.bar
+
+  @property
+  def favicon_store(self):
+    return self.bar_manager.favicon_store
 
   def stop_scheduler(self):
     Scheduler.shutdown()
@@ -77,11 +70,6 @@ class Layout:
 
     self.last_reload = self.mtime
     self.feed_hash = {}
-
-    self.bookmark_bar = self.load_bookmarks()
-    bookmarks = self.bookmarks_list(self.bookmark_bar)
-    logger.debug("====== Layout calling fetch favicons!")
-    self.favicon_store.fetch_favicons_from(bookmarks)
 
     logger.debug("Completed Layout reload!")
 
