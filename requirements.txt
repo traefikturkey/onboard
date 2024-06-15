@@ -12,6 +12,7 @@ flask-bcrypt
 flask-caching
 flask-minify
 flask-sqlalchemy
+flask-minify[go]
 hypercorn==0.15.0
 langchain
 langchain-community
@@ -20,7 +21,6 @@ pandas
 pillow
 python-dateutil
 python-dotenv
-pyping
 pyyaml
 redis
 requests
