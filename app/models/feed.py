@@ -99,22 +99,25 @@ class Feed(Widget):
   def load_cache(self, cache_path: Path) -> list[FeedArticle]:
     articles = []
     if cache_path.exists():
-      with open(cache_path, 'r') as f:
-        json_articles = json.load(f)['articles']
+      try:
+        with open(cache_path, 'r') as f:
+          json_articles = json.load(f)['articles']
 
-        for article in json_articles:
-          articles.append(
-              FeedArticle(
-                  original_title=article.get('original_title', article['title']),
-                  title=article['title'],
-                  link=article['link'],
-                  description=article['description'],
-                  pub_date=dateutil.parser.parse(article['pub_date']),
-                  processed=article.get('processed', None),
-                  parent=self
-              )
-          )
-      logging.debug(f"Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
+          for article in json_articles:
+            articles.append(
+                FeedArticle(
+                    original_title=article.get('original_title', article['title']),
+                    title=article['title'],
+                    link=article['link'],
+                    description=article['description'],
+                    pub_date=dateutil.parser.parse(article['pub_date']),
+                    processed=article.get('processed', None),
+                    parent=self
+                )
+            )
+        logging.debug(f"Loaded {len(articles)} cached articles for {self.name} : file {self.cache_path}")
+      except Exception as ex:
+        logging.error(f"Failed to load cached articles for {self.name} : {str(ex)}")
     else:
       logging.debug(f"Failed to load cached articles for {self.name} : file {self.cache_path} does not exist")
 
