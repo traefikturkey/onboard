@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 import logging
 import os
-import pyping
+import socket
 
 from pytz import utc
 from models.feed_article import FeedArticle
@@ -18,12 +18,17 @@ logger.setLevel(logging.DEBUG)
 
 
 class TitleEditor:
+  def hostname_resolves(hostname):
+    try:
+        socket.gethostbyname(hostname)
+        return 1
+    except socket.error:
+        return 0
+    
   def __init__(self):
     self.ollama_url = os.getenv('OLLAMA_URL')
 
-    self.ping_result = (pyping.ping(self.ollama_url).ret_code == 0)
-
-    if self.ollama_url and self.ping_result:
+    if self.ollama_url and self.hostname_resolves(self.ollama_url):
       parser = StructuredOutputParser.from_response_schemas(
           [ResponseSchema(name="title", description="title of the article")]
       )
@@ -72,7 +77,7 @@ class TitleEditor:
       self.script_hash = calculate_sha1_hash(f"{system_prompt.content}{model_name}{model_temp}")
 
   def process(self, articles: list[FeedArticle]) -> list[FeedArticle]:
-    if self.ollama_url and self.ping_result:
+    if self.ollama_url and self.hostname_resolves(self.ollama_url):
 
       needs_processed = list(filter(lambda article: article.processed != self.script_hash, articles))
       # if len(needs_processed) > 10:
