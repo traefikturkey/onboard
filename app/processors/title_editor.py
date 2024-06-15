@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 import logging
 import os
+import pyping
 
 from pytz import utc
 from models.feed_article import FeedArticle
@@ -10,7 +11,7 @@ from langchain_core.messages import SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 # from langchain.callbacks.tracers import ConsoleCallbackHandler
 from models.utils import calculate_sha1_hash
-import pyping
+
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -20,7 +21,7 @@ class TitleEditor:
   def __init__(self):
     self.ollama_url = os.getenv('OLLAMA_URL')
 
-    self.ping_result = (pyping.ping('google.com').ret_code == 0)
+    self.ping_result = (pyping.ping(self.ollama_url).ret_code == 0)
 
     if self.ollama_url and self.ping_result:
       parser = StructuredOutputParser.from_response_schemas(
