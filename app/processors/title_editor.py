@@ -18,7 +18,7 @@ logger.setLevel(logging.DEBUG)
 
 
 class TitleEditor:
-  def hostname_resolves(hostname):
+  def hostname_resolves(self, hostname):
     try:
         socket.gethostbyname(hostname)
         return 1
