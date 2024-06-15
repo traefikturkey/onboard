@@ -20,6 +20,7 @@ pandas
 pillow
 python-dateutil
 python-dotenv
+pyping
 pyyaml
 redis
 requests

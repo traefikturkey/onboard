@@ -10,6 +10,7 @@ from langchain_core.messages import SystemMessage
 from langchain.output_parsers import ResponseSchema, StructuredOutputParser
 # from langchain.callbacks.tracers import ConsoleCallbackHandler
 from models.utils import calculate_sha1_hash
+import pyping
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -18,7 +19,10 @@ logger.setLevel(logging.DEBUG)
 class TitleEditor:
   def __init__(self):
     self.ollama_url = os.getenv('OLLAMA_URL')
-    if self.ollama_url:
+
+    self.ping_result = (pyping.ping('google.com').ret_code == 0)
+
+    if self.ollama_url and self.ping_result:
       parser = StructuredOutputParser.from_response_schemas(
           [ResponseSchema(name="title", description="title of the article")]
       )
@@ -67,7 +71,7 @@ class TitleEditor:
       self.script_hash = calculate_sha1_hash(f"{system_prompt.content}{model_name}{model_temp}")
 
   def process(self, articles: list[FeedArticle]) -> list[FeedArticle]:
-    if self.ollama_url:
+    if self.ollama_url and self.ping_result:
 
       needs_processed = list(filter(lambda article: article.processed != self.script_hash, articles))
       # if len(needs_processed) > 10:
