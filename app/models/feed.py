@@ -140,7 +140,7 @@ class Feed(Widget):
               original_title=entry.title,
               title=entry.title,
               link=entry.link,
-              description=entry.description,
+              description=description,
               pub_date=pub_date,
               processed=None,
               parent=self
