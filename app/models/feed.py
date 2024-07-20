@@ -129,6 +129,12 @@ class Feed(Widget):
     feed = feedparser.parse(feed_url)
     for entry in feed.entries:
       pub_date = dateutil.parser.parse(entry.get('published', entry.get('updated', formatdate())))
+
+      if 'description' in entry:
+        description = entry.description
+      else:
+        description = None
+
       articles.append(
           FeedArticle(
               original_title=entry.title,
