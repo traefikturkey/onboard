@@ -133,7 +133,7 @@ class Feed(Widget):
       if 'description' in entry:
         description = entry.description
       else:
-        description = None
+        description = ''
 
       articles.append(
           FeedArticle(
