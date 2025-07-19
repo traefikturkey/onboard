@@ -1037,6 +1037,66 @@
     ]
   },
   {
+    "name": "3D Printing",
+    "contents": 
+    [
+      {
+        "name": "CGTrader",
+        "href": "https://www.cgtrader.com/",
+        "favicon": "/static/assets/icons/cgtrader.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Cults3D",
+        "href": "https://cults3d.com/en",
+        "favicon": "/static/assets/icons/cults3d.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Makerworld",
+        "href": "https://makerworld.com/en",
+        "favicon": "/static/assets/icons/makerworld.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "My MiniFactory",
+        "href": "https://www.myminifactory.com/",
+        "favicon": "/static/assets/icons/myminifactory.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Pinshape",
+        "href": "https://pinshape.com/",
+        "favicon": "/static/assets/icons/pinshape.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Printables",
+        "href": "https://www.printables.com/",
+        "favicon": "/static/assets/icons/printables.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Shapeways",
+        "href": "https://www.shapeways.com/",
+        "favicon": "/static/assets/icons/shapeways.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Thangs",
+        "href": "https://thangs.com/",
+        "favicon": "/static/assets/icons/thangs.com.favicon.ico",
+        "add_date": "1598536238"
+      },
+      {
+        "name": "Thingiverse",
+        "href": "https://www.thingiverse.com/",
+        "favicon": "/static/assets/icons/thingiverse.com.favicon.ico",
+        "add_date": "1598536238"
+      }
+    ]
+  },
+  {
     "name": "Deals",
     "contents": [
       {
@@ -1079,6 +1139,53 @@
         "href": "https://www.struggleville.net/",
         "favicon": "/static/assets/icons/struggleville.net.favicon.ico",
         "add_date": "1699019699"
+      }
+    ]
+  },
+  {
+    "name": "Mac.Bids",
+    "contents": [
+      {
+        "name": "assortments",
+        "href": "https://www.mac.bid/search?q=assortments",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "instrument",
+        "href": "https://www.mac.bid/search?q=instrument",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "laser",
+        "href": "https://www.mac.bid/search?q=laser",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "pegboard",
+        "href": "https://www.mac.bid/search?q=pegboard",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "screws",
+        "href": "https://www.mac.bid/search?q=screws",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "wen",
+        "href": "https://www.mac.bid/search?q=wen",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
+      },
+      {
+        "name": "vevor",
+        "href": "https://www.mac.bid/search?q=vevor",
+        "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+        "add_date": "1559399537"
       }
     ]
   },
@@ -1210,6 +1317,18 @@
     "name": "Taiga",
     "href": "https://tree.taiga.io/project/ilude-agpm-demo/kanban",
     "favicon": "/static/assets/icons/taiga.io.favicon.ico",
+    "add_date": "1713923017"
+  },
+  {
+    "name": "ZeroOne",
+    "href": "https://cloud.zeroone.tech/horizon/auth/login/?next=/horizon/",
+    "favicon": "/static/assets/icons/zeroone_32x32.ico",
+    "add_date": "1742994137"
+  },
+  {
+    "name": "Mac.Bid",
+    "href": "https://www.mac.bid/",
+    "favicon": "/static/assets/icons/mac.bid.favicon.ico",
     "add_date": "1713923017"
   }
 ]
