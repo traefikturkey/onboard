@@ -11,3 +11,5 @@ app/static/assets
 notebooks/data/
 
 app/.working/
+
+.specstory/
