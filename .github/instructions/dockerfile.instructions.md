@@ -3,12 +3,10 @@ description: "Dockerfile and containerization best practices for Joyride DNS Ser
 applyTo: "**/Dockerfile*"
 ---
 
-# Dockerfile Best Practices
-
-## Core Requirements
+# Dockerfile Core Requirements
 
 ### Base Images
-- Use Alpine Linux (`python:3.12-alpine`) for minimal attack surface
+- Use Alpine Linux containers for minimal attack surface, unless there are issues installing a needed package, then use Debian Slim based containers.
 - Specify version tags for reproducible builds
 
 ### Multi-stage Builds
@@ -16,7 +14,7 @@ applyTo: "**/Dockerfile*"
 - Copy only necessary artifacts to final stage
 
 ### Security
-- Create non-root users: `adduser -D -s /bin/sh username`
+- Create non-root users: 
 - Set USER directive before EXPOSE and CMD
 - Never include secrets in layers
 
@@ -27,7 +25,7 @@ applyTo: "**/Dockerfile*"
 - Order commands from least to most frequently changing
 
 ### Package Organization  
-- Maintain alphabetical order in `RUN apk add` commands
+- Maintain alphabetical order in apk and apt packages
 
 ### Environment Variables
 - Use ARG for build-time variables (PUID, PGID, USER, WORKDIR)
@@ -40,8 +38,7 @@ applyTo: "**/Dockerfile*"
 - Set appropriate intervals and timeouts
 
 ### BuildKit Features
-- Use cache mounts for package managers
-- Support multi-platform builds when needed
+- Use cache mounts for RUN commands
 
 ## Example Pattern
 

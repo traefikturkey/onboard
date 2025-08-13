@@ -9,28 +9,28 @@ applyTo: "**/.devcontainer/**"
 - Use multi-stage Dockerfile with dedicated development target
 - Include Docker-in-Docker feature for container testing
 - Mount Docker socket for container integration testing
-- Use non-root user (`vscode`) for security
+- Use non-root user (`anvil`) for security
 
 ### Environment Management
-- Separate `.devcontainer/.env` for development-specific variables
 - Load both root `.env` and `.devcontainer/.env` via runArgs
-- Initialize environment with `make initialize`
+- Initialize environment with `make initialize` using `initializeCommand` devcontainer.json setting
+- `.devcontainer/.env` will be created by `make initialize`
 
 ### Development Tools
 - Configure zsh with autosuggestions for better developer experience
-- Install Python development dependencies automatically
+- Install Language development dependencies automatically
 - Set up proper VS Code extensions and settings
 
 ### Volume Mounts
-- Home directory persistence: `devcontainer-home` volume
+- Home directory persistence: `${localWorkspaceFolderBasename}-home` volume
 - SSH key access for git operations
+- Docker socket access for container management
 
 ### Integration Testing Support
 - Configure Make targets for comprehensive testing
 - Support background service management with PID files
 
 ### Post-Create Commands
-- Install development dependencies
-- Set up dotfiles and shell configuration
+- Use `postCreateCommand` to run `./.devcontainer/setup-dotfiles.sh` and update programming language libraries after container creation
 - Initialize development environment variables
 - Prepare testing infrastructure

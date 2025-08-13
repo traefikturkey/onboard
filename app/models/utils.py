@@ -1,11 +1,12 @@
 import base64
 import hashlib
 import os
-from pathlib import Path
 import re
-from typing import Any, List, TypeVar, Callable, Type, cast
+from pathlib import Path
+from typing import Any, Callable, List, Type, TypeVar, cast
 
 import unidecode
+
 T = TypeVar("T")
 
 pwd = Path(os.path.dirname(os.path.realpath(__file__))).parent
@@ -21,7 +22,8 @@ def from_list(f: Callable[[Any], T], x: Any, parent: Any = None) -> List[T]:
   if parent is None:
     return [f(y) for y in x]
   else:
-    return [f(y, parent) for y in x]
+    # Pass a tuple (y, parent) if needed, but f must accept it
+    return [f((y, parent)) for y in x]
 
 
 def from_none(x: Any) -> Any:
@@ -33,7 +35,7 @@ def from_union(fs, x):
   for f in fs:
     try:
       return f(x)
-    except:
+    except Exception:
       pass
   assert False
 
@@ -55,16 +57,16 @@ def from_int(x: Any) -> int:
 
 def normalize_text(text: str) -> str:
   text = unidecode.unidecode(text)
-  text = re.sub(r'&#8220;|&#8221;', '"', text)
-  text = re.sub(r'&#8217;|&#8216;', "'", text)
-  return re.sub(r'\s+|\n|\r', ' ', text).strip()
+  text = re.sub(r"&#8220;|&#8221;", '"', text)
+  text = re.sub(r"&#8217;|&#8216;", "'", text)
+  return re.sub(r"\s+|\n|\r", " ", text).strip()
 
 
 def calculate_sha1_hash(value: str) -> str:
   sha1 = hashlib.sha1()
-  sha1.update(value.encode('utf-8'))
-  hash = base64.urlsafe_b64encode(sha1.digest()).decode('ascii')
-  return ''.join(filter(str.isalnum, hash))
+  sha1.update(value.encode("utf-8"))
+  hash = base64.urlsafe_b64encode(sha1.digest()).decode("ascii")
+  return "".join(filter(str.isalnum, hash))
 
 
 def to_snake_case(input_string):
@@ -75,6 +77,6 @@ def to_snake_case(input_string):
   words = [word.replace("'", "") for word in words]
 
   # Convert words to lowercase and join them with underscores
-  snake_case_string = '_'.join(word.lower() for word in words)
+  snake_case_string = "_".join(word.lower() for word in words)
 
   return snake_case_string

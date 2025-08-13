@@ -20,6 +20,7 @@ Maintain `.gitignore` and `.dockerignore` files with alphabetical ordering and p
 - Build artifacts (`build/`, `dist/`, `*.egg-info/`)
 - Testing outputs (`.coverage`, `.htmlcov/`, `.pytest_cache/`)
 - Environment files (`.env.*`)
+- vscode extensions files (`.specstory/`)
 
 **Only .gitignore:**
 - Editor files (`.vscode/`, `.idea/`)

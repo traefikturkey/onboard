@@ -22,7 +22,7 @@ uv.lock:
 # Run ALL tests (including broken ones for debugging)
 test: uv.lock
 	@echo "Running Behave BDD tests..."
-	behave -f progress --no-capture || exit 1
+	uv run behave tests/features -f progress --no-capture || exit 1
 	@echo "Running ALL tests (excluding disabled tests)..."
 	uv run pytest tests/ --ignore=tests/support --cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
 

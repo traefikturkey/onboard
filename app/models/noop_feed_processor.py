@@ -1,3 +1,3 @@
 class NoOpFeedProcessor:
-	def process(self, feed):
-		return feed
+    def process(self, feed):
+        return feed
