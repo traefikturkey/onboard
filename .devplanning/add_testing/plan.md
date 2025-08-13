@@ -79,7 +79,7 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 5. [x] app/processors/title_editor.py: TitleEditor
 6. [x] app/models/tab.py: Tab
 7. [x] app/models/widget_item.py: WidgetItem
-8. [ ] app/models/widget.py: Widget
+8. [x] app/models/widget.py: Widget
 9. [ ] app/models/row.py: Row
 10. [ ] app/models/scheduler.py: Scheduler
 11. [ ] app/models/noop_feed_processor.py: NoOpFeedProcessor
