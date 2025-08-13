@@ -1,4 +1,8 @@
-**Important:** Before marking any test step complete, always run `make test` and resolve all errors, failures, and warnings. Only check off a step when the code and tests are fully passing and clean.
+**Important:**
+- Before marking any test step complete, always run `make test` and resolve all errors, failures, and warnings. Only check off a step when the code and tests are fully passing and clean.
+- After running `make test`, update the checklist in this file (change `[ ]` to `[x]` for the step).
+- Do not proceed to the next step until both actions are done and confirmed.
+- If any required action is skipped, go back and complete it before continuing.
 
 **Testing Requirements:**
 - **Code Coverage:** Aim for 90%+ test coverage for each class/module being tested
@@ -74,7 +78,7 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 ## Write Unit Tests for Each Class
 5. [x] app/processors/title_editor.py: TitleEditor
 6. [x] app/models/tab.py: Tab
-7. [ ] app/models/widget_item.py: WidgetItem
+7. [x] app/models/widget_item.py: WidgetItem
 8. [ ] app/models/widget.py: Widget
 9. [ ] app/models/row.py: Row
 10. [ ] app/models/scheduler.py: Scheduler
