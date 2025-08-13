@@ -8,8 +8,6 @@
     "PROJECT_NAME": "${localWorkspaceFolderBasename}",
     "PROJECT_PATH": "${containerWorkspaceFolder}",
     "FLASK_DEBUG": "True",
-    "ANSIBLE_LOCALHOST_WARNING": "False",
-    "ANSIBLE_INVENTORY_UNPARSED_WARNING": "False"
   },
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "build": { 
@@ -21,9 +19,7 @@
       "PROJECT_PATH": "${containerWorkspaceFolder}"
     }
   },
-  "initializeCommand": "touch ${localWorkspaceFolder}/.devcontainer/.env",
-  //"updateContentCommand": "make ansible",
-  //"postAttachCommand": "zsh -l",
+  "initializeCommand": "make initialize",
   "runArgs": ["--name","${localWorkspaceFolderBasename}_devcontainer", "--hostname","${localWorkspaceFolderBasename}", "--env-file",".devcontainer/.env", "--gpus","all"],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
@@ -57,7 +53,7 @@
         "files.readonlyFromPermissions": true,
         "python.analysis.extraPaths": [ "${containerWorkspaceFolder}/app" ],
         "terminal.integrated.defaultProfile.linux": "zsh",
-        "terminal.integrated.defaultProfile.windows": "pwsh",
+        "terminal.integrated.defaultProfile.windows": "PowerShell",
         "terminal.integrated.profiles.linux": {
           "bash": {
             "path": "/bin/bash",
@@ -69,7 +65,7 @@
             "icon": "terminal-linux",
             "args": ["-l"]
           },
-          "pwsh": {
+          "PowerShell": {
             "args": ["-nologo"],
             "icon": "terminal-powershell",
             "path": "pwsh"
