@@ -2,7 +2,7 @@ import sqlite3
 from datetime import datetime
 
 import pandas as pd
-from models.utils import calculate_sha1_hash, pwd
+from ..models.utils import calculate_sha1_hash, pwd
 
 
 class LinkTracker:

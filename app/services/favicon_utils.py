@@ -4,7 +4,7 @@ from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
-from models.utils import pwd
+from ..models.utils import pwd
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)

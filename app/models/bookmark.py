@@ -1,4 +1,4 @@
-from models.widget_item import WidgetItem
+from .widget_item import WidgetItem
 
 
 class Bookmark(WidgetItem):
@@ -14,7 +14,7 @@ class Bookmark(WidgetItem):
     name = dictionary.get("name")
     link = dictionary.get("link")
     return Bookmark(name, link, parent)
-  from models.widget import Widget
+  from .widget import Widget
 
   def __init__(self, name: str, link: str, parent: Widget) -> None:
     super().__init__(name, link, parent)

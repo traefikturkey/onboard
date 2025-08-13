@@ -2,7 +2,7 @@ import json
 import logging
 import os
 
-from models.utils import pwd
+from ..models.utils import pwd
 from services.favicon_store import FaviconStore
 
 logger = logging.getLogger(__name__)

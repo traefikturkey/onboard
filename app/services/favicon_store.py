@@ -1,8 +1,8 @@
 import logging
 import re
 
-from models.scheduler import Scheduler
-from models.utils import pwd
+from ..models.scheduler import Scheduler
+from ..models.utils import pwd
 from services.favicon_utils import (
     base,
     download_favicon,

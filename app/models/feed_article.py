@@ -5,9 +5,9 @@ import warnings
 from typing import Optional, Any
 
 from bs4 import BeautifulSoup, MarkupResemblesLocatorWarning
-# Removed import to avoid circular import: from models.feed import Feed
-from models.utils import normalize_text
-from models.widget_item import WidgetItem
+# Removed import to avoid circular import: from .feed import Feed
+from .utils import normalize_text
+from .widget_item import WidgetItem
 
 warnings.filterwarnings("ignore", category=MarkupResemblesLocatorWarning)
 

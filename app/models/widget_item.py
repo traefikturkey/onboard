@@ -5,11 +5,11 @@ import json
 from typing import Optional
 from urllib.parse import parse_qsl, urlencode, urlparse, urlunparse
 
-from models.utils import calculate_sha1_hash
+from .utils import calculate_sha1_hash
 
 
 class WidgetItem:
-  from models.widget import Widget
+  from .widget import Widget
 
   id: str
   name: str

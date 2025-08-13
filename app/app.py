@@ -7,7 +7,7 @@ import sys
 from datetime import datetime
 from typing import Any
 
-import models.layout
+from app.models import layout as layout_module
 from flask import Flask, make_response, redirect, render_template
 from flask_assets import Bundle, Environment
 from flask_caching import Cache
@@ -20,7 +20,7 @@ logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
 
 copy_default_to_configs()
-layout = models.layout.Layout()
+layout = layout_module.Layout()
 
 app = Flask(__name__)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
