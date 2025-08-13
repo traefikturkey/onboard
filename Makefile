@@ -68,10 +68,10 @@ build-dev: .env
 	$(CONTAINER_RUNTIME) build --target devcontainer -t onboard .
 
 start: build
-	$(CONTAINER_RUNTIME) run --rm -d --name onboard -p 9830:9830 onboard
+	$(CONTAINER_RUNTIME) run --rm -d --name onboard -p 5000:5000 onboard
 
 up: build
-	$(CONTAINER_RUNTIME) run --rm -it --name onboard -p 9830:9830 onboard
+	$(CONTAINER_RUNTIME) run --rm -it --name onboard -p 5000:5000 onboard
 
 
 down:

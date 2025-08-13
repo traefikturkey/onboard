@@ -18,7 +18,8 @@ class Scheduler:
 
     @staticmethod
     def start():
-        Scheduler.__scheduler.start()
+        if Scheduler.__scheduler:
+            Scheduler.__scheduler.start()
 
     @staticmethod
     def getScheduler() -> BackgroundScheduler:
@@ -36,7 +37,11 @@ class Scheduler:
                 }
             )
 
-            if bool(os.environ.get("FLASK_ENV", "development") == "development"):
+            # Check if scheduler is disabled for testing
+            if os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower() == "true":
+                # Don't start scheduler when disabled
+                pass
+            elif bool(os.environ.get("FLASK_ENV", "development") == "development"):
                 if bool(os.environ.get("WERKZEUG_RUN_MAIN")):
                     Scheduler.start()
             elif not Scheduler.__scheduler.running:

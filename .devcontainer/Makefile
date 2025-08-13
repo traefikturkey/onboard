@@ -55,14 +55,26 @@ clean:
 	@echo "Clean completed!"
 
 
-# # Stop background Joyride DNS server
-# stop-app:
-# 	@if [ -f /tmp/joyride-dns.pid ]; then \
-# 		kill -TERM `cat /tmp/joyride-dns.pid` 2>/dev/null || true; \
-# 	fi
+# Start background onboard server
+start-app:
+	@echo "Starting onboard server in background..."
+	@PYTHONPATH=app nohup uv run python run.py > /tmp/onboard.log 2>&1 & echo $$! > /tmp/onboard.pid
+	@echo "Onboard server started with PID: $$(cat /tmp/onboard.pid)"
+	@echo "Logs available at: /tmp/onboard.log"
 
-# # Run Flask application locally
-# run: stop-app
-# 	@FLASK_DEBUG=true uv run joyride
+# Stop background onboard server
+stop-app:
+	@if [ -f /tmp/onboard.pid ]; then \
+		echo "Stopping onboard server with PID: $$(cat /tmp/onboard.pid)"; \
+		kill -TERM $$(cat /tmp/onboard.pid) 2>/dev/null || true; \
+		rm -f /tmp/onboard.pid; \
+		echo "Onboard server stopped"; \
+	else \
+		echo "No onboard server PID file found"; \
+	fi
+
+# Run Flask application locally (foreground)
+run:
+	@PYTHONPATH=app uv run python run.py
 
 
