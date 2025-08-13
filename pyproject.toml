@@ -1,0 +1,64 @@
+[project]
+name = "onboard"
+version = "0.1.0"
+description = "Flask/Python project using UV for dependency management"
+authors = [{ name = "Mike Glenn", email = "mglenn@ilude.com" }]
+dependencies = [
+    "flask",
+    "aiohttp[speedups]",
+    "argcomplete",
+    "apscheduler",
+    "bs4",
+    "cssmin",
+    "docker",
+    "feedparser",
+    "flask-admin",
+    "flask[async]",
+    "flask-assets",
+    "flask-bcrypt",
+    "flask-caching",
+    "flask-minify",
+    "flask-sqlalchemy",
+    "flask-minify[go]",
+    "hypercorn==0.15.0",
+    "langchain",
+    "langchain-community",
+    "lxml==5.1.1",
+    "pandas",
+    "pillow",
+    "python-dateutil",
+    "python-dotenv",
+    "pyyaml",
+    "redis",
+    "requests",
+    "unidecode",
+    "url-normalize",
+    "w3lib"
+]
+
+[project.optional-dependencies]
+dev = [
+    "black==23.12.1",
+    "flake8==7.0.0", 
+    "isort==5.13.2",
+    "pytest==7.4.3",
+    "pytest-flask==1.3.0",
+    "pytest-cov==4.1.0",
+]
+test = [
+    "pytest==7.4.3",
+    "pytest-flask==1.3.0", 
+    "pytest-cov==4.1.0",
+]
+lint = [
+    "black==23.12.1",
+    "flake8==7.0.0",
+    "isort==5.13.2",
+]
+
+[tool.setuptools]
+py-modules = ["run"]
+
+[build-system]
+requires = ["setuptools>=45", "wheel", "uv"]
+build-backend = "setuptools.build_meta"

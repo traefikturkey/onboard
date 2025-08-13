@@ -84,7 +84,7 @@ restart: build down start
 # Semantic version bumping logic
 # -------------------------------
 SEMANTIC_VERSION := $(shell git tag --list 'v*.*.*' --sort=-v:refname | head -n 1)
-VERSION := $(shell echo $(SEMANTIC_VERSION) | sed 's/^v//')
+VERSION := $(shell if [ -z "$(SEMANTIC_VERSION)" ]; then echo "0.0.0"; else echo $(SEMANTIC_VERSION) | sed 's/^v//'; fi)
 
 # Export for docker-compose
 export SEMANTIC_VERSION

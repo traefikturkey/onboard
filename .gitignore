@@ -1,15 +1,46 @@
-.env
-__pycache__/
 
+# Environment variables
+.env
+.env.*
+.install-*
+
+# Python cache and compiled files
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Build, distribution, and packaging
+build/
+dist/
+*.egg-info/
+*.egg
+
+# Testing outputs
+.pytest_cache/
+.coverage
+coverage.xml
+.htmlcov/
+
+# Flask instance folder
+instance/
+
+# VS Code history
+.history/
+
+# Specstory tool
+.specstory/
+
+# UV virtual environment
+.venv/
+
+# App-specific ignores
 app/feed_cache
 app/configs/*
 !app/configs/.keep
-
 app/static/.*-cache
 app/static/assets
-
-notebooks/data/
-
 app/.working/
 
-.specstory/
+# Notebooks data
+notebooks/data/

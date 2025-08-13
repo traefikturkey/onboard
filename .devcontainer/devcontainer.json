@@ -20,7 +20,13 @@
     }
   },
   "initializeCommand": "make initialize",
-  "runArgs": ["--name","${localWorkspaceFolderBasename}_devcontainer", "--hostname","${localWorkspaceFolderBasename}", "--env-file",".devcontainer/.env", "--gpus","all"],
+  "postCreateCommand": "uv sync --extra dev && ./.devcontainer/setup-dotfiles.sh",
+  "runArgs": [
+    "--name","${localWorkspaceFolderBasename}_devcontainer", 
+    "--hostname","${localWorkspaceFolderBasename}", 
+    "--env-file",".devcontainer/.env", 
+    "--env-file","./.env", 
+    "--gpus","all"],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/anvil/.ssh,type=bind,consistency=cached",
@@ -45,7 +51,8 @@
         "redhat.vscode-yaml",
         "ms-python.black-formatter",
         "ms-python.isort",
-        "ms-python.autopep8"
+        "ms-python.autopep8",
+        "ms-python.python"
       ],
       "settings": {
         "dev.containers.copyGitConfig": false,

@@ -18,7 +18,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
-    gosu \
     less \
     libopenblas-dev \
     locales \
@@ -34,8 +33,13 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
 ENV LANG en_US.UTF-8  
 ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8   
+ENV LC_ALL en_US.UTF-8
 
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
+
+# Copy requirements files first (for better caching)
+COPY pyproject.toml uv.lock ./
 
 ##############################
 # Begin build 
@@ -60,13 +64,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* 
 
-COPY requirements.txt requirements.txt
-RUN pip3 install --upgrade pip && \
-    pip3 install --upgrade setuptools && \
-    pip3 install --upgrade wheel && \
-    mkdir -p ${PYTHON_DEPS_PATH} && \
-    pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} -r requirements.txt && \
-    rm -rf requirements.txt
+
 
 
 ##############################
@@ -96,16 +94,11 @@ ENV TERM_SHELL=${TERM_SHELL}
 RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     groupadd --gid ${PGID} ${USER} && \
     useradd --uid ${PUID} --gid ${PGID} -s /bin/${TERM_SHELL} -m ${USER} && \
-    echo "alias l='ls -lhA --color=auto --group-directories-first'" >> /etc/zshenv && \
-    echo "alias es='env | sort'" >> /etc/zshenv && \
-    echo "PS1='\h:\$(pwd) \$ '" >> /etc/zshenv && \
     mkdir -p ${PROJECT_PATH} && \
     chown -R ${USER}:${USER} ${PROJECT_PATH} && \
     chown -R ${USER}:${USER} ${HOME} && \
     # set the shell for root too
-    chsh -s /bin/${TERM_SHELL} && \
-    # https://www.jeffgeerling.com/blog/2023/how-solve-error-externally-managed-environment-when-installing-pip3
-    rm -rf /usr/lib/python${PYTHON_VERSION}/EXTERNALLY-MANAGED 
+    chsh -s /bin/${TERM_SHELL} 
 
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
@@ -126,18 +119,22 @@ if [ "$(id -u)" = "0" ]; then
   set -- gosu ${USER} "$@"
 else
   sudo chown -R ${USER}:${USER} /var/run/docker.sock
+  sudo chown -R ${USER}:${USER} ~/.cache
 fi
 
 echo "Running: $@"
 exec $@
 EOF
 
+# Create .venv directory in /app and set permissions
+RUN mkdir -p /app/.venv && chown anvil:anvil /app/.venv
+
 WORKDIR $PROJECT_PATH
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
 ##############################
 # Begin production 
-##############################
+
 FROM user_base as production
 
 COPY --from=build --chown=${USER}:${USER} ${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
@@ -152,50 +149,50 @@ RUN mkdir -p /app/static/icons && \
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
+# Install Python dependencies with cache mount
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync 
+
 CMD [ "python3", "app.py" ]
-
-##############################
-# Begin jupyter-builder 
-##############################
-FROM build as jupyter-builder
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    graphviz \
-    imagemagick \
-    libffi-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libpq-dev \
-    libssl-dev \
-    libxml2-dev \
-    libxslt-dev \
-    gnuplot \
-    gnuplot-x11 \
-    libzmq3-dev && \
-    apt-get autoremove -fy && \
-    apt-get clean && \
-    apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn watermark
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
-RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
-#RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
 
 ##############################
 # Begin devcontainer 
 ##############################
 FROM user_base as devcontainer
 
+WORKDIR /app
+
 RUN apt-get update && apt-get install -y --no-install-recommends \
-    ansible \
+    bash \
     bash-completion \
+    build-essential \
+    coreutils \
+    docker.io \
     dnsutils \
     exa \
+    gh \
+    git \
+    gnuplot \
+    gnuplot-x11 \
+    graphviz \
+    imagemagick \
     iproute2 \
     iputils-ping \
     jq \
+    libjpeg-dev \
+    libpng-dev \
+    libpq-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libzmq3-dev \
+    make \
+    nodejs \
+    npm \
     openssh-client \
+    passwd \
+    python3-pip \
+    python3-setuptools \
     ripgrep \
     rsync \
     sshpass \
@@ -203,6 +200,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     tar \
     tree \
     util-linux \
+    yarnpkg \
     yq \
     zsh \
     zsh-autosuggestions \
@@ -214,13 +212,17 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
+# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn watermark
+# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
+# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
+# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
+
+# Install Python dependencies with cache mount as the anvil user
+RUN --mount=type=cache,target=/tmp/.cache/uv \
+    uv sync --extra dev --active
+
 USER ${USER}
 
-COPY .devcontainer .devcontainer
-RUN ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/requirements.yml && \
-    ansible-playbook --inventory 127.0.0.1 --connection=local .devcontainer/ansible/install-docker.yml
-
-COPY --from=jupyter-builder --chown=${USER}:${USER}	${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
 
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]
