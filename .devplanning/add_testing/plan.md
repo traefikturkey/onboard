@@ -91,25 +91,25 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 17. [x] app/models/column.py: Column
 18. [x] app/models/exceptions.py: IDException
 19. [x] app/models/bookmark.py: Bookmark
-20. [ ] app/services/bookmark_bar_manager.py: BookmarkBarManager
-21. [ ] app/services/favicon_store.py: FaviconStore
-22. [ ] app/services/link_tracker.py: LinkTracker
-23. [ ] app/utils.py: Utility functions
+20. [x] app/services/bookmark_bar_manager.py: BookmarkBarManager
+21. [x] app/services/favicon_store.py: FaviconStore
+22. [x] app/services/link_tracker.py: LinkTracker
+23. [x] app/utils.py: Utility functions
 24. [ ] app/app.py: Flask app, routes, and startup logic
 
 ## Write Unit Tests for Key Functions
-25. [ ] app/models/utils.py: from_list
-26. [ ] app/models/utils.py: from_dict
-27. [ ] app/models/utils.py: normalize_text
-28. [ ] app/models/utils.py: calculate_sha1_hash
+25. [x] app/models/utils.py: from_list
+26. [x] app/models/utils.py: from_dict
+27. [x] app/models/utils.py: normalize_text
+28. [x] app/models/utils.py: calculate_sha1_hash
 29. [ ] app/app.py: index route
 30. [ ] app/app.py: feed route
 31. [ ] app/app.py: click_events route
 32. [ ] app/app.py: track route
 33. [ ] app/app.py: refresh route
 34. [ ] app/app.py: healthcheck route
-35. [ ] app/models/scheduler.py: Scheduler logic
-36. [ ] app/models/feed.py & app/models/feed_article.py: Feed/article processing
+35. [x] app/models/scheduler.py: Scheduler logic
+36. [x] app/models/feed.py & app/models/feed_article.py: Feed/article processing
 37. [ ] app/utils.py: copy_default_to_configs
 
 38. [ ] Integrate with CI/CD
