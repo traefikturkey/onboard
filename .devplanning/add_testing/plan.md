@@ -114,7 +114,7 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 
 38. [ ] Integrate with CI/CD
 39. [x] Measure Coverage
-40. [ ] Document Testing Approach
+40. [x] Document Testing Approach (`.devplanning/add_testing/testing_approach.md`)
 41. [ ] Iterate and Expand
 
 ## Key functions to test:
