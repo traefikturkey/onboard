@@ -58,6 +58,6 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 COPY app/ ./app/
 USER ${USER}
 HEALTHCHECK --interval=30s --timeout=10s \
-    CMD curl -f http://localhost:5000/health || exit 1
+    CMD curl -f http://localhost:9830/health || exit 1
 CMD ["python", "-m", "app.main"]
 ```

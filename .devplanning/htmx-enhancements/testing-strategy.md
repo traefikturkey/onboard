@@ -95,7 +95,7 @@ class TestHTMXExtensions:
 
     def test_preload_extension_loads(self, driver):
         """Test that preload extension is loaded and functional"""
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Check that htmx and preload extension are loaded
         script_result = driver.execute_script("""
@@ -108,7 +108,7 @@ class TestHTMXExtensions:
 
     def test_widget_preloads_on_hover(self, driver):
         """Test that widgets preload content on hover"""
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Find a widget with loading state
         widget = WebDriverWait(driver, 10).until(
@@ -145,7 +145,7 @@ class TestHTMXExtensions:
         if not supports_transitions:
             pytest.skip("Browser doesn't support View Transitions")
         
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Find tab links
         tabs = driver.find_elements(By.CSS_SELECTOR, '.tab-bar a[hx-get]')
@@ -169,7 +169,7 @@ class TestHTMXExtensions:
 ```python
 def test_alpine_state_preserved_with_morphing(self, driver):
     """Test that Alpine.js state is preserved during HTMX swaps"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Find widget with Alpine state
     widget_item = WebDriverWait(driver, 10).until(
@@ -207,7 +207,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 class TestLoadingPerformance:
     def test_perceived_loading_time_improvement(self, driver):
         """Test that perceived loading time is improved with preloading"""
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Measure time without preload (disable preload first)
         driver.execute_script("""
@@ -252,7 +252,7 @@ class TestLoadingPerformance:
         if not driver.execute_script("return 'startViewTransition' in document;"):
             pytest.skip("View Transitions not supported")
         
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Enable performance monitoring
         driver.execute_script("""
@@ -299,7 +299,7 @@ class TestLoadingPerformance:
 ```python
 def test_no_memory_leaks_with_extended_usage(self, driver):
     """Test that extended usage doesn't cause memory leaks"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Measure initial memory
     initial_memory = driver.execute_script("""
@@ -341,7 +341,7 @@ def test_no_memory_leaks_with_extended_usage(self, driver):
 def test_graceful_degradation(browser, driver_factory):
     """Test graceful degradation across browsers"""
     driver = driver_factory(browser)
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Test basic functionality works regardless of feature support
     tabs = driver.find_elements(By.CSS_SELECTOR, '.tab-bar a')
@@ -362,7 +362,7 @@ def test_progressive_enhancement(driver):
     chrome_options.add_argument('--disable-javascript')
     
     driver = webdriver.Chrome(options=chrome_options)
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Basic navigation should still work
     tabs = driver.find_elements(By.CSS_SELECTOR, '.tab-bar a')
@@ -381,7 +381,7 @@ def test_progressive_enhancement(driver):
 # tests/accessibility/test_accessibility.py
 def test_loading_states_have_aria_labels(driver):
     """Test that loading states are accessible to screen readers"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     widget = driver.find_element(By.CSS_SELECTOR, '.box[hx-get]')
     
@@ -398,7 +398,7 @@ def test_loading_states_have_aria_labels(driver):
 
 def test_focus_management_during_transitions(driver):
     """Test that focus is properly managed during view transitions"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Focus on a tab
     tab = driver.find_element(By.CSS_SELECTOR, '.tab-bar a[hx-get]')
@@ -419,7 +419,7 @@ def test_focus_management_during_transitions(driver):
 ```python
 def test_handles_network_errors_gracefully(driver):
     """Test that network errors are handled gracefully"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Simulate network error
     driver.execute_script("""
@@ -442,7 +442,7 @@ def test_handles_network_errors_gracefully(driver):
 
 def test_server_error_handling(driver):
     """Test handling of server errors (404, 500, etc.)"""
-    driver.get('http://localhost:5000')
+    driver.get('http://localhost:9830')
     
     # Create widget with invalid URL
     driver.execute_script("""
@@ -537,7 +537,7 @@ def measure_loading_performance():
     }
     
     try:
-        driver.get('http://localhost:5000')
+        driver.get('http://localhost:9830')
         
         # Measure widget loading
         for i in range(10):
@@ -634,7 +634,7 @@ pytest --cov=app --cov-report=html --cov-report=term tests/
 python scripts/performance_monitor.py > performance_report.txt
 
 # Generate accessibility report
-pa11y http://localhost:5000 --reporter json > accessibility_report.json
+pa11y http://localhost:9830 --reporter json > accessibility_report.json
 ```
 
 This testing strategy ensures that all HTMX enhancements are thoroughly validated for functionality, performance, accessibility, and cross-browser compatibility before deployment.

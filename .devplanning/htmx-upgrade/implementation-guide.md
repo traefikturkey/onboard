@@ -46,7 +46,7 @@ make test
 uv run python run.py
 
 # Check browser console for any HTMX errors
-# Navigate to http://localhost:5000
+# Navigate to http://localhost:9830
 ```
 
 ## Browser Compatibility Note
