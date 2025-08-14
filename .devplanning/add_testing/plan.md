@@ -110,7 +110,7 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 34. [x] app/app.py: healthcheck route
 35. [x] app/models/scheduler.py: Scheduler logic
 36. [x] app/models/feed.py & app/models/feed_article.py: Feed/article processing
-37. [ ] app/utils.py: copy_default_to_configs
+37. [x] app/utils.py: copy_default_to_configs
 
 38. [ ] Integrate with CI/CD
 39. [x] Measure Coverage
