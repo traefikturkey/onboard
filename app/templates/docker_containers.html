@@ -1,6 +1,10 @@
 <div class="box"
 {% if widget and widget['hx-get'] and not containers %}
-  hx-get="{{ widget['hx-get'] }}" hx-trigger="load" hx-swap="outerHTML"
+  hx-get="{{ widget['hx-get'] }}" 
+  hx-trigger="load" 
+  hx-swap="outerHTML"
+  hx-ext="preload"
+  preload="mouseenter"
 {% endif %}
 >
   <div class="box-header">

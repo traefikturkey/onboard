@@ -4,6 +4,7 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="htmx-config" content='{"globalViewTransitions": true}'>
 	<title>{{ site_title }}</title>
 	
 	<meta name="author" content="iLude">
@@ -16,6 +17,7 @@
 	<meta property="og:image:alt" content="{{ site_title }}">
 
 	<script defer src="https://unpkg.com/htmx.org@2.0.6/dist/htmx.min.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-preload@2.0.2/dist/preload.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 	<script>
     // Add Font Awesome icons
@@ -46,7 +48,13 @@
 				</div>
 				<div class="row tab-bar">
 					{% for tab in layout.tabs %}
-						<a href="/tab/{{tab.name}}" data-index="{{ loop.index }}"  data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
+						<a href="/tab/{{tab.name}}" 
+						   hx-get="/tab/{{tab.name}}"
+						   hx-target="#main-content"
+						   hx-swap="innerHTML transition:true"
+						   hx-push-url="true"
+						   data-index="{{ loop.index }}"  
+						   data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
 					{% endfor %}
 				</div>
 			</div>
@@ -54,11 +62,13 @@
 				<div class="logo"><!-- Placeholder for the logo --></div> 
 			</div>
 		</div>
-		{% for row in layout.tab(tab_name).rows:  %}
-			{% with row=row %}
-				{% include "row.html" %}
-			{% endwith %}
-		{% endfor %}
+		<div id="main-content">
+			{% for row in layout.tab(tab_name).rows:  %}
+				{% with row=row %}
+					{% include "row.html" %}
+				{% endwith %}
+			{% endfor %}
+		</div>
 		<footer>
 			<div>
 				<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
