@@ -2,8 +2,8 @@
   <div class="box {{ widget.type }}-box" 
        hx-get="{{ widget.hx_get }}" 
        hx-trigger="load" 
-       hx-swap="outerHTML"
-       hx-ext="preload,loading-states"
+       hx-swap="morph"
+       hx-ext="preload,loading-states,alpine-morph"
        preload="mouseenter"
        data-loading-class="widget-loading"
        data-loading-class-remove="widget-loading">
