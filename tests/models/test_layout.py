@@ -1,3 +1,7 @@
+import os
+from unittest.mock import MagicMock, patch
+from pathlib import Path
+import tempfile
 import unittest
 from types import SimpleNamespace
 from unittest.mock import MagicMock
@@ -71,13 +75,6 @@ class TestLayoutBasicMethods(unittest.TestCase):
 
     self.assertEqual(layout.favicon_path("http://example"), "icon-path")
     fake_favicon.icon_path.assert_called_once_with("http://example")
-import os
-import tempfile
-import unittest
-from pathlib import Path
-from unittest.mock import MagicMock, patch
-
-from app.models.layout import Layout
 
 
 class TestLayout(unittest.TestCase):
