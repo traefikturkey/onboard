@@ -78,7 +78,7 @@
    - Remove or deprecate `app/startup.py` once its responsibilities are fully migrated.
    - Migrate `Startup.archive_large_jsons()` behavior into `FeedCache.archive_large_jsons()` (already done) and ensure any remaining scheduling/registration logic is moved into application startup wiring that uses `MockScheduler`/`SchedulerInterface` for tests.
    - Update or remove tests that assert behavior on `Startup`; instead, test the new application wiring or `FeedCache` directly.
-   - cleanup and remove all old code and files that are no longer used
+   - Cleanup and remove all old code and files that are no longer used
 
 ### Phase 3 — Testing & QA
 
