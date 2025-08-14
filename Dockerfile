@@ -15,7 +15,9 @@ ENV UV_LINK_MODE=copy
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
@@ -110,7 +112,9 @@ ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 FROM base as build
 
 # Install build dependencies needed for compiling Python packages
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update && apt-get install -y --no-install-recommends \
     binutils \
     build-essential \
     pkg-config \
@@ -137,6 +141,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Install Python dependencies to a specific location using uv
 # This creates a complete virtual environment that can be copied to production
 RUN --mount=type=cache,target=/root/.cache/uv \
+    --mount=type=cache,target=/root/.cache/pip \
     uv sync --frozen --no-editable
 
 ##############################
@@ -168,11 +173,13 @@ CMD ["/bin/sh", "-c", "/app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONB
 ##############################
 # Begin devcontainer 
 ##############################
-FROM base as devcontainer
+FROM build as devcontainer
 
 WORKDIR /app
 
-RUN apt-get update && apt-get install -y --no-install-recommends \
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update && apt-get install -y --no-install-recommends \
     bash \
     bash-completion \
     build-essential \
@@ -222,8 +229,10 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
-# Install Python dependencies with cache mount as the anvil user
+# Install Python dependencies with cache mounts as the anvil user
 RUN --mount=type=cache,target=/tmp/.cache/uv \
+    --mount=type=cache,target=/root/.cache/pip \
+    --mount=type=cache,target=/root/.cache/uv \
     uv sync --extra dev --active
 
 USER ${USER}

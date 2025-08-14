@@ -1,0 +1,43 @@
+[project]
+name = "notebooks"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiohttp",
+    "beautifulsoup4",
+    "python-dotenv",
+    "feedparser",
+    "ipython",
+    "langchain",
+    "langchain-community",
+    "langchain-core",
+    "matplotlib",
+    "nltk",
+    "numpy",
+    "pandas",
+    "pillow",
+    "pyyaml",
+    "requests",
+    "scipy",
+    "scikit-learn",
+    "deptry>=0.23.1",
+    "networkx>=3.5",
+    "pillow>=11.3.0",
+    "yamlpath>=3.8.2",
+    "onboard",
+]
+[project.optional-dependencies]
+dev = []
+data = [
+    "gensim",
+    "torch",
+]
+
+[tool.deptry.per_rule_ignores]
+DEP001 = ["post_processor"]
+DEP002 = ["deptry", "onboard"]
+
+[tool.uv.sources]
+onboard = { workspace = true }

@@ -1,15 +1,14 @@
 import logging
 import re
 
+from app.models.scheduler import Scheduler
+from app.models.utils import pwd
 from services.favicon_utils import (
     base,
     download_favicon,
     favicon_failed_filename,
     favicon_filename,
 )
-
-from app.models.scheduler import Scheduler
-from app.models.utils import pwd
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

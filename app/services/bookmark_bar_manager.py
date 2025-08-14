@@ -2,9 +2,8 @@ import json
 import logging
 import os
 
-from services.favicon_store import FaviconStore
-
 from app.models.utils import pwd
+from services.favicon_store import FaviconStore
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)

@@ -59,6 +59,13 @@ clean:
 	@echo "Clean completed!"
 
 
+check-deps:
+	@echo "Checking for production dependencies issues..."
+	@uv run deptry ./app 
+	@echo "Checking for development dependencies issues..."
+	@uv run deptry . --ignore-notebooks
+
+
 # Start background onboard server
 start-app:
 	@echo "Starting onboard server in background..."

@@ -22,8 +22,8 @@ try:
     from app.models.feed_article import FeedArticle
     from app.models.utils import calculate_sha1_hash
 except Exception:
-    from models.feed_article import FeedArticle
-    from models.utils import calculate_sha1_hash
+    from app.models.feed_article import FeedArticle
+    from app.models.utils import calculate_sha1_hash
 
 
 # from langchain.callbacks.tracers import ConsoleCallbackHandler

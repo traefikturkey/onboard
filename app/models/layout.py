@@ -2,6 +2,7 @@ import logging
 import os
 
 import yaml
+
 from services.bookmark_bar_manager import BookmarkBarManager
 
 from .bookmark import Bookmark
