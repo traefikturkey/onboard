@@ -3,8 +3,10 @@
   hx-get="{{ widget['hx-get'] }}" 
   hx-trigger="load" 
   hx-swap="outerHTML"
-  hx-ext="preload"
+  hx-ext="preload,loading-states"
   preload="mouseenter"
+  data-loading-class="widget-loading"
+  data-loading-class-remove="widget-loading"
 {% endif %}
 >
   <div class="box-header">

@@ -1,3 +1,7 @@
+<head>
+    <title>{{ tab_name.title() }} - {{ site_title }}</title>
+    <meta property="og:title" content="{{ tab_name.title() }} - {{ site_title }}">
+</head>
 {% for row in layout.tab(tab_name).rows:  %}
     {% with row=row %}
         {% include "row.html" %}
