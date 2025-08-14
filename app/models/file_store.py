@@ -3,19 +3,19 @@ from pathlib import Path
 from typing import List
 
 
-class FileStore:
-  """Prototype-style FileStore base class.
+class CacheStore:
+  """Prototype-style CacheStore base class.
 
-  This class defines the interface/contract for file stores but is a
+  This class defines the interface/contract for cache-backed stores but is a
   regular concrete class (prototype pattern) rather than an ABC. Subclasses
   should override the concrete methods below. Callers can also instantiate
-  and clone an existing FileStore subclass via `clone()`.
+  and clone an existing CacheStore subclass via `clone()`.
 
   The change from an ABC to a prototype-style base makes it easier to
   construct lightweight test doubles and to clone configured instances.
   """
 
-  def clone(self) -> "FileStore":
+  def clone(self) -> "CacheStore":
     """Return a shallow copy of this instance (prototype clone).
 
     Subclasses that maintain non-trivial mutable state should override
@@ -28,8 +28,8 @@ class FileStore:
 
     Subclasses should provide a concrete implementation.
     """
-  # Default no-op implementation to allow direct invocation of the
-  # unbound function objects (some tests call these for coverage).
+  # Default no-op implementation: keep as `pass` so direct calls to the
+  # unbound function objects return None (used by coverage tests).
   pass
 
   def write_json_atomic(self, path: Path, data: dict) -> None:

@@ -6,7 +6,7 @@ from app.models import file_store as fs_mod
 def test_call_abstract_bodies_execute():
     # Access the raw function objects defined on the class dict and call them
     # directly to execute the 'pass' bodies and increase coverage.
-    cls = fs_mod.FileStore
+    cls = fs_mod.CacheStore
     # The abstract methods are stored in the class dict as functions
     for name in ("read_json", "write_json_atomic", "list_dir", "move"):
         fn = cls.__dict__[name]

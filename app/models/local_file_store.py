@@ -3,11 +3,11 @@ import shutil
 from pathlib import Path
 from typing import List
 
-from .file_store import FileStore
+from .file_store import CacheStore
 
 
-class LocalFileStore(FileStore):
-    """Filesystem-backed FileStore using real file IO operations."""
+class LocalFileStore(CacheStore):
+    """Filesystem-backed CacheStore using real file IO operations."""
 
     def read_json(self, path: Path) -> dict:
         with open(path, "r", encoding="utf-8") as f:

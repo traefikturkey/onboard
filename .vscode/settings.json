@@ -45,5 +45,18 @@
 		"docker build": true,
 		"/^make (format|lint|run|test|)$/": true,
 		"behave": true
-	}
+	},
+  
+  // Python indentation settings - force 4 spaces
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true,
+    "editor.detectIndentation": false,
+    "editor.formatOnSave": false
+  },
+  
+  // General editor settings to prevent indentation changes
+  "editor.detectIndentation": false,
+  "editor.tabSize": 4,
+  "editor.insertSpaces": true
 }

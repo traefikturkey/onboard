@@ -4,7 +4,7 @@ from datetime import date
 from pathlib import Path
 from typing import List, Optional
 
-from .file_store import FileStore
+from .file_store import CacheStore
 from .local_file_store import LocalFileStore
 from .utils import pwd
 
@@ -32,7 +32,7 @@ class FeedCache:
         self,
         feed_id: str,
         working_dir: Optional[Path] = None,
-        file_store: Optional[FileStore] = None,
+        file_store: Optional[CacheStore] = None,
     ):
         """Create a FeedCache bound to a feed id.
 
@@ -54,7 +54,7 @@ class FeedCache:
         self.cache_path: Path = cache_dir.joinpath(f"{self.feed_id}.json")
         # Dependency-injected file store; default to LocalFileStore for
         # backwards compatibility.
-        self.file_store: FileStore = file_store or LocalFileStore()
+        self.file_store: CacheStore = file_store or LocalFileStore()
 
         # Run best-effort startup logic (archive existing large cache files)
         # by default we avoid running this in testing or when the scheduler is disabled.

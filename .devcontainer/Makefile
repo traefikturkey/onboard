@@ -17,7 +17,11 @@ initialize:
 
 # Install development dependencies (only if pyproject.toml changed)
 uv.lock:
-	uv sync --extra devmake 
+	uv sync --dev
+
+# Run Flask application locally (foreground)
+run:
+	@PYTHONPATH=app uv run gunicorn run:app -b 0.0.0.0:$(ONBOARD_PORT)
 
 # Run ALL tests (including broken ones for debugging)
 test: uv.lock
@@ -54,7 +58,7 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	rm -rf .coverage .htmlcov/ .pytest_cache/ .venv/
+	rm -rf .coverage .htmlcov/ .pytest_cache/ 
 #	@rm -f /tmp/joyride-dns.pid 2>/dev/null || true
 	@echo "Clean completed!"
 
@@ -83,9 +87,3 @@ stop-app:
 	else \
 		echo "No onboard server PID file found"; \
 	fi
-
-# Run Flask application locally (foreground)
-run:
-	@PYTHONPATH=app uv run gunicorn run:app -b 0.0.0.0:$(ONBOARD_PORT)
-
-

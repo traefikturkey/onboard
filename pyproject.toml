@@ -32,6 +32,11 @@ dependencies = [
 [tool.deptry.per_rule_ignores]
 DEP002 = ["gunicorn", "python-dotenv"]
 
+[tool.black]
+line-length = 88
+skip-string-normalization = true
+target-version = ['py312']
+
 [tool.setuptools]
 py-modules = ["run"]
 

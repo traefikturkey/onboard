@@ -2,10 +2,10 @@ import json
 from pathlib import Path
 from typing import Dict, List
 
-from app.models.file_store import FileStore
+from app.models.file_store import CacheStore
 
 
-class InMemoryFileStore(FileStore):
+class InMemoryFileStore(CacheStore):
     """In-memory FileStore for unit tests.
 
     Simulates files in memory. Supports configurable content and size to test

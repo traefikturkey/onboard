@@ -44,3 +44,6 @@ app/.working/
 
 # Notebooks data
 notebooks/data/
+
+# Specstory chat history checkpoint
+.devplanning/**/specstory_history_checkpoint/*.md
