@@ -4,47 +4,6 @@ ARG PYTHON_VERSION=3.12-slim-bookworm
 FROM python:${PYTHON_VERSION} as base
 LABEL maintainer="Mike Glenn <mglenn@ilude.com>"
 
-ARG TZ=America/New_York
-ENV TZ=${TZ}
-
-ENV PYTHON_DEPS_PATH=/dependencies
-ENV PYTHONPATH="${PYTHONPATH}:${PYTHON_DEPS_PATH}"
-ENV PYTHONUNBUFFERED=TRUE
-ENV UV_LINK_MODE=copy
-
-ENV DEBIAN_FRONTEND=noninteractive
-ENV DEBCONF_NONINTERACTIVE_SEEN=true
-
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
-    apt-get update && apt-get install -y --no-install-recommends \
-    bash \
-    ca-certificates \
-    curl \
-    gosu \
-    less \
-    libopenblas-dev \
-    locales \
-    make \
-    tzdata \
-    wget && \
-    # cleanup
-    apt-get autoremove -fy && \
-    apt-get clean && \
-    apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/* 
-
-RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
-ENV LC_ALL en_US.UTF-8
-
-# Install uv
-COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
-
-# Copy requirements files first (for better caching)
-COPY pyproject.toml uv.lock ./
-
 # User management setup (previously in user_base stage)
 ARG PUID=${PUID:-1000}
 ARG PGID=${PGID:-1000}
@@ -64,6 +23,42 @@ ENV ONBOARD_PORT=${ONBOARD_PORT}
 ENV HOME=/home/${USER}
 ARG TERM_SHELL=zsh
 ENV TERM_SHELL=${TERM_SHELL} 
+
+ARG TZ=America/New_York
+ENV TZ=${TZ}
+
+ENV PYTHON_DEPS_PATH=/dependencies
+ENV PYTHONPATH="${PYTHONPATH}:${PYTHON_DEPS_PATH}"
+ENV PYTHONUNBUFFERED=TRUE
+ENV UV_LINK_MODE=copy
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBCONF_NONINTERACTIVE_SEEN=true
+
+RUN --mount=type=cache,target=/var/cache/apt \
+    --mount=type=cache,target=/var/lib/apt/lists \
+    apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    curl \
+    less \
+    libopenblas-dev \
+    locales \
+    make \
+    tzdata \
+    wget && \
+    # cleanup
+    apt-get autoremove -fy && \
+    apt-get clean && \
+    apt-get autoclean -y && \
+    rm -rf /var/lib/apt/lists/* 
+
+RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
+ENV LANG en_US.UTF-8  
+ENV LANGUAGE en_US:en  
+ENV LC_ALL en_US.UTF-8
+
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 
 RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     groupadd --gid ${PGID} ${USER} && \
@@ -115,6 +110,7 @@ FROM base as build
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt/lists \
     apt-get update && apt-get install -y --no-install-recommends \
+    bash \
     binutils \
     build-essential \
     pkg-config \
@@ -138,6 +134,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
+# Copy requirements files first (for better caching)
+COPY pyproject.toml uv.lock ./
+
 # Install Python dependencies to a specific location using uv
 # This creates a complete virtual environment that can be copied to production
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -151,7 +150,7 @@ FROM base as production
 
 # Copy the complete virtual environment from build stage
 # uv creates .venv in the current directory, so we copy that
-COPY --from=build --chown=${USER}:${USER} /.venv /app/.venv
+COPY --from=build --chown=${USER}:${USER} ${PROJECT_PATH}/.venv ${PROJECT_PATH}/.venv
 
 # Copy application code
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
@@ -159,16 +158,18 @@ COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 ENV FLASK_ENV=production
 
 # Create necessary directories for static assets
-RUN mkdir -p /app/static/icons && \
-    mkdir -p /app/static/assets && \
+RUN mkdir -p ${PROJECT_PATH}/static/icons && \
+    mkdir -p ${PROJECT_PATH}/static/assets && \
     chown -R ${USER}:${USER} /app/static
 
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
+USER ${USER}
+
 # Use the virtual environment from the build stage
 # Run the app with gunicorn using the pre-built virtual environment
-CMD ["/bin/sh", "-c", "/app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
+CMD ["/bin/sh", "-c", "uv run -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
 # Begin devcontainer 

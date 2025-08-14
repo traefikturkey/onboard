@@ -26,46 +26,47 @@
    - Methods: `add_job(...)`, `remove_job(job_id)`, `modify_job(job_id, ...)`
    - Properties: `running: bool`
 
-2. [ ] Implement `APSchedulerScheduler` concrete implementation
+2. [x] Implement `APSchedulerScheduler` concrete implementation
    - Create `app/models/apscheduler_scheduler.py` implementing `SchedulerInterface`
    - Wrap existing `app/models/scheduler.py` internals or use APScheduler directly
    - Ensure backward compatibility with current scheduler usage
 
-3. [ ] Implement `MockScheduler` for testing
+3. [x] Implement `MockScheduler` for testing
    - Create `tests/mocks/mock_scheduler.py` implementing `SchedulerInterface`
    - Record method calls, never start background threads
    - Provide assertion helpers for testing schedule registration
 
-4. [ ] Create `FileStore` abstraction
+4. [x] Create `FileStore` abstraction
    - Define `app/models/file_store.py` with abstract base class or protocol
    - Methods: `read_json(path: Path) -> dict`, `write_json_atomic(path: Path, data: dict)`, `list_dir(path: Path) -> List[Path]`, `move(src: Path, dst: Path)`
 
-5. [ ] Implement `LocalFileStore` concrete implementation
+5. [x] Implement `LocalFileStore` concrete implementation
    - Create `app/models/local_file_store.py` implementing `FileStore`
    - Use real filesystem operations (open/json/os.replace/shutil.move)
 
-6. [ ] Implement `InMemoryFileStore` for testing
+6. [x] Implement `InMemoryFileStore` for testing
    - Create `tests/mocks/in_memory_file_store.py` implementing `FileStore`
    - Simulate files in memory with configurable sizes for testing `archive_large_jsons`
    - Support corrupt JSON simulation for error case testing
 
-7. [ ] Implement `FeedCache` API and core behavior, and add comprehensive unit tests in `tests/models/test_feed_cache.py`.
+7. [x] Implement `FeedCache` API and core behavior, and add comprehensive unit tests in `tests/models/test_feed_cache.py`.
 
-   - Update `FeedCache` constructor: `FeedCache(feed_id: str, working_dir: Optional[Path] = None, file_store: Optional[FileStore] = None)`
-   - Use injected `file_store` for all file operations (defaults to `LocalFileStore`)
-   - Unit tests (pure unit tests using mocks):
-     - `test_load_creates_cache_dir_and_returns_empty_when_missing`
-     - `test_save_and_load_roundtrip`
-     - `test_archive_large_jsons_moves_large_files`
-     - `test_load_handles_corrupt_json_gracefully`
-     - `test_onboard_archive_on_startup_default_true` (unit test: simulate env and assert `Startup.archive_large_jsons` is invoked or not)
-     - `test_archive_job_registered_only_in_production_when_scheduler_running` (unit test: mock `Scheduler` to assert job registration behavior)
+    - Update `FeedCache` constructor: `FeedCache(feed_id: str, working_dir: Optional[Path] = None, file_store: Optional[FileStore] = None)`
+    - Use injected `file_store` for all file operations (defaults to `LocalFileStore`)
+    - Unit tests (pure unit tests using mocks):
+       - `test_load_creates_cache_dir_and_returns_empty_when_missing`
+       - `test_save_and_load_roundtrip`
+       - `test_archive_large_jsons_moves_large_files`
+       - `test_load_handles_corrupt_json_gracefully`
+       - `test_archive_on_load_behavior_exposed_via_FeedCache` (unit test: ensure archive-on-load can be enabled/disabled via parameter)
+       - `test_scheduler_registration_for_archiving` (unit test: mock `Scheduler`/`MockScheduler` to assert any job registration behavior is performed by the application wiring, not by `Startup`)
 
-   - Acceptance criteria:
-     - Atomic writes implemented using temp-file + `os.replace()` (or `Path.replace`) for `save_articles`.
-     - `archive_on_load` flag implemented and unit-testable; tests should disable it via env or parameter to avoid side-effects.
-     - `FeedCache.load_cache()` returns raw serializable article dicts (no `FeedArticle` conversion).
-     - Tests use `MockScheduler` and `InMemoryFileStore` for deterministic behavior — no real scheduler or filesystem interactions.
+    - Acceptance criteria:
+       - Atomic writes implemented using temp-file + `os.replace()` (or `Path.replace`) for `save_articles`.
+       - `archive_on_load` flag implemented and unit-testable; tests should disable it via env or parameter to avoid side-effects.
+       - `FeedCache.load_cache()` returns raw serializable article dicts (no `FeedArticle` conversion).
+       - Tests use `MockScheduler` and `InMemoryFileStore` for deterministic behavior — no real scheduler or filesystem interactions.
+       - Note: `Startup` will be removed at the end of this refactor — its archive and scheduling responsibilities are intended to be migrated into `FeedCache` or into application startup wiring. Tests should target `FeedCache` and the application-level wiring rather than `Startup` itself.
 
 ### Phase 2 — Integration
 
@@ -73,6 +74,11 @@
    - Update `app/models/feed.py` to instantiate `self.feed_cache = FeedCache(self.id)`
    - Keep `Feed` responsible for business logic: converting dict -> `FeedArticle`, dedupe, processors, sorting
    - Replace file-IO in `Feed` with calls to `FeedCache.load_cache()` and `FeedCache.save_articles()` as appropriate
+2. [ ] Remove legacy `Startup` and migrate responsibilities
+   - Remove or deprecate `app/startup.py` once its responsibilities are fully migrated.
+   - Migrate `Startup.archive_large_jsons()` behavior into `FeedCache.archive_large_jsons()` (already done) and ensure any remaining scheduling/registration logic is moved into application startup wiring that uses `MockScheduler`/`SchedulerInterface` for tests.
+   - Update or remove tests that assert behavior on `Startup`; instead, test the new application wiring or `FeedCache` directly.
+   - cleanup and remove all old code and files that are no longer used
 
 ### Phase 3 — Testing & QA
 
