@@ -114,11 +114,13 @@ class Layout:
         feed = self.get_feed(feed_id)
         feed.refresh()
 
-    def find_link(self, row: Row, widget_id: str, link_id: str) -> str:
+    from typing import Optional
+
+    def find_link(self, row: Row, widget_id: str, link_id: str) -> Optional[str]:
         for column in row.columns:
             if column.rows:
                 for row in column.rows:
-                    link = self.find_link(column, widget_id, link_id)
+                    link = self.find_link(row, widget_id, link_id)
                     if link:
                         return link
             else:

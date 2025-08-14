@@ -84,12 +84,12 @@ def test_from_dict_with_rows(self, mock_row_class, mock_from_list):
 10. [x] app/models/scheduler.py: Scheduler
 11. [x] app/models/noop_feed_processor.py: NoOpFeedProcessor
 12. [x] app/models/layout.py: Layout
-13. [ ] app/models/iframe.py: Iframe
-14. [ ] app/models/feed_article.py: FeedArticle
-15. [ ] app/models/feed.py: Feed
-16. [ ] app/models/bookmarks.py: Bookmarks
-17. [ ] app/models/column.py: Column
-18. [ ] app/models/exceptions.py: IDException
+13. [x] app/models/iframe.py: Iframe
+14. [x] app/models/feed_article.py: FeedArticle
+15. [x] app/models/feed.py: Feed
+16. [x] app/models/bookmarks.py: Bookmarks
+17. [x] app/models/column.py: Column
+18. [x] app/models/exceptions.py: IDException
 19. [x] app/models/bookmark.py: Bookmark
 20. [ ] app/services/bookmark_bar_manager.py: BookmarkBarManager
 21. [ ] app/services/favicon_store.py: FaviconStore
