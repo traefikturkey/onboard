@@ -39,18 +39,18 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
 
 
 if os.environ.get("FLASK_DEBUG", "False") == "True":
-  # Use explicit backend class path to avoid Flask-Caching deprecation warnings
-  cache_config = {"CACHE_TYPE": "flask_caching.backends.nullcache.NullCache"}
+    # Use explicit backend class path to avoid Flask-Caching deprecation warnings
+    cache_config = {"CACHE_TYPE": "flask_caching.backends.nullcache.NullCache"}
 else:
-  # 600 seconds = 10 minutes
-  # Use explicit backend class path to avoid Flask-Caching deprecation warnings
-  cache_config = {
-      "CACHE_TYPE": "flask_caching.backends.simplecache.SimpleCache",
-      "CACHE_DEFAULT_TIMEOUT": 600,
-  }
-  from flask_minify import Minify
+    # 600 seconds = 10 minutes
+    # Use explicit backend class path to avoid Flask-Caching deprecation warnings
+    cache_config = {
+        "CACHE_TYPE": "flask_caching.backends.simplecache.SimpleCache",
+        "CACHE_DEFAULT_TIMEOUT": 600,
+    }
+    from flask_minify import Minify
 
-  Minify(app=app, html=True, js=True, cssless=True)
+    Minify(app=app, html=True, js=True, cssless=True)
 
 cache = Cache(app, config=cache_config)
 page_timeout = int(os.environ.get("ONBOARD_PAGE_TIMEOUT", 600))
@@ -64,80 +64,73 @@ css.build()
 
 @app.context_processor
 def inject_current_date():
-  return {
-      "today_date": datetime.now(),
-      "site_title": os.environ.get("ONBOARD_SITE_TITLE", "OnBoard"),
-      "favicon_path": layout.favicon_path,
-  }
+    return {
+        "today_date": datetime.now(),
+        "site_title": os.environ.get("ONBOARD_SITE_TITLE", "OnBoard"),
+        "favicon_path": layout.favicon_path,
+    }
 
 
 @app.route("/")
 @app.route("/tab/<tab_name>")
 @cache.cached(timeout=page_timeout, unless=lambda: layout.is_modified)
 def index(tab_name=None):
-  # Load feeds and bookmarks
-  if layout.is_modified():
-    layout.reload()
+    # Load feeds and bookmarks
+    if layout.is_modified():
+        layout.reload()
 
-  if request.headers.get('HX-Request'):
-    # Return partial content for HTMX requests
-    return render_template(
-        'tab_content.html',
-        layout=layout,
-        tab_name=tab_name
-    )
-  else:
-    # Return full page for direct navigation
-    return render_template(
-        "index.html",
-        layout=layout,
-        tab_name=tab_name,
-        skip_htmx=False
-    )
+    if request.headers.get("HX-Request"):
+        # Return partial content for HTMX requests
+        return render_template("tab_content.html", layout=layout, tab_name=tab_name)
+    else:
+        # Return full page for direct navigation
+        return render_template(
+            "index.html", layout=layout, tab_name=tab_name, skip_htmx=False
+        )
 
 
 @app.route("/feed/<feed_id>")
 def feed(feed_id):
-  feed = layout.get_feed(feed_id)
-  # logger.debug(f"{feed.name} - {feed.display_items[0].title}")
-  return render_template(feed.template, widget=feed, skip_htmx=True)
+    feed = layout.get_feed(feed_id)
+    # logger.debug(f"{feed.name} - {feed.display_items[0].title}")
+    return render_template(feed.template, widget=feed, skip_htmx=True)
 
 
 @app.route("/click_events")
 def click_events():
-  df = link_tracker.get_click_events()
-  html = df.to_html(classes="data", index=False)
-  response = make_response(html)
-  response.headers["Content-Type"] = "text/html"
-  return response
+    df = link_tracker.get_click_events()
+    html = df.to_html(classes="data", index=False)
+    response = make_response(html)
+    response.headers["Content-Type"] = "text/html"
+    return response
 
 
 @app.route("/redirect/<feed_id>/<link_id>")
 def track(feed_id, link_id):
-  link = layout.get_link(feed_id, link_id)
-  # defensive: ensure link is a string and handle missing links gracefully
-  link_tracker.track_click_event(feed_id, link_id, link)
+    link = layout.get_link(feed_id, link_id)
+    # defensive: ensure link is a string and handle missing links gracefully
+    link_tracker.track_click_event(feed_id, link_id, link)
 
-  if not link:
-    logger.warning(
-        f"No target link found for feed={feed_id} link={link_id}; redirecting to index"
-    )
-    return redirect("/", code=302)
+    if not link:
+        logger.warning(
+            f"No target link found for feed={feed_id} link={link_id}; redirecting to index"
+        )
+        return redirect("/", code=302)
 
-  logger.info(f"redirecting to {link}")
-  return redirect(str(link), code=302)
+    logger.info(f"redirecting to {link}")
+    return redirect(str(link), code=302)
 
 
 @app.route("/feed/<feed_id>/refresh")
 def refresh(feed_id):
-  # layout exposes refresh_feeds (plural); call the correct method
-  layout.refresh_feeds(feed_id)
-  return redirect("/", code=302)
+    # layout exposes refresh_feeds (plural); call the correct method
+    layout.refresh_feeds(feed_id)
+    return redirect("/", code=302)
 
 
 @app.route("/api/healthcheck")
 def healthcheck():
-  return "OK", 200
+    return "OK", 200
 
 
 ###############################################################################
@@ -148,45 +141,45 @@ def healthcheck():
 
 
 if __name__ == "__main__":
-  port = int(os.environ.get("FLASK_PORT", os.environ.get("ONBOARD_PORT", 5000)))
-  development = bool(os.environ.get("FLASK_ENV", "development") == "development")
-  if development:
-    app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
-    if bool(os.environ.get("WERKZEUG_RUN_MAIN")):
-      print("")
-      layout.stop_scheduler()
-      app.logger.info("Shutting down...")
+    port = int(os.environ.get("FLASK_PORT", os.environ.get("ONBOARD_PORT", 5000)))
+    development = bool(os.environ.get("FLASK_ENV", "development") == "development")
+    if development:
+        app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
+        if bool(os.environ.get("WERKZEUG_RUN_MAIN")):
+            print("")
+            layout.stop_scheduler()
+            app.logger.info("Shutting down...")
 
-    sys.exit()
-  else:
-    try:
-      from hypercorn.asyncio import serve
-      from hypercorn.config import Config
+        sys.exit()
+    else:
+        try:
+            from hypercorn.asyncio import serve
+            from hypercorn.config import Config
 
-      shutdown_event = asyncio.Event()
+            shutdown_event = asyncio.Event()
 
-      def _signal_handler(*_: Any) -> None:
-        logger.info("Shutting down...")
-        layout.stop_scheduler()
-        shutdown_event.set()
+            def _signal_handler(*_: Any) -> None:
+                logger.info("Shutting down...")
+                layout.stop_scheduler()
+                shutdown_event.set()
 
-      config = Config()
-      config.accesslog = "-"
-      config.errorlog = "-"
-      config.loglevel = "DEBUG"
-      config.bind = f"0.0.0.0:{port}"
-      loop = asyncio.new_event_loop()
-      loop.add_signal_handler(signal.SIGTERM, _signal_handler)
+            config = Config()
+            config.accesslog = "-"
+            config.errorlog = "-"
+            config.loglevel = "DEBUG"
+            config.bind = f"0.0.0.0:{port}"
+            loop = asyncio.new_event_loop()
+            loop.add_signal_handler(signal.SIGTERM, _signal_handler)
 
-      async def _shutdown_trigger() -> None:
-        # wait until the event is set, then return None (type-friendly)
-        await shutdown_event.wait()
-        return None
+            async def _shutdown_trigger() -> None:
+                # wait until the event is set, then return None (type-friendly)
+                await shutdown_event.wait()
+                return None
 
-      loop.run_until_complete(
-          serve(app, config, shutdown_trigger=_shutdown_trigger)
-      )
-    except KeyboardInterrupt:
-      logger.info("\nShutting down...")
-      layout.stop_scheduler()
-      sys.exit()
+            loop.run_until_complete(
+                serve(app, config, shutdown_trigger=_shutdown_trigger)
+            )
+        except KeyboardInterrupt:
+            logger.info("\nShutting down...")
+            layout.stop_scheduler()
+            sys.exit()

@@ -12,6 +12,7 @@ import dateutil
 import feedparser
 
 from .feed_article import FeedArticle
+from .feed_cache import FeedCache
 from .noop_feed_processor import NoOpFeedProcessor
 from .utils import calculate_sha1_hash, pwd
 from .widget import Widget
@@ -48,15 +49,31 @@ class Feed(Widget):
                             }
                         )
 
-        cache_dir = pwd.joinpath(
-            os.getenv("WORKING_STORAGE", ".working"), "cache"
-        ).resolve()
-        if not cache_dir.exists():
-            cache_dir.mkdir(parents=True, exist_ok=True)
+        # Use FeedCache to centralize cache path & IO
+        self.feed_cache = FeedCache(self.id)
+        self.cache_path = self.feed_cache.cache_path
 
-        self.cache_path = cache_dir.joinpath(f"{self.id}.json")
-
-        self.items = self.load_cache(self.cache_path)
+        # load cached article dicts then convert to FeedArticle
+        dicts = self.feed_cache.load_cache(archive_on_load=False)
+        self.items = []
+        for article in dicts:
+            try:
+                self.items.append(
+                    FeedArticle(
+                        original_title=article.get(
+                            "original_title", article.get("title")
+                        ),
+                        title=article.get("title"),
+                        link=article.get("link"),
+                        description=article.get("description", ""),
+                        pub_date=dateutil.parser.parse(article.get("pub_date")),
+                        processed=article.get("processed", None),
+                        parent=self,
+                    )
+                )
+            except Exception:
+                # skip malformed entries
+                continue
         if self.items:
             self._last_updated = datetime.fromtimestamp(
                 os.path.getmtime(self.cache_path)
@@ -223,7 +240,9 @@ class Feed(Widget):
     def save_articles(self, articles: list[FeedArticle]):
         # load all existing articles from the json file, and add the new ones
         # then apply the filters
-        all_articles = self.load_cache(self.cache_path) + articles
+        # Get existing articles as FeedArticle objects
+        existing = self.items or []
+        all_articles = existing + articles
 
         # using article.id remove duplicates from articles
         all_articles = self.remove_duplicate_articles(all_articles)
@@ -233,25 +252,21 @@ class Feed(Widget):
         # sort articles in place by pub_date newest to oldest
         all_articles.sort(key=lambda a: a.pub_date, reverse=True)
 
-        data = {
-            "name": self.name,
-            "link": self.link,
-            "articles": [
-                {
-                    "original_title": article.original_title,
-                    "title": article.title,
-                    "link": article.link,
-                    "description": article.description,
-                    "pub_date": utils.format_datetime(article.pub_date),
-                    "id": article.id,
-                    "processed": article.processed,
-                }
-                for article in all_articles
-            ],
-        }
-        with open(self.cache_path, "w") as f:
-            json.dump(data, f, indent=2)
+        # Persist using FeedCache (save serializable dicts)
+        serializable = [
+            {
+                "original_title": article.original_title,
+                "title": article.title,
+                "link": article.link,
+                "description": article.description,
+                "pub_date": utils.format_datetime(article.pub_date),
+                "id": article.id,
+                "processed": article.processed,
+            }
+            for article in all_articles
+        ]
 
+        self.feed_cache.save_articles(serializable)
         logger.info(
             f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}"
         )

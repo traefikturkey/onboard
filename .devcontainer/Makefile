@@ -34,7 +34,7 @@ test: uv.lock
 # E203: whitespace before ':' (conflicts with black formatting)
 # W503: line break before binary operator (conflicts with black formatting)
 # E501: line too long (disabled to match black's line length handling)
-lint: uv.lock
+lint: format
 	uv run flake8 app tests --extend-ignore=E203,W503,E501
 	@echo "Linting completed successfully!"
 
