@@ -1,15 +1,10 @@
 import os
-import sys
 import tempfile
-import time
 import unittest
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
 from app.models.layout import Layout
-from app.models.tab import Tab
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 
 class TestLayoutExtended(unittest.TestCase):
@@ -61,7 +56,6 @@ class TestLayoutExtended(unittest.TestCase):
             os.unlink(path)
 
     def test_mtime_and_is_modified(self):
-        # write a temp config and set last_reload in the past
         path = self.write_yaml_config("tabs: []\nheaders: []\n")
         try:
             self.layout.config_path = path
@@ -76,7 +70,6 @@ class TestLayoutExtended(unittest.TestCase):
             os.unlink(path)
 
     def test_get_feeds_widgets_feed_type(self):
-        # columns with widgets, one feed and one non-feed
         feed_widget = MagicMock()
         feed_widget.type = "feed"
         feed_widget.id = "f1"
@@ -92,13 +85,11 @@ class TestLayoutExtended(unittest.TestCase):
         self.assertNotIn(other_widget, feeds)
 
     def test_get_feed_and_refresh(self):
-        # create a feed-like object with id and refresh method
         feed = MagicMock()
         feed.id = "feed1"
         feed.type = "feed"
         feed.refresh = MagicMock()
 
-        # Build structure: tab -> row -> column with widgets [feed]
         column = MagicMock()
         column.rows = []
         column.widgets = [feed]
@@ -110,16 +101,13 @@ class TestLayoutExtended(unittest.TestCase):
         self.layout.tabs = [tab]
         self.layout.feed_hash = {}
 
-        # get_feed should populate feed_hash and return the feed
         found = self.layout.get_feed("feed1")
         self.assertIs(found, feed)
 
-        # refresh_feeds should call refresh on the feed
         self.layout.refresh_feeds("feed1")
         feed.refresh.assert_called_once()
 
     def test_get_link_no_match_returns_none(self):
-        # no headers and empty tabs
         self.layout.id = "layout"
         self.layout.headers = []
         self.layout.tabs = []
@@ -140,7 +128,6 @@ class TestLayoutExtended(unittest.TestCase):
             self.layout.stop_scheduler()
             mock_shutdown.assert_called_once()
 
-        # favicon_path delegates
         fake_favicon.icon_path.return_value = "icon-path"
         self.assertEqual(self.layout.favicon_path("u"), "icon-path")
         fake_favicon.icon_path.assert_called_once_with("u")

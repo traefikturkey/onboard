@@ -1,13 +1,10 @@
 import json
 import os
-import sys
 import tempfile
 import unittest
 from datetime import datetime
 from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from app.models.feed import Feed
 from app.models.feed_article import FeedArticle
@@ -51,7 +48,6 @@ class TestFeedExtra(unittest.TestCase):
                     self.description = description
 
             def get(self, key, default=None):
-                # behave like feedparser entry.get
                 return getattr(self, key, default)
 
             def __contains__(self, key):
@@ -70,7 +66,6 @@ class TestFeedExtra(unittest.TestCase):
         widget = self.make_widget()
         f = Feed(widget)
 
-        # point widget to use the test_processor created in workspace/processors
         f.widget = {"process": [{"processor": "test_processor"}]}
 
         a = FeedArticle(
@@ -79,7 +74,7 @@ class TestFeedExtra(unittest.TestCase):
             link="l",
             description="d",
             pub_date=datetime.now(),
-            processed=None,
+            processed="",
             parent=f,
         )
         res = f.processors([a])
@@ -119,10 +114,10 @@ class TestFeedExtra(unittest.TestCase):
             link="l",
             description="d",
             pub_date=datetime(2020, 1, 1),
-            processed=None,
+            processed="",
             parent=f,
         )
-        res = f.save_articles([a])
+        f.save_articles([a])
 
         self.assertTrue(f.cache_path.exists())
         data = json.loads(f.cache_path.read_text())

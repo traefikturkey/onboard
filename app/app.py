@@ -39,10 +39,15 @@ app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
 
 
 if os.environ.get("FLASK_DEBUG", "False") == "True":
-    cache_config = {"CACHE_TYPE": "null"}
+    # Use explicit backend class path to avoid Flask-Caching deprecation warnings
+    cache_config = {"CACHE_TYPE": "flask_caching.backends.nullcache.NullCache"}
 else:
     # 600 seconds = 10 minutes
-    cache_config = {"CACHE_TYPE": "simple", "CACHE_DEFAULT_TIMEOUT": 600}
+    # Use explicit backend class path to avoid Flask-Caching deprecation warnings
+    cache_config = {
+        "CACHE_TYPE": "flask_caching.backends.simplecache.SimpleCache",
+        "CACHE_DEFAULT_TIMEOUT": 600,
+    }
     from flask_minify import Minify
 
     Minify(app=app, html=True, js=True, cssless=True)
@@ -98,16 +103,23 @@ def click_events():
 @app.route("/redirect/<feed_id>/<link_id>")
 def track(feed_id, link_id):
     link = layout.get_link(feed_id, link_id)
-
+    # defensive: ensure link is a string and handle missing links gracefully
     link_tracker.track_click_event(feed_id, link_id, link)
 
+    if not link:
+        logger.warning(
+            f"No target link found for feed={feed_id} link={link_id}; redirecting to index"
+        )
+        return redirect("/", code=302)
+
     logger.info(f"redirecting to {link}")
-    return redirect(link, code=302)
+    return redirect(str(link), code=302)
 
 
 @app.route("/feed/<feed_id>/refresh")
 def refresh(feed_id):
-    layout.refresh_feed(feed_id)
+    # layout exposes refresh_feeds (plural); call the correct method
+    layout.refresh_feeds(feed_id)
     return redirect("/", code=302)
 
 
@@ -153,8 +165,14 @@ if __name__ == "__main__":
             config.bind = f"0.0.0.0:{port}"
             loop = asyncio.new_event_loop()
             loop.add_signal_handler(signal.SIGTERM, _signal_handler)
+
+            async def _shutdown_trigger() -> None:
+                # wait until the event is set, then return None (type-friendly)
+                await shutdown_event.wait()
+                return None
+
             loop.run_until_complete(
-                serve(app, config, shutdown_trigger=shutdown_event.wait)
+                serve(app, config, shutdown_trigger=_shutdown_trigger)
             )
         except KeyboardInterrupt:
             logger.info("\nShutting down...")

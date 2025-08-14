@@ -1,13 +1,8 @@
 import json
 import os
-import sys
 import tempfile
 import unittest
-from datetime import datetime
-from pathlib import Path
 from unittest.mock import MagicMock, patch
-
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../..")))
 
 from app.models.feed import Feed
 
@@ -97,6 +92,20 @@ class TestFeedMore(unittest.TestCase):
         widget = self.make_widget()
         f = Feed(widget)
         f.job = None
-        with patch("logging.warn") as mock_warn:
+        # patch the module logger.warning used by Feed.refresh
+        with patch("app.models.feed.logger.warning") as mock_warn:
+            f.refresh()
+            mock_warn.assert_called()
+
+    def test_refresh_with_missing_job_attribute_no_raise(self):
+        """Ensure refresh() is defensive when the 'job' attribute is missing entirely."""
+        widget = self.make_widget()
+        f = Feed(widget)
+        # remove the attribute if present to simulate older objects
+        if hasattr(f, "job"):
+            delattr(f, "job")
+
+        with patch("app.models.feed.logger.warning") as mock_warn:
+            # should not raise
             f.refresh()
             mock_warn.assert_called()

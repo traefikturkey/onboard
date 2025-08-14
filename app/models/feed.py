@@ -81,11 +81,15 @@ class Feed(Widget):
                 self.refresh()
 
     def refresh(self):
-        if self.job:
+        # Be defensive: some Feed instances may not have a 'job' attribute
+        if hasattr(self, "job") and self.job:
             logging.debug(f"Feed: {self.name} scheduled for immediate update now!")
-            self.job.modify(next_run_time=datetime.now())
+            try:
+                self.job.modify(next_run_time=datetime.now())
+            except Exception:
+                logger.exception(f"Failed to modify job for feed {self.name}")
         else:
-            logging.warn(f"Feed: {self.name} does not have a scheduled job!")
+            logger.warning(f"Feed: {self.name} does not have a scheduled job!")
 
     @property
     def needs_update(self):
@@ -154,23 +158,23 @@ class Feed(Widget):
         articles = []
         feed = feedparser.parse(feed_url)
         for entry in feed.entries:
-            pub_date = dateutil.parser.parse(
-                entry.get("published", entry.get("updated", formatdate()))
-            )
+            # coerce potentially unexpected types to str for parsing and FeedArticle
+            published = entry.get("published", entry.get("updated", formatdate()))
+            pub_date = dateutil.parser.parse(str(published))
 
             if "description" in entry:
-                description = entry.description
+                description = str(entry.description)
             else:
                 description = ""
 
             articles.append(
                 FeedArticle(
-                    original_title=entry.title,
-                    title=entry.title,
-                    link=entry.link,
+                    original_title=str(entry.title),
+                    title=str(entry.title),
+                    link=str(entry.link),
                     description=description,
                     pub_date=pub_date,
-                    processed=None,
+                    processed="",
                     parent=self,
                 )
             )

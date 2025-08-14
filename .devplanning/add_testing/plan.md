@@ -153,7 +153,7 @@ tests/
 
 ```
 test:
-    pytest --cov=app --cov=models --cov=services --cov-report=term-missing
+    uv run pytest --cov=app --cov=models --cov=services --cov-report=term-missing
 bdd:
     behave tests/features
 ```
