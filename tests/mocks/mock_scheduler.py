@@ -13,6 +13,7 @@ class MockScheduler(SchedulerInterface):
     def __init__(self) -> None:
         self.jobs: Dict[str, Dict[str, Any]] = {}
         self._running = False
+        self._remove_all_called = False
 
     @property
     def running(self) -> bool:
@@ -40,6 +41,13 @@ class MockScheduler(SchedulerInterface):
 
     def shutdown(self, wait: bool = True) -> None:
         self._running = False
+
+    def remove_all_jobs(self) -> None:
+        """Test helper to mirror APScheduler's remove_all_jobs API.
+
+        Records that a bulk-clear was requested so tests can assert it.
+        """
+        self._remove_all_called = True
 
     # Test helpers
     def has_job(self, job_id: str) -> bool:

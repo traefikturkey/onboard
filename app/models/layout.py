@@ -5,11 +5,11 @@ import yaml
 
 from services.bookmark_bar_manager import BookmarkBarManager
 
+from .apscheduler import Scheduler
 from .bookmark import Bookmark
 from .column import Column
 from .feed import Feed
 from .row import Row
-from .scheduler import Scheduler
 from .tab import Tab
 from .utils import from_list, pwd
 

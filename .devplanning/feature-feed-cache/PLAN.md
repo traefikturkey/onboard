@@ -70,11 +70,11 @@
 
 ### Phase 2 — Integration
 
-1. [ ] Integrate `FeedCache` into `Feed`
+1. [X] Integrate `FeedCache` into `Feed`
    - Update `app/models/feed.py` to instantiate `self.feed_cache = FeedCache(self.id)`
    - Keep `Feed` responsible for business logic: converting dict -> `FeedArticle`, dedupe, processors, sorting
    - Replace file-IO in `Feed` with calls to `FeedCache.load_cache()` and `FeedCache.save_articles()` as appropriate
-2. [ ] Remove legacy `Startup` and migrate responsibilities
+2. [X] Remove legacy `Startup` and migrate responsibilities
    - Remove or deprecate `app/startup.py` once its responsibilities are fully migrated.
    - Migrate `Startup.archive_large_jsons()` behavior into `FeedCache.archive_large_jsons()` (already done) and ensure any remaining scheduling/registration logic is moved into application startup wiring that uses `MockScheduler`/`SchedulerInterface` for tests.
    - Update or remove tests that assert behavior on `Startup`; instead, test the new application wiring or `FeedCache` directly.
@@ -82,7 +82,7 @@
 
 ### Phase 3 — Testing & QA
 
-1. [ ] Implement integration tests and validate behaviors
+1. [X] Implement integration tests and validate behaviors
    - Integration test: `tests/models/test_feed_integration.py` verifying `Feed` uses `FeedCache` and preserves dedupe/processor behavior.
    - End-to-end validation that archive-on-load works correctly in production-like scenarios.
 

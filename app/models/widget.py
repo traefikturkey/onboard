@@ -1,8 +1,8 @@
 import logging
 from datetime import datetime
 
+from .apscheduler import Scheduler
 from .exceptions import IDException
-from .scheduler import Scheduler
 from .utils import calculate_sha1_hash, pwd
 
 logger = logging.getLogger(__name__)

@@ -1,22 +1,19 @@
-from abc import ABC, abstractmethod
-from typing import Any, Optional
+from typing import Any, Optional, Protocol
 
 
-class SchedulerInterface(ABC):
-    """Abstract interface for scheduler implementations.
+class SchedulerInterface(Protocol):
+    """Structural interface for scheduler implementations.
 
-    This allows dependency injection and easier unit testing by providing
-    a common interface that can be implemented by both real schedulers
-    (APScheduler) and mock schedulers for testing.
+    Using a Protocol allows both concrete implementations and test
+    doubles to satisfy the contract by shape rather than nominal
+    inheritance. Keep the method signatures compatible with
+    APScheduler's API.
     """
 
     @property
-    @abstractmethod
-    def running(self) -> bool:
-        """Returns True if the scheduler is currently running."""
-        pass
+    def running(self) -> bool:  # pragma: no cover - tiny shim
+        ...
 
-    @abstractmethod
     def add_job(
         self,
         func: Any,
@@ -34,34 +31,18 @@ class SchedulerInterface(ABC):
         replace_existing: bool = False,
         **trigger_args: Any,
     ) -> Any:
-        """Add a job to the scheduler.
+        ...
 
-        Args match APScheduler's add_job method signature for compatibility.
-        Returns a job object (implementation-specific).
-        """
-        pass
-
-    @abstractmethod
     def remove_job(self, job_id: str, jobstore: Optional[str] = None) -> None:
-        """Remove a job from the scheduler by ID."""
-        pass
+        ...
 
-    @abstractmethod
     def modify_job(
         self, job_id: str, jobstore: Optional[str] = None, **changes: Any
     ) -> Any:
-        """Modify an existing job's properties.
+        ...
 
-        Returns the modified job object (implementation-specific).
-        """
-        pass
-
-    @abstractmethod
     def start(self, paused: bool = False) -> None:
-        """Start the scheduler."""
-        pass
+        ...
 
-    @abstractmethod
     def shutdown(self, wait: bool = True) -> None:
-        """Shutdown the scheduler."""
-        pass
+        ...

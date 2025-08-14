@@ -1,7 +1,7 @@
 import logging
 import re
 
-from app.models.scheduler import Scheduler
+from app.models.apscheduler import Scheduler
 from app.models.utils import pwd
 from services.favicon_utils import (
     base,
