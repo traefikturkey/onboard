@@ -631,6 +631,12 @@ wheels = [
 ]
 
 [[package]]
+name = "cssmin"
+version = "0.2.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/8e/d8/dc9da69bb186303f7ab41adef0a5b6d34da2fdba006827620877760241c3/cssmin-0.2.0.tar.gz", hash = "sha256:e012f0cc8401efcf2620332339011564738ae32be8c84b2e43ce8beaec1067b6", size = 3228, upload-time = "2013-10-14T15:40:29.854Z" }
+
+[[package]]
 name = "cucumber-expressions"
 version = "18.0.1"
 source = { registry = "https://pypi.org/simple" }
@@ -2501,6 +2507,7 @@ source = { editable = "." }
 dependencies = [
     { name = "apscheduler" },
     { name = "bs4" },
+    { name = "cssmin" },
     { name = "docker" },
     { name = "feedparser" },
     { name = "flask", extra = ["async"] },
@@ -2563,6 +2570,7 @@ dev = [
 requires-dist = [
     { name = "apscheduler" },
     { name = "bs4" },
+    { name = "cssmin", specifier = ">=0.2.0" },
     { name = "docker" },
     { name = "feedparser" },
     { name = "flask" },
