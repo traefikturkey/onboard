@@ -1,7 +1,12 @@
 from app.app import app
 import sys
 import os
-sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "app")))
+
+# Ensure the project root is on sys.path so `import app` resolves correctly
+project_root = os.path.abspath(os.path.dirname(__file__))
+if project_root not in sys.path:
+  sys.path.insert(0, project_root)
+
 
 if __name__ == "__main__":
   # Allow overriding the port via PORT or ONBOARD_PORT environment variable (default: 5000)

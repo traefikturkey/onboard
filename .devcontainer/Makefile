@@ -62,7 +62,7 @@ clean:
 # Start background onboard server
 start-app:
 	@echo "Starting onboard server in background..."
-	@PYTHONPATH=app nohup uv run python run.py > /tmp/onboard.log 2>&1 & echo $$! > /tmp/onboard.pid
+	@PYTHONPATH=app nohup uv run gunicorn run:app -b 0.0.0.0:$(ONBOARD_PORT) --log-file /tmp/onboard.log 2>&1 & echo $$! > /tmp/onboard.pid
 	@echo "Onboard server started with PID: $$(cat /tmp/onboard.pid)"
 	@echo "Logs available at: /tmp/onboard.log"
 
@@ -79,6 +79,6 @@ stop-app:
 
 # Run Flask application locally (foreground)
 run:
-	@PYTHONPATH=app uv run python run.py
+	@PYTHONPATH=app uv run gunicorn run:app -b 0.0.0.0:$(ONBOARD_PORT)
 
 

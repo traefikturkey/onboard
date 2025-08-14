@@ -19,6 +19,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
     curl \
+    gosu \
     less \
     libopenblas-dev \
     locales \
@@ -42,37 +43,7 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /usr/local/bin/uv
 # Copy requirements files first (for better caching)
 COPY pyproject.toml uv.lock ./
 
-##############################
-# Begin build 
-##############################
-FROM base as build
-
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    binutils \
-    build-essential \
-    pkg-config gfortran \
-    cmake \
-    coreutils \
-    extra-cmake-modules \
-    findutils \
-    git \
-    openssl \
-    openssh-client \
-    sqlite3 \
-    libsqlite3-dev && \
-    apt-get autoremove -fy && \
-    apt-get clean && \
-    apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/* 
-
-
-
-
-##############################
-# Begin user_base 
-##############################
-FROM base as user_base
-
+# User management setup (previously in user_base stage)
 ARG PUID=${PUID:-1000}
 ARG PGID=${PGID:-1000}
 
@@ -134,15 +105,55 @@ WORKDIR $PROJECT_PATH
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
 ##############################
+# Begin build 
+##############################
+FROM base as build
+
+# Install build dependencies needed for compiling Python packages
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    binutils \
+    build-essential \
+    pkg-config \
+    gfortran \
+    cmake \
+    git \
+    openssl \
+    openssh-client \
+    sqlite3 \
+    libsqlite3-dev \
+    # Additional build deps that some Python packages might need
+    libffi-dev \
+    libssl-dev \
+    libxml2-dev \
+    libxslt-dev \
+    libjpeg-dev \
+    libpng-dev \
+    zlib1g-dev && \
+    apt-get autoremove -fy && \
+    apt-get clean && \
+    apt-get autoclean -y && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Python dependencies to a specific location using uv
+# This creates a complete virtual environment that can be copied to production
+RUN --mount=type=cache,target=/root/.cache/uv \
+    uv sync --frozen --no-editable
+
+##############################
 # Begin production 
+##############################
+FROM base as production
 
-FROM user_base as production
+# Copy the complete virtual environment from build stage
+# uv creates .venv in the current directory, so we copy that
+COPY --from=build --chown=${USER}:${USER} /.venv /app/.venv
 
-COPY --from=build --chown=${USER}:${USER} ${PYTHON_DEPS_PATH} ${PYTHON_DEPS_PATH}
+# Copy application code
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 
 ENV FLASK_ENV=production
 
+# Create necessary directories for static assets
 RUN mkdir -p /app/static/icons && \
     mkdir -p /app/static/assets && \
     chown -R ${USER}:${USER} /app/static
@@ -150,16 +161,14 @@ RUN mkdir -p /app/static/icons && \
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
-# Install Python dependencies with cache mount
-RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync 
-
-CMD [ "python3", "app.py" ]
+# Use the virtual environment from the build stage
+# Run the app with gunicorn using the pre-built virtual environment
+CMD ["/bin/sh", "-c", "/app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
 # Begin devcontainer 
 ##############################
-FROM user_base as devcontainer
+FROM base as devcontainer
 
 WORKDIR /app
 
@@ -213,17 +222,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER} 
 
-# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} docutils h5py ipykernel ipython jupyter jupyterhub notebook numpy nltk pyyaml pylint scikit-learn watermark
-# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --no-deps --prefer-binary matplotlib seaborn plotly graphviz imutils keras
-# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} --prefer-binary pandas-datareader bottleneck scipy duckdb sqlalchemy pyautogui requests_cache statsmodels
-# RUN pip3 install --no-cache-dir --target=${PYTHON_DEPS_PATH} gensim torch tensorflow
-
 # Install Python dependencies with cache mount as the anvil user
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     uv sync --extra dev --active
 
 USER ${USER}
-
 
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]
