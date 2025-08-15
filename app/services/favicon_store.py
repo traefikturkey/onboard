@@ -3,7 +3,7 @@ import re
 
 from app.models.apscheduler import Scheduler
 from app.models.utils import pwd
-from services.favicon_utils import (
+from app.services.favicon_utils import (
     base,
     download_favicon,
     favicon_failed_filename,

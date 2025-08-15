@@ -3,7 +3,7 @@ import os
 
 import yaml
 
-from services.bookmark_bar_manager import BookmarkBarManager
+from app.services.bookmark_bar_manager import BookmarkBarManager
 
 from .apscheduler import Scheduler
 from .bookmark import Bookmark

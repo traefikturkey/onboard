@@ -13,8 +13,8 @@ from flask_assets import Bundle, Environment
 from flask_caching import Cache
 
 from app.models import layout as layout_module
-from services.link_tracker import link_tracker
-from utils import copy_default_to_configs
+from app.services.link_tracker import link_tracker
+from app.utils import copy_default_to_configs
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)
 

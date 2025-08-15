@@ -3,7 +3,7 @@ import logging
 import os
 
 from app.models.utils import pwd
-from services.favicon_store import FaviconStore
+from app.services.favicon_store import FaviconStore
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
