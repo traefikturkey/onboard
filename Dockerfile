@@ -17,7 +17,7 @@ ENV PROJECT_NAME=${PROJECT_NAME}
 ARG PROJECT_PATH=/app
 ENV PROJECT_PATH=${PROJECT_PATH}
 
-ARG ONBOARD_PORT=5000
+ARG ONBOARD_PORT=9830
 ENV ONBOARD_PORT=${ONBOARD_PORT}
 
 ENV HOME=/home/${USER}
@@ -40,6 +40,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get update && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
+    gosu \
     less \
     libopenblas-dev \
     locales \
@@ -71,24 +72,27 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
 
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
-set -e
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # do not hide errors within pipes
 if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
-  set -x
-  set -o xtrace
+    set -x
+    set -o xtrace
 fi
 
+# If running as root, adjust the anvil user's UID/GID and drop to that user
 if [ "$(id -u)" = "0" ]; then
-  groupmod -o -g ${PGID:-1000} ${USER}
-  usermod -o -u ${PUID:-1000} ${USER}
+    groupmod -o -g ${PGID:-1000} ${USER} || true
+    usermod -o -u ${PUID:-1000} ${USER} || true
 
-  chown ${USER}:${USER} /var/run/docker.sock
+    # Ensure docker.sock is owned by the target user when running as root
+    chown ${USER}:${USER} /var/run/docker.sock || true
 
-  # Add call to gosu to drop from root user
-  # when running original entrypoint
-  set -- gosu ${USER} "$@"
+    echo "Running: $@"
+    exec gosu ${USER} "$@"
 else
-  sudo chown -R ${USER}:${USER} /var/run/docker.sock
-  sudo chown -R ${USER}:${USER} ~/.cache
+    # Non-root container: do not attempt sudo; ownership should already be correct
+    gosu chown ${USER}:${USER} /var/run/docker.sock || true
 fi
 
 echo "Running: $@"
@@ -154,8 +158,11 @@ COPY --from=build --chown=${USER}:${USER} ${PROJECT_PATH}/.venv ${PROJECT_PATH}/
 
 # Copy application code
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
+# Copy the run script at project root so gunicorn can import `run:app`
+COPY --chown=${USER}:${USER} run.py ${PROJECT_PATH}/run.py
 
 ENV FLASK_ENV=production
+ENV PYTHONPATH=/:/app:${PYTHONPATH}
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
@@ -165,11 +172,10 @@ RUN mkdir -p ${PROJECT_PATH}/static/icons && \
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
-USER ${USER}
-
 # Use the virtual environment from the build stage
 # Run the app with gunicorn using the pre-built virtual environment
-CMD ["/bin/sh", "-c", "uv run -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
+# Use `uv run -- <cmd>` so uv forwards the command instead of interpreting -m as a uv option
+CMD ["/bin/sh", "-c", "cd / && /app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
 # Begin devcontainer 
@@ -236,7 +242,9 @@ RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/uv \
     uv sync --extra dev --active
 
-USER ${USER}
+ENV DOCKER_BUILDKIT := 1
+ENV DOCKER_SCAN_SUGGEST := false
+ENV COMPOSE_DOCKER_CLI_BUILD := 1
 
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]

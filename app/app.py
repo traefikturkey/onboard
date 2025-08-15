@@ -141,7 +141,7 @@ def healthcheck():
 
 
 if __name__ == "__main__":
-    port = int(os.environ.get("FLASK_PORT", os.environ.get("ONBOARD_PORT", 5000)))
+    port = int(os.environ.get("FLASK_PORT", os.environ.get("ONBOARD_PORT", 9830)))
     development = bool(os.environ.get("FLASK_ENV", "development") == "development")
     if development:
         app.run(port=port, debug=bool(os.environ.get("FLASK_DEBUG", "True")))
