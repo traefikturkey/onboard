@@ -163,7 +163,8 @@ ENV PYTHONPATH=/:${PROJECT_PATH}:${PYTHONPATH}
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
-    mkdir -p ${PROJECT_PATH}/static/assets
+    mkdir -p ${PROJECT_PATH}/static/assets && \
+    chown -R ${USER}:${USER} ${PROJECT_PATH}
 
 # Use the virtual environment from the build stage
 # Run the app with gunicorn using the pre-built virtual environment
