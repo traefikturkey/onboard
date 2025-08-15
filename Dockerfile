@@ -41,12 +41,9 @@ RUN --mount=type=cache,target=/var/cache/apt \
     ca-certificates \
     curl \
     gosu \
-    less \
     libopenblas-dev \
     locales \
-    make \
-    tzdata \
-    wget && \
+    tzdata && \
     # cleanup
     apt-get autoremove -fy && \
     apt-get clean && \
@@ -80,15 +77,15 @@ if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
     set -o xtrace
 fi
 
-# If running as root, adjust the anvil user's UID/GID and drop to that user
+# If running as root, adjust the ${USER} user's UID/GID and drop to that user
 if [ "$(id -u)" = "0" ]; then
-    groupmod -o -g ${PGID:-1000} ${USER} || true
-    usermod -o -u ${PUID:-1000} ${USER} || true
+    groupmod -o -g ${PGID:-1000} ${USER} 2>&1 >/dev/null|| true
+    usermod -o -u ${PUID:-1000} ${USER} 2>&1 >/dev/null|| true
 
     # Ensure docker.sock is owned by the target user when running as root
-    chown ${USER}:${USER} /var/run/docker.sock || true
+    chown ${USER}:${USER} /var/run/docker.sock 2>&1 >/dev/null|| true
 
-    echo "Running: $@"
+    echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
 else
     # Non-root container: do not attempt sudo; ownership should already be correct
@@ -96,11 +93,11 @@ else
 fi
 
 echo "Running: $@"
-exec $@
+exec "$@"
 EOF
 
-# Create .venv directory in /app and set permissions
-RUN mkdir -p /app/.venv && chown anvil:anvil /app/.venv
+# Create .venv directory in ${PROJECT_PATH} and set permissions
+RUN mkdir -p ${PROJECT_PATH}/.venv && chown ${USER}:${USER} ${PROJECT_PATH}/.venv
 
 WORKDIR $PROJECT_PATH
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
@@ -162,20 +159,19 @@ COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 COPY --chown=${USER}:${USER} run.py ${PROJECT_PATH}/run.py
 
 ENV FLASK_ENV=production
-ENV PYTHONPATH=/:/app:${PYTHONPATH}
+ENV PYTHONPATH=/:${PROJECT_PATH}:${PYTHONPATH}
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     mkdir -p ${PROJECT_PATH}/static/assets && \
-    chown -R ${USER}:${USER} /app/static
-
+    chown -R ${USER}:${USER} ${PROJECT_PATH}
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
 # Use the virtual environment from the build stage
 # Run the app with gunicorn using the pre-built virtual environment
 # Use `uv run -- <cmd>` so uv forwards the command instead of interpreting -m as a uv option
-CMD ["/bin/sh", "-c", "cd / && /app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
+CMD ["/bin/sh", "-c", "cd / && exec /app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
 # Begin devcontainer 
@@ -203,6 +199,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     iproute2 \
     iputils-ping \
     jq \
+    less \
     libjpeg-dev \
     libpng-dev \
     libpq-dev \

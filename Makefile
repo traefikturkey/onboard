@@ -62,20 +62,22 @@ export SEMANTIC_VERSION
 	touch .env
 
 build: .env
-	$(CONTAINER_RUNTIME) build -t onboard:latest . 
+	$(CONTAINER_RUNTIME) build -t onboard:prod --target production .
 
 build-dev: .env
 	$(CONTAINER_RUNTIME) build --target devcontainer -t onboard .
 
 start: build
-	$(CONTAINER_RUNTIME) run --rm -d --name onboard -p 9830:9830 onboard
+	$(CONTAINER_RUNTIME) run --rm -d --name onboard_prod_run -p 9830:9830 onboard:prod
 
 up: build
-	$(CONTAINER_RUNTIME) run --rm -it --name onboard -p 9830:9830 onboard
-
+	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
 
 down:
-	$(CONTAINER_RUNTIME) stop onboard
+	$(CONTAINER_RUNTIME) stop onboard_prod_run
+
+logs:
+	$(CONTAINER_RUNTIME) logs onboard_prod_run -f
 
 
 restart: build down start
