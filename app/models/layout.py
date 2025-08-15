@@ -107,6 +107,26 @@ class Layout:
 
         return feeds
 
+    def process_rows(self, column: Column) -> list[Feed]:
+        """Recursively walk a column's rows/columns/widgets and return any feed widgets.
+
+        This helper complements get_feeds where nested structures can contain rows
+        that in turn contain more columns. It returns a flat list of Feed objects.
+        """
+        feeds: list[Feed] = []
+        # If this column contains nested rows, descend into them
+        if getattr(column, "rows", None):
+            for row in column.rows:
+                for col in row.columns:
+                    feeds += self.process_rows(col)
+
+        # Collect feed widgets from this column
+        for widget in getattr(column, "widgets", []):
+            if getattr(widget, "type", None) == "feed":
+                feeds.append(widget)
+
+        return feeds
+
     def get_feed(self, feed_id: str) -> Feed:
         if not self.feed_hash:
             feeds = []
