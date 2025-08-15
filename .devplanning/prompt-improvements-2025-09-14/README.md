@@ -24,3 +24,8 @@
         - the .github/**/*.md file that makes the most sense to add the suggested prompt instruction to based on the file types that are involved in the problem
 ```
 
+# Follow up Prompt
+
+```
+- create a directory .devplanning/prompt-improvements-2025-09-14/specstory_history_checkpoint and move the .specstory/history/*.md files into it 
+- suggest

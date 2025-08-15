@@ -114,7 +114,7 @@ All below sustained for 3 consecutive weeks:
 - Monthly: Assess if any metrics can be retired or automated.
 
 ## 18. Minimal Startup Tasks (To Do)
-- [ ] Add `VERSION` file.
+- [x] Add `VERSION` file.
 - [ ] Add initial `log.tsv` with header.
 - [ ] Record baseline for last 5 recent tasks manually (estimate metrics).
 - [ ] Add CHANGELOG entry for current version baseline.

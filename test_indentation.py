@@ -5,66 +5,53 @@ This file should maintain 4-space indentation when saved.
 """
 
 def test_function():
-    """Test function with nested code to check indentation."""
-    if True:
+    """Smoke test to exercise indentation sample without returning a value (avoid PytestReturnNotNoneWarning)."""
+    if True:  # intentional simple branch
         print("This should be indented with 4 spaces")
         for i in range(3):
             if i % 2 == 0:
                 print(f"Number {i} is even")
             else:
                 print(f"Number {i} is odd")
-    
+
     # Nested dictionary to test complex indentation
     config = {
         "database": {
             "host": "localhost",
             "port": 5432,
-            "credentials": {
-                "username": "admin",
-                "password": "secret"
-            }
+            "credentials": {"username": "admin", "password": "secret"},
         },
-        "cache": {
-            "type": "redis",
-            "ttl": 3600
-        }
+        "cache": {"type": "redis", "ttl": 3600},
     }
-    
-    return config
 
+    # Minimal assertion instead of returning object
+    assert config["database"]["host"] == "localhost"
 
-class TestClass:
-    """Test class to verify class indentation."""
-    
-    def __init__(self):
+class IndentationHelper:
+    """Helper class (renamed from TestClass to avoid collection warning)."""
+
+    def __init__(self):  # simple container
         self.data = []
-    
+
     def add_item(self, item):
-        """Add an item to the data list."""
         if item not in self.data:
             self.data.append(item)
             return True
         return False
-    
+
     def process_data(self):
-        """Process the data with complex nested logic."""
         result = []
         for item in self.data:
             if isinstance(item, str):
-                processed = {
-                    "original": item,
-                    "length": len(item),
-                    "uppercase": item.upper()
-                }
-                result.append(processed)
+                result.append(
+                    {"original": item, "length": len(item), "uppercase": item.upper()}
+                )
         return result
 
 
 if __name__ == "__main__":
-    # Test the indentation settings
     test_function()
-    
-    obj = TestClass()
-    obj.add_item("test")
-    obj.add_item("hello")
-    print(obj.process_data())
+    helper = IndentationHelper()
+    helper.add_item("test")
+    helper.add_item("hello")
+    print(helper.process_data())

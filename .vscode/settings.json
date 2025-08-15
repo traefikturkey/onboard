@@ -37,7 +37,7 @@
     "./app/services"
   ],
   "chat.tools.terminal.autoApprove": {
-		
+		"date +%F": true,
 		"ls": true,
 		"/^uv run (pytest|black|isort|behave|python).*/": true,
 		"/^make (test|lint)$/": true,
