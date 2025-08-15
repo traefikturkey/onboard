@@ -22,7 +22,7 @@ ENV ONBOARD_PORT=${ONBOARD_PORT}
 
 ENV HOME=/home/${USER}
 ARG TERM_SHELL=zsh
-ENV TERM_SHELL=${TERM_SHELL} 
+ENV TERM_SHELL=${TERM_SHELL}
 
 ARG TZ=America/New_York
 ENV TZ=${TZ}
@@ -48,11 +48,11 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoremove -fy && \
     apt-get clean && \
     apt-get autoclean -y && \
-    rm -rf /var/lib/apt/lists/* 
+    rm -rf /var/lib/apt/lists/*
 
 RUN sed -i '/en_US.UTF-8/s/^# //g' /etc/locale.gen && locale-gen
-ENV LANG en_US.UTF-8  
-ENV LANGUAGE en_US:en  
+ENV LANG en_US.UTF-8
+ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
 
 # Install uv
@@ -65,7 +65,7 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
     chown -R ${USER}:${USER} ${PROJECT_PATH} && \
     chown -R ${USER}:${USER} ${HOME} && \
     # set the shell for root too
-    chsh -s /bin/${TERM_SHELL} 
+    chsh -s /bin/${TERM_SHELL}
 
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
@@ -103,7 +103,7 @@ WORKDIR $PROJECT_PATH
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
 ##############################
-# Begin build 
+# Begin build
 ##############################
 FROM base as build
 
@@ -136,7 +136,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     rm -rf /var/lib/apt/lists/*
 
 # Copy requirements files first (for better caching)
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml uv.lock ${PROJECT_PATH}/
 
 # Install Python dependencies to a specific location using uv
 # This creates a complete virtual environment that can be copied to production
@@ -145,7 +145,7 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     uv sync --frozen --no-editable
 
 ##############################
-# Begin production 
+# Begin production
 ##############################
 FROM base as production
 
@@ -165,6 +165,7 @@ ENV PYTHONPATH=/:${PROJECT_PATH}:${PYTHONPATH}
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     mkdir -p ${PROJECT_PATH}/static/assets && \
     chown -R ${USER}:${USER} ${PROJECT_PATH}
+
 HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
     CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
 
@@ -174,11 +175,9 @@ HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
 CMD ["/bin/sh", "-c", "cd / && exec /app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
-# Begin devcontainer 
+# Begin devcontainer
 ##############################
 FROM build as devcontainer
-
-WORKDIR /app
 
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt/lists \
@@ -231,13 +230,17 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/* && \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
-    chmod 0440 /etc/sudoers.d/${USER} 
+    chmod 0440 /etc/sudoers.d/${USER}
+
+COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
 
 # Install Python dependencies with cache mounts as the anvil user
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
-    uv sync --extra dev --active
+    pwd && \
+    ls -la && \
+    uv sync --dev
 
 ENV DOCKER_BUILDKIT := 1
 ENV DOCKER_SCAN_SUGGEST := false
