@@ -163,11 +163,7 @@ ENV PYTHONPATH=/:${PROJECT_PATH}:${PYTHONPATH}
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
-    mkdir -p ${PROJECT_PATH}/static/assets && \
-    chown -R ${USER}:${USER} ${PROJECT_PATH}
-
-HEALTHCHECK --interval=10s --timeout=3s --start-period=40s \
-    CMD wget --no-verbose --tries=1 --spider --no-check-certificate http://localhost:$ONBOARD_PORT/api/healthcheck || exit 1
+    mkdir -p ${PROJECT_PATH}/static/assets
 
 # Use the virtual environment from the build stage
 # Run the app with gunicorn using the pre-built virtual environment
