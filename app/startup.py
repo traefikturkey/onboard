@@ -24,7 +24,6 @@ def copy_default_to_configs():
     Path(config_dir).mkdir(parents=True, exist_ok=True)
 
     # copy files from default directory to configs directory that are missing
-    # track number of files copied in variable files_copied
     files_copied = 0
     for file in os.listdir(default_dir):
         if file not in os.listdir(config_dir):

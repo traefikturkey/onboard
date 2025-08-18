@@ -14,7 +14,7 @@ from flask_caching import Cache
 
 from app.models import layout as layout_module
 from app.services.link_tracker import link_tracker
-from app.utils import copy_default_to_configs
+from app.startup import copy_default_to_configs
 from app.models import apscheduler as apscheduler_module
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)

@@ -1,4 +1,4 @@
-import app.utils as utils
+import app.startup as utils
 
 
 def test_copy_default_to_configs_copies_missing(tmp_path, monkeypatch):
