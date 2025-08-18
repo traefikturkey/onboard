@@ -5,6 +5,11 @@ applyTo: "**/Makefile"
 
 # Makefile Development Standards
 
+## Command Usage
+- **Use make commands without flags unless required for the specific task**
+- **Do not add `-s`, `-j1`, or other flags unless the user requests them**
+- Adding unnecessary flags causes build system failures
+
 ### Target Organization
 - Use real file targets instead of `.PHONY` when possible
 - Group related targets with comments

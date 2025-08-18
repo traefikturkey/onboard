@@ -5,6 +5,17 @@ applyTo: "**/tests/**/*.py"
 
 # Testing Standards
 
+## Test Execution
+- **Always use `uv run -m pytest` for running tests**
+- **Never use pytest directly**
+- Use `make test` for consistent test execution when available
+
+## Test Strategy
+- **Test public APIs only**
+- Install missing dependencies with `uv add --dev` instead of adding skips
+- If user wants tests deleted, delete them immediately
+- When user deletes files: move skip() before imports in tests, delete unsalvageable tests
+
 ## Test Organization
 - Tests in dedicated `tests/` directory
 - Aim for >90% code coverage on critical paths

@@ -5,6 +5,19 @@ applyTo: "**/*.py"
 
 # Python Development Standards
 
+## Project Tooling (uv-first)
+
+- **Always use uv for Python projects**: `uv run -m pytest`, `uv add <library>`, `uv run`
+- **Never use pytest or python directly**
+- Package installation:
+  - Production: `uv add <library_name>`
+  - Development: `uv add --dev <library_name>`
+  - Notebook dependencies: `uv add --group notebook <library_name>`
+- **Never use direct package installation tools**
+- Always verify files exist before suggesting fixes
+- When user deletes files: update imports, move skip() before imports in tests, delete unsalvageable tests
+- **Never recreate deleted files**
+
 ## Code Style and Formatting
 
 - Follow **PEP 8** style guide with Black formatter (line length 88)
@@ -51,6 +64,8 @@ applyTo: "**/*.py"
 - Use Python's logging module with structured logging
 - Handle edge cases and write clear exception handling
 - Account for common edge cases like empty inputs, invalid data types, and large datasets
+- **Never remove public methods/properties to fix lints - add type hints instead**
+- Always mention if behavior might change
 
 ## Example Pattern
 
@@ -126,6 +141,10 @@ signal.signal(signal.SIGTERM, signal_handler)
 signal.signal(signal.SIGINT, signal_handler)
 ```
 
+### Web Framework Integration
+- Check for JS framework conflicts when links/forms don't work
+- Add `data-*-boost='false'` or equivalent to opt out of framework interception
+
 ## Flask Application Patterns
 
 ### Application Organization
@@ -159,8 +178,11 @@ signal.signal(signal.SIGINT, signal_handler)
 }
 ```
 
-## Package Structure
+## File and Import Management
 
+- Fix imports by checking __init__.py files first
+- When moving files: create new, update imports, delete old, commit all together
+- Always verify file operations worked
 - Keep app as proper Python package with `__init__.py` files
 - Import pattern: `from app import app`
 - Custom error handlers for consistent API responses

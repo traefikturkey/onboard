@@ -61,3 +61,41 @@ HEALTHCHECK --interval=30s --timeout=10s \
     CMD curl -f http://localhost:9830/health || exit 1
 CMD ["python", "-m", "app.main"]
 ```
+
+## Signal Handling and Entrypoint Scripts
+
+### Production Containers
+- Use `gosu` with `exec` in production entrypoint scripts to drop privileges and forward signals
+- Ensure CMD uses direct command execution (not shell wrapping) for proper signal delivery
+- When docker.sock is mounted, fix permissions in entrypoint with: `chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true`
+
+### Development Containers
+- Sudo is acceptable for devcontainer usage
+- After 2 failures: stop and analyze the root cause completely, then apply full solution once
+
+### Example Entrypoint Script
+```bash
+#!/bin/bash
+set -o errexit   # abort on nonzero exitstatus
+set -o nounset   # abort on unbound variable
+set -o pipefail  # do not hide errors within pipes
+if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
+    set -x
+    set -o xtrace
+fi
+
+# If running as root, adjust the ${USER} user's UID/GID and drop to that user
+if [ "$(id -u)" = "0" ]; then
+    groupmod -o -g ${PGID:-1000} ${USER} 2>&1 >/dev/null|| true
+    usermod -o -u ${PUID:-1000} ${USER} 2>&1 >/dev/null|| true
+
+    # Ensure docker.sock is owned by the target user when running as root
+    chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
+
+    echo "Running as user ${USER}: $@"
+    exec gosu ${USER} "$@"
+fi
+
+echo "Running: $@"
+exec "$@"
+```

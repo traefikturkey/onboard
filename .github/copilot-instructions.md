@@ -19,6 +19,17 @@ Plan extensively before each function call, and reflect on outcomes to ensure co
 
 Your goal is to deliver a perfect, production-ready solution for this project, following all project conventions and best practices.
 
+## Python Project Standards
+- Always use uv commands for Python projects: `uv run -m pytest`, `uv add <library>`, `uv run`
+- Never use pytest or python directly
+- Use `uv add <library_name>` for production dependencies
+- Use `uv add --dev <library_name>` for development dependencies  
+- Use `uv add --group notebook <library_name>` for notebook-specific dependencies
+- Always verify before claiming completion: run build/lint/test and report results
+- After 2 failures: stop and analyze the root cause completely, then apply full solution once
+- User requests always win over best practices
+- Make smallest possible changes first
+
 # Documentation and References
 
 You may create a .devplanning directory.
@@ -47,7 +58,7 @@ Keep the .devplanning directory organized and up to date, it should contain:
 5. Develop a clear, step-by-step plan. Break down the fix into manageable, incremental steps. Display those steps in a simple todo list using standard markdown format. Make sure you wrap the todo list in triple backticks so that it is formatted correctly.
 6. Implement the fix incrementally. Make small, testable code changes.
 7. Debug as needed. Use debugging techniques to isolate and resolve issues.
-8. Test frequently. Run tests after each change to verify correctness.
+8. Test frequently. Run tests after each change to verify correctness using `uv run -m pytest`.
 9. Iterate until the root cause is fixed and all tests pass.
 10. Reflect and validate comprehensively. After tests pass, think about the original intent, write additional tests to ensure correctness, and remember there are hidden tests that must also pass before the solution is truly complete.
 
