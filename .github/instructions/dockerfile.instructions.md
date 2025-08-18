@@ -40,6 +40,21 @@ applyTo: "**/Dockerfile*"
 ### BuildKit Features
 - Use cache mounts for RUN commands
 
+### Build Performance Optimization
+- Order COPY operations from least to most frequently changing
+- Copy dependency files (requirements.txt, pyproject.toml, package.json) before source code
+- Use cache mounts for package managers: `--mount=type=cache,target=/root/.cache/pip`
+- Implement multi-stage builds with dedicated dependency stages
+- Pin base image versions to exact patches for consistent caching
+- Use BuildKit cache exports for CI/CD: `--cache-to=type=registry` and `--cache-from=type=registry`
+- Keep .dockerignore comprehensive to minimize build context
+
+### Build Context Optimization
+- Maintain comprehensive .dockerignore files
+- Exclude: tests/, .git/, __pycache__/, *.pyc, .coverage/, notebooks/, .devplanning/
+- Include only necessary files in build context
+- Regularly audit .dockerignore for new directories
+
 ## Example Pattern
 
 ```dockerfile

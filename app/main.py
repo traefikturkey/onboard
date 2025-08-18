@@ -12,9 +12,9 @@ from flask import Flask, make_response, redirect, render_template, request
 from flask_assets import Bundle, Environment
 from flask_caching import Cache
 
+from app.models import apscheduler as apscheduler_module
 from app.models import layout as layout_module
 from app.services.link_tracker import link_tracker
-from app.models import apscheduler as apscheduler_module
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)
 
@@ -75,9 +75,14 @@ def _is_test_environment() -> bool:
     )
 
 
-if os.environ.get("FLASK_ENV", "development") == "production" and not _is_test_environment():
+if (
+    os.environ.get("FLASK_ENV", "development") == "production"
+    and not _is_test_environment()
+):
     try:
-        logger.info("Production startup: eagerly reloading layout and initializing scheduler")
+        logger.info(
+            "Production startup: eagerly reloading layout and initializing scheduler"
+        )
         # Ensure the layout is loaded before serving requests
         layout.reload()
         # Trigger scheduler initialization (it will respect test flags internally)

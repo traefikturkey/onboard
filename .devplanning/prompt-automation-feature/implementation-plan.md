@@ -74,72 +74,73 @@
 2. Document the decision logic for file selection
 3. Extract the exact text replacement patterns used
 4. Identify the verification commands executed
+5. **Generalize patterns to work across technology stacks**
 
 **Outputs**:
-- Workflow sequence document
-- Decision matrix for file updates
-- Template patterns for common changes
+- Generic workflow sequence document
+- Technology-agnostic decision matrix for file updates
+- Universal template patterns for common changes
 
 ### Task 2: Pattern Codification
 **Inputs**:
 - 14 improvement patterns from determined-issues.md
 - Instruction file mapping logic
-- uv-first implementation examples
+- **Generic implementation examples for multiple technology stacks**
 
 **Process**:
-1. Convert each pattern into prompt instructions
-2. Create conditional logic for pattern application
-3. Define file-specific customization rules
-4. Build verification checkpoints
+1. Convert each pattern into technology-agnostic prompt instructions
+2. Create conditional logic for pattern application across project types
+3. Define project-adaptive customization rules
+4. Build verification checkpoints that work with any toolchain
 
 **Outputs**:
-- Pattern application rules
-- File-specific instruction templates
-- Verification command sequences
+- Universal pattern application rules
+- Technology-adaptable instruction templates
+- Generic verification command sequences
 
 ### Task 3: Prompt Assembly
 **Inputs**:
-- Workflow sequence
-- Pattern application rules
-- Verification framework
-- Error handling strategies
+- Generic workflow sequence
+- Universal pattern application rules
+- Cross-technology verification framework
+- Technology-agnostic error handling strategies
 
 **Process**:
-1. Structure main prompt sections
-2. Integrate decision logic
-3. Add verification checkpoints
-4. Include error recovery procedures
+1. Structure main prompt sections for any project type
+2. Integrate decision logic that adapts to different toolchains
+3. Add verification checkpoints that work across technologies
+4. Include error recovery procedures for various project types
 
 **Outputs**:
-- Complete prompt file
-- Usage documentation
-- Test validation plan
+- Complete generic prompt file
+- Cross-technology usage documentation
+- Universal test validation plan
 
 ## Success Criteria Checklist
 
 ### Functional Completeness
-- [ ] Prompt recreates exact changes from commit 07dcdbd
-- [ ] All 14 improvement patterns are codified
-- [ ] File mapping logic is comprehensive
-- [ ] Verification steps are complete
+- [x] Prompt recreates exact workflow principles from commit 07dcdbd in generic form
+- [x] All 14 improvement patterns are abstracted into universal principles
+- [x] File mapping logic is comprehensive and technology-agnostic
+- [x] Verification steps work across different technology stacks
 
 ### Technical Quality
-- [ ] All file paths are correct
-- [ ] Command sequences are validated
-- [ ] Error handling is robust
-- [ ] Git operations are safe
+- [x] All file paths are correct and adaptable
+- [x] Command sequences are parameterized for different toolchains
+- [x] Error handling works across project types
+- [x] Git operations are safe and universal
 
-### Usability
-- [ ] Clear step-by-step instructions
-- [ ] Progress reporting is informative
-- [ ] Error messages are actionable
-- [ ] Documentation is comprehensive
+### Cross-Technology Usability
+- [x] Clear step-by-step instructions for any project type
+- [x] Progress reporting works with any verification approach
+- [x] Error messages are actionable across technologies
+- [x] Documentation covers multiple technology examples
 
 ### Maintainability
-- [ ] Prompt structure is modular
-- [ ] Easy to extend with new patterns
-- [ ] Version tracking is maintained
-- [ ] Future compatibility is ensured
+- [x] Prompt structure is modular and technology-agnostic
+- [x] Easy to extend with new patterns from any technology stack
+- [x] Version tracking is maintained universally
+- [x] Future compatibility across evolving toolchains is ensured
 
 ## Timeline Estimate
 - Phase 1: 30 minutes (analysis and planning)

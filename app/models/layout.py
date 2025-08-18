@@ -1,9 +1,9 @@
 import logging
 import os
-
-import yaml
 import shutil
 from pathlib import Path
+
+import yaml
 
 from app.services.bookmark_bar_manager import BookmarkBarManager
 
