@@ -89,7 +89,7 @@ class Layout:
         if columns.rows:
             for row in columns.rows:
                 for column in row.columns:
-                    feeds += self.process_rows(column)
+                        feeds += self.get_feeds(column)
 
         for widget in columns.widgets:
             if widget.type == "feed":

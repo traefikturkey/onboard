@@ -31,6 +31,12 @@ ENV PYTHON_DEPS_PATH=/dependencies
 ENV PYTHONPATH="${PYTHONPATH}:${PYTHON_DEPS_PATH}"
 ENV PYTHONUNBUFFERED=TRUE
 ENV UV_LINK_MODE=copy
+ENV UV_SYSTEM_PYTHON=1
+# Install project dependencies into the system Python prefix instead of a project .venv
+# See: https://docs.astral.sh/uv/concepts/projects/config/#project-environment-path
+ENV UV_PROJECT_ENVIRONMENT=/usr/local
+# Allow modifying the system environment inside containers
+ENV UV_BREAK_SYSTEM_PACKAGES=1
 
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
@@ -96,9 +102,6 @@ echo "Running: $@"
 exec "$@"
 EOF
 
-# Create .venv directory in ${PROJECT_PATH} and set permissions
-RUN mkdir -p ${PROJECT_PATH}/.venv && chown ${USER}:${USER} ${PROJECT_PATH}/.venv
-
 WORKDIR $PROJECT_PATH
 ENTRYPOINT [ "/usr/local/bin/docker-entrypoint.sh" ]
 
@@ -138,8 +141,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 # Copy requirements files first (for better caching)
 COPY pyproject.toml uv.lock ${PROJECT_PATH}/
 
-# Install Python dependencies to a specific location using uv
-# This creates a complete virtual environment that can be copied to production
+# Install Python dependencies into the system environment using uv
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     uv sync --frozen --no-editable
@@ -149,27 +151,25 @@ RUN --mount=type=cache,target=/root/.cache/uv \
 ##############################
 FROM base as production
 
-# Copy the complete virtual environment from build stage
-# uv creates .venv in the current directory, so we copy that
-COPY --from=build --chown=${USER}:${USER} ${PROJECT_PATH}/.venv ${PROJECT_PATH}/.venv
-
-# Copy application code
-COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
+# Copy application code (as a proper package under /app/app)
+COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
 # Copy the run script at project root so gunicorn can import `run:app`
 COPY --chown=${USER}:${USER} run.py ${PROJECT_PATH}/run.py
 
+# Bring in dependencies installed into the system prefix from the build stage
+COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=build /usr/local/bin /usr/local/bin
+
 ENV FLASK_ENV=production
-ENV PYTHONPATH=/:${PROJECT_PATH}:${PYTHONPATH}
+# Use default Python import paths; rely on /app being the working dir
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     mkdir -p ${PROJECT_PATH}/static/assets && \
     chown -R ${USER}:${USER} ${PROJECT_PATH}
 
-# Use the virtual environment from the build stage
-# Run the app with gunicorn using the pre-built virtual environment
-# Use `uv run -- <cmd>` so uv forwards the command instead of interpreting -m as a uv option
-CMD ["/bin/sh", "-c", "cd / && exec /app/.venv/bin/python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
+# Run the app with gunicorn using the system Python environment
+CMD ["/bin/sh", "-c", "cd / && exec python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
 
 ##############################
 # Begin devcontainer
@@ -229,19 +229,19 @@ RUN --mount=type=cache,target=/var/cache/apt \
     echo ${USER} ALL=\(root\) NOPASSWD:ALL > /etc/sudoers.d/${USER} && \
     chmod 0440 /etc/sudoers.d/${USER}
 
-COPY --chown=${USER}:${USER} app ${PROJECT_PATH}
-
-# Install Python dependencies with cache mounts as the anvil user
+# Install Python dependencies into the system environment (run as root)
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
-    pwd && \
-    ls -la && \
     uv sync --dev
 
-ENV DOCKER_BUILDKIT := 1
-ENV DOCKER_SCAN_SUGGEST := false
-ENV COMPOSE_DOCKER_CLI_BUILD := 1
+# Copy application code after dependency installation (keep package layout)
+COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
+
+# Switch to non-root user for development
+USER ${USER}
+
+# Note: DOCKER_BUILDKIT/COMPOSE_DOCKER_CLI_BUILD are build-time client vars; do not set them inside the image
 
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]

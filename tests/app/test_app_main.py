@@ -57,8 +57,8 @@ def test_flask_debug_branch_uses_nullcache(monkeypatch):
     # Execute the module as __main__ to run top-level code; it will import our fake
     try:
         # Ensure a clean import to avoid warnings about pre-existing module entries
-        sys.modules.pop("app.app", None)
-        runpy.run_module("app.app", run_name="__main__")
+        sys.modules.pop("app.main", None)
+        runpy.run_module("app.main", run_name="__main__")
     except SystemExit:
         # __main__ may call sys.exit(); that's fine
         pass
@@ -115,8 +115,8 @@ def test_main_development_calls_stop_scheduler(monkeypatch):
     sys.modules["flask_assets"] = fake_flask_assets
 
     try:
-        sys.modules.pop("app.app", None)
-        runpy.run_module("app.app", run_name="__main__")
+        sys.modules.pop("app.main", None)
+        runpy.run_module("app.main", run_name="__main__")
     except SystemExit:
         # expected sys.exit() at the end of the __main__ development branch
         pass
@@ -178,7 +178,7 @@ def test_main_production_hypercorn_shutdown(monkeypatch):
 
     import asyncio as _asyncio
 
-    # Patch the real asyncio module's new_event_loop so app.app uses our FakeLoop
+    # Patch the real asyncio module's new_event_loop so app.main uses our FakeLoop
     monkeypatch.setattr(_asyncio, "new_event_loop", lambda: FakeLoop(), raising=False)
 
     # Stub flask_assets so css.build() is safe
@@ -203,8 +203,8 @@ def test_main_production_hypercorn_shutdown(monkeypatch):
     sys.modules["flask_assets"] = fake_flask_assets
 
     try:
-        sys.modules.pop("app.app", None)
-        runpy.run_module("app.app", run_name="__main__")
+        sys.modules.pop("app.main", None)
+        runpy.run_module("app.main", run_name="__main__")
     except Exception:
         # allow any exit/stop behaviour; we only assert our flags
         pass

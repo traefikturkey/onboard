@@ -10,7 +10,7 @@
     "FLASK_DEBUG": "True",
   },
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
-  "build": { 
+  "build": {
     "context": "..",
     "dockerfile": "../Dockerfile",
     "target": "devcontainer",
@@ -20,12 +20,12 @@
     }
   },
   "initializeCommand": "make initialize",
-  "postCreateCommand": "uv sync --extra dev && ./.devcontainer/setup-dotfiles.sh",
+  "postCreateCommand": "chown -R ${USER}:${USER} ${PROJECT_PATH} && uv sync --dev && ./.devcontainer/setup-dotfiles.sh",
   "runArgs": [
-    "--name","${localWorkspaceFolderBasename}_devcontainer", 
-    "--hostname","${localWorkspaceFolderBasename}", 
-    "--env-file",".devcontainer/.env", 
-    "--env-file","./.env", 
+    "--name","${localWorkspaceFolderBasename}_devcontainer",
+    "--hostname","${localWorkspaceFolderBasename}",
+    "--env-file",".devcontainer/.env",
+    "--env-file","./.env",
     "--gpus","all"],
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",

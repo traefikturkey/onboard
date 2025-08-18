@@ -1,11 +1,6 @@
-from app.app import app
-import sys
+from app.main import app
 import os
-
-# Ensure the project root is on sys.path so `import app` resolves correctly
-project_root = os.path.abspath(os.path.dirname(__file__))
-if project_root not in sys.path:
-  sys.path.insert(0, project_root)
+import sys
 
 
 if __name__ == "__main__":

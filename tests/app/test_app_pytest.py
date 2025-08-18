@@ -1,6 +1,6 @@
 import types
 
-import app.app as app_module
+import app.main as app_module
 
 
 class FakeFeed:

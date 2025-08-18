@@ -1,7 +1,7 @@
 import types
 from datetime import datetime
 
-import app.app as app_module
+import app.main as app_module
 
 
 class FakeLayoutModified:
