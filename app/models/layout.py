@@ -2,6 +2,8 @@ import logging
 import os
 
 import yaml
+import shutil
+from pathlib import Path
 
 from app.services.bookmark_bar_manager import BookmarkBarManager
 
@@ -23,6 +25,14 @@ class Layout:
     headers: list[Bookmark] = []
 
     def __init__(self, config_file: str = "configs/layout.yml"):
+        # Ensure default config files (including layout.yml) exist before
+        # resolving the config path and loading the layout.
+        try:
+            _copy_default_to_configs()
+        except Exception:
+            # Don't raise on startup copy failure; let reload surface issues
+            logger.exception("Failed to copy default configs")
+
         self.config_path = pwd.joinpath(config_file)
 
         self.bar_manager = BookmarkBarManager()
@@ -147,3 +157,28 @@ class Layout:
                     return link
 
         return None
+
+
+def _copy_default_to_configs():
+    """Private helper: copy files from `defaults/` into `configs/` when missing.
+
+    Kept private to this module because it's only used by Layout initialization.
+    """
+    default_dir = os.path.join(pwd, "defaults")
+    config_dir = os.path.join(pwd, "configs")
+
+    Path(config_dir).mkdir(parents=True, exist_ok=True)
+
+    files_copied = 0
+    for file in os.listdir(default_dir):
+        if file not in os.listdir(config_dir):
+            src = os.path.join(default_dir, file)
+            dst = os.path.join(config_dir, file)
+            shutil.copy2(src, dst)
+            files_copied += 1
+            logger.info(
+                f"File {file} copied successfully from {default_dir} to {config_dir}."
+            )
+
+    if files_copied == 0:
+        logger.info(f"No files copied from {default_dir} to {config_dir}.")

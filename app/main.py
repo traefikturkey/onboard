@@ -31,7 +31,6 @@ warnings.filterwarnings(
 )
 logging.getLogger("flask_caching").setLevel(logging.ERROR)
 
-copy_default_to_configs()
 layout = layout_module.Layout()
 
 app = Flask(__name__)

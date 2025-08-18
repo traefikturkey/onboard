@@ -1,4 +1,4 @@
-import app.startup as utils
+import app.models.layout as layout_module
 
 
 def test_copy_default_to_configs_copies_missing(tmp_path, monkeypatch):
@@ -16,7 +16,7 @@ def test_copy_default_to_configs_copies_missing(tmp_path, monkeypatch):
     (configs / "bookmarks_bar.json").write_text("[\nexisting\n]")
 
     # point utils.pwd to our temporary base
-    monkeypatch.setattr(utils, "pwd", base)
+    monkeypatch.setattr(layout_module, "pwd", base)
 
     # replace logger with a fake recorder so we can assert messages
     class FakeLogger:
@@ -27,9 +27,9 @@ def test_copy_default_to_configs_copies_missing(tmp_path, monkeypatch):
             self.records.append(msg)
 
     fake_logger = FakeLogger()
-    monkeypatch.setattr(utils, "logger", fake_logger)
+    monkeypatch.setattr(layout_module, "logger", fake_logger)
 
-    utils.copy_default_to_configs()
+    layout_module._copy_default_to_configs()
 
     # layout.yml should be copied, bookmarks_bar.json should remain (not overwritten)
     assert (configs / "layout.yml").exists()
@@ -50,7 +50,7 @@ def test_copy_default_to_configs_noop_when_none_missing(tmp_path, monkeypatch):
     (defaults / "layout.yml").write_text("layout: default")
     (configs / "layout.yml").write_text("layout: existing")
 
-    monkeypatch.setattr(utils, "pwd", base)
+    monkeypatch.setattr(layout_module, "pwd", base)
 
     # replace logger
     class FakeLogger:
@@ -61,8 +61,8 @@ def test_copy_default_to_configs_noop_when_none_missing(tmp_path, monkeypatch):
             self.records.append(msg)
 
     fake_logger = FakeLogger()
-    monkeypatch.setattr(utils, "logger", fake_logger)
+    monkeypatch.setattr(layout_module, "logger", fake_logger)
 
-    utils.copy_default_to_configs()
+    layout_module._copy_default_to_configs()
 
     assert any("No files copied from" in m for m in fake_logger.records)
