@@ -135,11 +135,13 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR ${PROJECT_PATH}/app
+WORKDIR ${PROJECT_PATH}
 
-# Copy lockfile for reproducible resolution; use app's pyproject for runtime deps
+# Copy lockfile and root pyproject for reproducible resolution
 COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
-COPY app/pyproject.toml ${PROJECT_PATH}/app/pyproject.toml
+# Copy source needed to build the package (setuptools expects run.py and app/)
+COPY app ${PROJECT_PATH}/app
+COPY run.py ${PROJECT_PATH}/run.py
 
 # Install Python dependencies into the system environment using uv
 RUN --mount=type=cache,target=/root/.cache/uv \
@@ -241,7 +243,11 @@ COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/
 # Switch to non-root user for development
 USER ${USER}
 
-# Note: DOCKER_BUILDKIT/COMPOSE_DOCKER_CLI_BUILD are build-time client vars; do not set them inside the image
+# Note: For production images, don't set DOCKER_BUILDKIT/COMPOSE_DOCKER_CLI_BUILD.
+# We set DOCKER_BUILDKIT=1 only in the devcontainer stage to affect the docker CLI inside the container.
+
+# Enable BuildKit for docker CLI inside the devcontainer
+ENV DOCKER_BUILDKIT=1
 
 # https://code.visualstudio.com/remote/advancedcontainers/start-processes#_adding-startup-commands-to-the-docker-image-instead
 CMD [ "sleep", "infinity" ]
