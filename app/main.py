@@ -15,6 +15,7 @@ from flask_caching import Cache
 from app.models import layout as layout_module
 from app.services.link_tracker import link_tracker
 from app.utils import copy_default_to_configs
+from app.models import apscheduler as apscheduler_module
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)
 
@@ -60,6 +61,31 @@ assets = Environment(app)
 css = Bundle("css/*.css", filters="cssmin", output="assets/common.css")
 assets.register("css_all", css)
 css.build()
+
+
+# Eagerly load layout and initialize scheduler when running in production.
+# Tests and other CI runs should skip this; use the same detection logic as
+# the Scheduler helper to avoid starting background jobs during tests.
+def _is_test_environment() -> bool:
+    # Mirror checks used by Scheduler.getScheduler() to detect test runs
+    return (
+        os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower() == "true"
+        or "pytest" in sys.modules
+        or "PYTEST_CURRENT_TEST" in os.environ
+        or any("test" in arg for arg in sys.argv)
+        or "behave" in sys.modules
+    )
+
+
+if os.environ.get("FLASK_ENV", "development") == "production" and not _is_test_environment():
+    try:
+        logger.info("Production startup: eagerly reloading layout and initializing scheduler")
+        # Ensure the layout is loaded before serving requests
+        layout.reload()
+        # Trigger scheduler initialization (it will respect test flags internally)
+        apscheduler_module.Scheduler.getScheduler()
+    except Exception:
+        logger.exception("Failed to eagerly reload layout during production startup")
 
 
 @app.context_processor
