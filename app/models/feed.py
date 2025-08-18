@@ -1,9 +1,9 @@
+import calendar
 import importlib
 import logging
 import os
 from collections import defaultdict
 from datetime import datetime, timedelta, timezone
-import calendar
 from email import utils
 from email.utils import formatdate
 from pathlib import Path
@@ -197,17 +197,16 @@ class Feed(Widget):
         # Log parse problems but continue processing entries when possible
         if getattr(feed, "bozo", False):
             logger.warning(
-                "RSS parse issue for %s: %s", feed_url, getattr(feed, "bozo_exception", "unknown")
+                "RSS parse issue for %s: %s",
+                feed_url,
+                getattr(feed, "bozo_exception", "unknown"),
             )
 
         for entry in getattr(feed, "entries", []) or []:
             # Prefer structured times when available to avoid dateutil parse errors
             pub_date: datetime
             try:
-                tm = (
-                    entry.get("published_parsed")
-                    or entry.get("updated_parsed")
-                )
+                tm = entry.get("published_parsed") or entry.get("updated_parsed")
                 if tm is not None:
                     # Convert struct_time to aware UTC datetime
                     pub_date = datetime.fromtimestamp(
@@ -220,7 +219,11 @@ class Feed(Widget):
                         from email.utils import parsedate_to_datetime
 
                         parsed = parsedate_to_datetime(str(raw))
-                        pub_date = parsed if parsed is not None else datetime.now(tz=timezone.utc)
+                        pub_date = (
+                            parsed
+                            if parsed is not None
+                            else datetime.now(tz=timezone.utc)
+                        )
                     except Exception:
                         # Last resort: dateutil with fallback to now
                         pub_date = dateutil.parser.parse(str(raw))

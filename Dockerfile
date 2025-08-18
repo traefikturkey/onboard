@@ -89,7 +89,7 @@ if [ "$(id -u)" = "0" ]; then
     usermod -o -u ${PUID:-1000} ${USER} 2>&1 >/dev/null|| true
 
     # Ensure docker.sock is owned by the target user when running as root
-    chown ${USER}:${USER} /var/run/docker.sock 2>&1 >/dev/null|| true
+    chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
 
     echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
@@ -135,7 +135,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-WORKDIR ${PROJECT_PATH}
+WORKDIR ${PROJECT_PATH}/app
 
 # Copy lockfile for reproducible resolution; use app's pyproject for runtime deps
 COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
@@ -169,7 +169,7 @@ RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     chown -R ${USER}:${USER} ${PROJECT_PATH}
 
 # Run the app with gunicorn via uv without a shell
-CMD ["uv", "run", "gunicorn", "run::app", "--access-logfile", "-", "--error-logfile", "-"]
+CMD ["uv", "run", "--no-sync", "-m", "gunicorn", "run:app", "--bind", "0.0.0.0:9830", "--access-logfile", "-", "--error-logfile", "-"]
 
 ##############################
 # Begin devcontainer
