@@ -5,19 +5,6 @@ description: This prompt analyzes conversation history to systematically improve
 
 # Automated Instruction Improvement Prompt
 
-## Mini/Haiku Model Guidelines
-
-**For smaller models, follow these principles:**
-- BE CONCRETE: Use exact file paths and commands. Avoid abstract concepts.
-- BE SEQUENTIAL: Complete each step fully before moving to next.
-- BE SPECIFIC: Replace placeholders with actual project commands.
-
-**Simple workflow summary:**
-1. Find conversation files newer than VERSION 
-2. Read each file and note problems
-3. Update instruction files with fixes
-4. Test and commit changes
-
 ## Overview
 
 This prompt replicates a proven workflow that:
@@ -27,42 +14,11 @@ This prompt replicates a proven workflow that:
 4. Verifies changes through testing and git operations
 5. Creates version tracking for future analysis
 
-## Simple Execution Checklist
-
-For mini/Haiku models, follow this simplified checklist:
-
-**Step 1: Get File List**
-```bash
-# Run this command and copy the output
-if [ -f ".github/VERSION" ]; then
-    find .specstory/history -name "*.md" -newer .github/VERSION
-else
-    find .specstory/history -name "*.md"
-fi
-```
-
-**Step 2: Analyze Files**
-- Read each file from Step 1
-- Note AI/user problems
-- Look for patterns
-
-**Step 3: Update Instructions**
-- Edit `.github/copilot-instructions.md`
-- Edit files in `.github/instructions/`
-- Add specific improvements found
-
-**Step 4: Test and Commit**
-```bash
-[project test command]
-echo "$(date)" > .github/VERSION
-git add -A
-git commit -m "Update instructions based on conversation analysis"
-```
-
 ## Detailed Instructions
 
 ### Prerequisites
 
+- specstory extension must be installed and enabled
 - Conversation history files in `.specstory/history/*.md`
 - Existing instruction files in `.github/instructions/` and `.github/copilot-instructions.md`
 - Git repository with clean working directory
