@@ -2,7 +2,8 @@ import importlib
 import logging
 import os
 from collections import defaultdict
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
+import calendar
 from email import utils
 from email.utils import formatdate
 from pathlib import Path
@@ -192,27 +193,57 @@ class Feed(Widget):
     def download(self, feed_url: str) -> list[FeedArticle]:
         articles = []
         feed = feedparser.parse(feed_url)
-        for entry in feed.entries:
-            # coerce potentially unexpected types to str for parsing and FeedArticle
-            published = entry.get("published", entry.get("updated", formatdate()))
-            pub_date = dateutil.parser.parse(str(published))
 
-            if "description" in entry:
-                description = str(entry.description)
-            else:
-                description = ""
-
-            articles.append(
-                FeedArticle(
-                    original_title=str(entry.title),
-                    title=str(entry.title),
-                    link=str(entry.link),
-                    description=description,
-                    pub_date=pub_date,
-                    processed="",
-                    parent=self,
-                )
+        # Log parse problems but continue processing entries when possible
+        if getattr(feed, "bozo", False):
+            logger.warning(
+                "RSS parse issue for %s: %s", feed_url, getattr(feed, "bozo_exception", "unknown")
             )
+
+        for entry in getattr(feed, "entries", []) or []:
+            # Prefer structured times when available to avoid dateutil parse errors
+            pub_date: datetime
+            try:
+                tm = (
+                    entry.get("published_parsed")
+                    or entry.get("updated_parsed")
+                )
+                if tm is not None:
+                    # Convert struct_time to aware UTC datetime
+                    pub_date = datetime.fromtimestamp(
+                        calendar.timegm(tm), tz=timezone.utc
+                    )
+                else:
+                    raw = entry.get("published") or entry.get("updated") or formatdate()
+                    # email.utils handles many RSS/Atom datetime formats
+                    try:
+                        from email.utils import parsedate_to_datetime
+
+                        parsed = parsedate_to_datetime(str(raw))
+                        pub_date = parsed if parsed is not None else datetime.now(tz=timezone.utc)
+                    except Exception:
+                        # Last resort: dateutil with fallback to now
+                        pub_date = dateutil.parser.parse(str(raw))
+            except Exception:
+                pub_date = datetime.now(tz=timezone.utc)
+
+            description = str(entry.get("description", ""))
+
+            try:
+                articles.append(
+                    FeedArticle(
+                        original_title=str(entry.get("title", "")),
+                        title=str(entry.get("title", "")),
+                        link=str(entry.get("link", "")),
+                        description=description,
+                        pub_date=pub_date,
+                        processed="",
+                        parent=self,
+                    )
+                )
+            except Exception:
+                # Skip malformed entries defensively
+                continue
 
         return articles
 

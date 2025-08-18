@@ -8,16 +8,17 @@ ifneq (,$(wildcard .devcontainer/.env))
 endif
 
 # Initialize development environment
-initialize: 
+initialize:
 	@echo "Initializing development environment for $(DETECTED_OS)..."
 	@echo "HOSTIP: $(HOSTIP)"
 	@echo "HOSTIP=$(HOSTIP)" > .devcontainer/.env
 	@echo "SEMANTIC_VERSION=$(SEMANTIC_VERSION)" >> .devcontainer/.env
-	
+
 
 # Install development dependencies (only if pyproject.toml changed)
 uv.lock:
-	uv sync --dev
+	uv lock
+	uv sync --dev --all-packages
 
 # Run Flask application locally (foreground)
 run:
@@ -26,13 +27,13 @@ run:
 # Run ALL tests (including broken ones for debugging)
 test: uv.lock
 	@echo "Running Behave BDD tests..."
-	@if uv run python -c 'import behave' >/dev/null 2>&1; then \
-		uv run behave tests/features -f progress --no-capture || exit 1; \
+	@if uv run --all-packages python -c 'import behave' >/dev/null 2>&1; then \
+		uv run --all-packages behave tests/features -f progress --no-capture || exit 1; \
 	else \
 		echo "behave not installed in uv environment, skipping BDD tests"; \
 	fi
 	@echo "Running ALL tests (excluding disabled tests)..."
-	uv run pytest tests/ --ignore=tests/support --cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
+	uv run --all-packages pytest tests/ --ignore=tests/support --cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
 
 # Run linting
 # E203: whitespace before ':' (conflicts with black formatting)
@@ -45,7 +46,7 @@ lint: format
 # Format code
 format: uv.lock
 	@echo "Formatting code with black..."
-	uv run black app tests 
+	uv run black app tests
 	@echo "Organizing imports with isort..."
 	uv run isort app tests --profile black
 	@echo "Removing trailing whitespace..."
@@ -58,14 +59,14 @@ clean:
 	find . -type f -name "*.pyc" -delete
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
-	rm -rf .coverage .htmlcov/ .pytest_cache/ 
+	rm -rf .coverage .htmlcov/ .pytest_cache/
 #	@rm -f /tmp/joyride-dns.pid 2>/dev/null || true
 	@echo "Clean completed!"
 
 
 check-deps:
 	@echo "Checking for production dependencies issues..."
-	@uv run deptry ./app 
+	@uv run deptry ./app
 	@echo "Checking for development dependencies issues..."
 	@uv run deptry . --ignore-notebooks
 

@@ -14,7 +14,7 @@ ENV USER=${USER}
 ARG PROJECT_NAME
 ENV PROJECT_NAME=${PROJECT_NAME}
 
-ARG PROJECT_PATH=/app
+ARG PROJECT_PATH=/srv
 ENV PROJECT_PATH=${PROJECT_PATH}
 
 ARG ONBOARD_PORT=9830
@@ -27,8 +27,7 @@ ENV TERM_SHELL=${TERM_SHELL}
 ARG TZ=America/New_York
 ENV TZ=${TZ}
 
-ENV PYTHON_DEPS_PATH=/dependencies
-ENV PYTHONPATH="${PYTHONPATH}:${PYTHON_DEPS_PATH}"
+### Remove legacy vendor/deps path usage; rely on system site-packages managed by uv
 ENV PYTHONUNBUFFERED=TRUE
 ENV UV_LINK_MODE=copy
 ENV UV_SYSTEM_PYTHON=1
@@ -44,6 +43,7 @@ ENV DEBCONF_NONINTERACTIVE_SEEN=true
 RUN --mount=type=cache,target=/var/cache/apt \
     --mount=type=cache,target=/var/lib/apt/lists \
     apt-get update && apt-get install -y --no-install-recommends \
+    bash \
     ca-certificates \
     curl \
     gosu \
@@ -93,9 +93,6 @@ if [ "$(id -u)" = "0" ]; then
 
     echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
-else
-    # Non-root container: do not attempt sudo; ownership should already be correct
-    gosu chown ${USER}:${USER} /var/run/docker.sock || true
 fi
 
 echo "Running: $@"
@@ -138,20 +135,23 @@ RUN --mount=type=cache,target=/var/cache/apt \
     apt-get autoclean -y && \
     rm -rf /var/lib/apt/lists/*
 
-# Copy requirements files first (for better caching)
-COPY pyproject.toml uv.lock ${PROJECT_PATH}/
+WORKDIR ${PROJECT_PATH}
+
+# Copy lockfile for reproducible resolution; use app's pyproject for runtime deps
+COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
+COPY app/pyproject.toml ${PROJECT_PATH}/app/pyproject.toml
 
 # Install Python dependencies into the system environment using uv
 RUN --mount=type=cache,target=/root/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
-    uv sync --frozen --no-editable
+    uv sync --no-editable --no-dev
 
 ##############################
 # Begin production
 ##############################
 FROM base as production
 
-# Copy application code (as a proper package under /app/app)
+# Copy application code into the project directory root (creates ${PROJECT_PATH}/app)
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
 # Copy the run script at project root so gunicorn can import `run:app`
 COPY --chown=${USER}:${USER} run.py ${PROJECT_PATH}/run.py
@@ -161,15 +161,15 @@ COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3
 COPY --from=build /usr/local/bin /usr/local/bin
 
 ENV FLASK_ENV=production
-# Use default Python import paths; rely on /app being the working dir
+# Use default Python import paths; rely on ${PROJECT_PATH} as the working dir
 
 # Create necessary directories for static assets
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     mkdir -p ${PROJECT_PATH}/static/assets && \
     chown -R ${USER}:${USER} ${PROJECT_PATH}
 
-# Run the app with gunicorn using the system Python environment
-CMD ["/bin/sh", "-c", "cd / && exec python -m gunicorn run:app -b 0.0.0.0:$ONBOARD_PORT --access-logfile - --error-logfile -"]
+# Run the app with gunicorn via uv without a shell
+CMD ["uv", "run", "gunicorn", "run::app", "--access-logfile", "-", "--error-logfile", "-"]
 
 ##############################
 # Begin devcontainer
@@ -236,7 +236,7 @@ RUN --mount=type=cache,target=/tmp/.cache/uv \
     uv sync --dev
 
 # Copy application code after dependency installation (keep package layout)
-COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
+COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/
 
 # Switch to non-root user for development
 USER ${USER}

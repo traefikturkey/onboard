@@ -10,6 +10,7 @@ resolution-markers = [
 members = [
     "notebooks",
     "onboard",
+    "onboard-root",
 ]
 
 [[package]]
@@ -2357,7 +2358,7 @@ requires-dist = [
     { name = "networkx", specifier = ">=3.5" },
     { name = "nltk" },
     { name = "numpy" },
-    { name = "onboard", editable = "." },
+    { name = "onboard", editable = "app" },
     { name = "pandas" },
     { name = "pillow" },
     { name = "pillow", specifier = ">=11.3.0" },
@@ -2547,7 +2548,7 @@ wheels = [
 [[package]]
 name = "onboard"
 version = "0.1.0"
-source = { editable = "." }
+source = { editable = "app" }
 dependencies = [
     { name = "apscheduler" },
     { name = "bs4" },
@@ -2570,6 +2571,37 @@ dependencies = [
     { name = "requests" },
     { name = "unidecode" },
 ]
+
+[package.metadata]
+requires-dist = [
+    { name = "apscheduler" },
+    { name = "bs4" },
+    { name = "cssmin", specifier = ">=0.2.0" },
+    { name = "docker" },
+    { name = "feedparser" },
+    { name = "flask" },
+    { name = "flask", extras = ["async"] },
+    { name = "flask-assets" },
+    { name = "flask-caching" },
+    { name = "flask-minify" },
+    { name = "flask-minify", extras = ["go"] },
+    { name = "gunicorn" },
+    { name = "hypercorn", specifier = "==0.15.0" },
+    { name = "langchain" },
+    { name = "langchain-community" },
+    { name = "langchain-core" },
+    { name = "pandas" },
+    { name = "python-dateutil" },
+    { name = "python-dotenv" },
+    { name = "pyyaml" },
+    { name = "requests" },
+    { name = "unidecode" },
+]
+
+[[package]]
+name = "onboard-root"
+version = "0.1.0"
+source = { virtual = "." }
 
 [package.dev-dependencies]
 dev = [
@@ -2614,30 +2646,6 @@ dev = [
 ]
 
 [package.metadata]
-requires-dist = [
-    { name = "apscheduler" },
-    { name = "bs4" },
-    { name = "cssmin", specifier = ">=0.2.0" },
-    { name = "docker" },
-    { name = "feedparser" },
-    { name = "flask" },
-    { name = "flask", extras = ["async"] },
-    { name = "flask-assets" },
-    { name = "flask-caching" },
-    { name = "flask-minify" },
-    { name = "flask-minify", extras = ["go"] },
-    { name = "gunicorn" },
-    { name = "hypercorn", specifier = "==0.15.0" },
-    { name = "langchain" },
-    { name = "langchain-community" },
-    { name = "langchain-core" },
-    { name = "pandas" },
-    { name = "python-dateutil" },
-    { name = "python-dotenv" },
-    { name = "pyyaml" },
-    { name = "requests" },
-    { name = "unidecode" },
-]
 
 [package.metadata.requires-dev]
 dev = [
