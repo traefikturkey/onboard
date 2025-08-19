@@ -1,8 +1,6 @@
 ---
 description: 'Guidelines for creating and maintaining GitHub Copilot instruction files and prompt files with current best practices and supported features.'
-applyTo: |
-  .github/instructions/*.instructions.md
-  .github/prompts/*.prompt.md
+applyTo: '.github/{instructions/*.instructions.md,prompts/*.prompt.md}'
 ---
 
 # Copilot Customization Instructions

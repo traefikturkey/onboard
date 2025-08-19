@@ -5,12 +5,9 @@ applyTo: '**'
 
 # MCP services cheat-sheet
 
-Purpose: provide the team a compact reference for the MCP-style tools referenced in the codebase and the helper functions we use when integrating with MCP servers (Context7, Memory MCPs, Pylance MCP, sequential-thinking MCPs, etc.). Links point to primary docs and MCP discovery pages so you can install or inspect servers locally.
+Purpose: provide a compact reference for the MCP-style tools referenced in the codebase and the helper functions we use when integrating with MCP servers (Context7, Memory MCPs, sequential-thinking MCPs). Links point to primary docs and MCP discovery pages so you can install or inspect servers locally.
 
 High-level pointers
-- Model Context Protocol (MCP) is the open protocol used by editors and agents to discover and call tools exposed by MCP servers. See the VS Code MCP docs and the MCP specification to learn how servers are configured and discovered:
-  - VS Code: https://code.visualstudio.com/docs/copilot/chat/mcp-servers
-  - MCP specification (reference): https://modelcontextprotocol.io/
 
 - Context7 (and similar servers) expose library/documentation tools (resolve-library-id, get-library-docs). Context7 is a popular example and docs are here:
   - Context7 (project pages / docs): https://github.com/upstash/context7
@@ -47,23 +44,6 @@ Function reference (the functions listed in the repository and what they map to)
     - mcp_memory_search_nodes — search nodes by text or metadata
   - Typical servers: Memory MCP servers (implementations vary). Consult the specific server's docs for exact payload shapes.
   - Discovery tip: add a Memory MCP to VS Code (or your MCP client) and use the MCP inspector to examine the tool signatures and example inputs.
-
-- mcp_pylance_mcp_s_pylance*
-  - Purpose: operations that a Pylance/Python analysis MCP might expose to editor/agent clients. In this repo we've listed helpers that mirror typical language-server style capabilities:
-    - mcp_pylance_mcp_s_pylanceDocuments — fetch docs or language-server style docs
-    - mcp_pylance_mcp_s_pylanceFileSyntaxErrors — check a Python file for syntax errors
-    - mcp_pylance_mcp_s_pylanceImports — analyze imports across a workspace
-    - mcp_pylance_mcp_s_pylanceInstalledTopLevelModules — list top-level modules available in the Python environment
-    - mcp_pylance_mcp_s_pylanceInvokeRefactoring — run a refactoring (e.g., remove unused imports)
-    - mcp_pylance_mcp_s_pylancePythonEnvironments — enumerate Python environments
-    - mcp_pylance_mcp_s_pylanceSettings — get Python analysis settings
-    - mcp_pylance_mcp_s_pylanceSyntaxErrors — validate a code snippet for syntax errors
-    - mcp_pylance_mcp_s_pylanceUpdatePythonEnvironment — switch the active Python environment
-    - mcp_pylance_mcp_s_pylanceWorkspaceRoots — list workspace root URIs
-    - mcp_pylance_mcp_s_pylanceWorkspaceUserFiles — list user Python files in the workspace
-  - Typical server: a Pylance-style MCP server (or a server that wraps Pyright/Pylance). VS Code MCP docs explain how language-analysis MCP tools are exposed to agent mode.
-  - How to discover: install the Pylance MCP server in VS Code (or run the MCP inspector) and call the tool discovery endpoint — the tool signatures will list required params.
-  - Reference: VS Code MCP docs (how to add servers) https://code.visualstudio.com/docs/copilot/chat/mcp-servers
 
 - mcp_sequentialthi_sequentialthinking
   - Purpose: a sequential-thinking MCP exposes a multi-step planning or chain-of-thought style tool that agents can call to break a task into ordered sub-steps. This can be useful to run deterministic multi-step strategies inside an MCP-enabled agent.
