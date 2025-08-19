@@ -41,7 +41,7 @@
 		"ls": true,
 		"/^uv run (pytest|black|isort|behave|python).*/": true,
     "/^make (?:test(?:-[\\w-]+)?|lint)$/": true,
-		"/^git (status|show\\b.*).*/": true,
+		"/^git (add|status|show\\b.*).*/": true,
 		"docker build": true,
 		"/^make (format|lint|run|test|)$/": true,
 		"behave": true
