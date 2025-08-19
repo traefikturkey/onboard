@@ -72,6 +72,8 @@ clean:
 #	@rm -f /tmp/joyride-dns.pid 2>/dev/null || true
 	@echo "Clean completed!"
 
+uv-update:
+	uv lock --upgrade && uv sync --dev
 
 deptry:
 	@echo "Checking for production dependencies issues..."

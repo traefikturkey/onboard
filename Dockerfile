@@ -242,7 +242,8 @@ RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
     uv sync --dev && \
-    chown -R $USER:$USER /usr/local/lib/python3.12/site-packages/
+    chown -R $USER:$USER /usr/local/lib/python3.12/site-packages/ && \
+    chown -R $USER:$USER /usr/local/bin
 
 # Copy application code after dependency installation (keep package layout)
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/
