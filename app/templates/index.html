@@ -6,7 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="htmx-config" content='{"globalViewTransitions": true}'>
 	<title>{{ site_title }}</title>
-	
+
 	<meta name="author" content="iLude">
 	<meta name="description" content="{{ site_title }}">
 
@@ -21,7 +21,7 @@
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-head-support@2.0.2/dist/head-support.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-loading-states@2.0.2/dist/loading-states.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-alpine-morph@2.0.2/dist/alpine-morph.js"></script>
+
 	<script>
     // Add Font Awesome icons
     var script = document.createElement('script');
@@ -34,7 +34,7 @@
 	<link rel="stylesheet" href="{{ ASSET_URL }}">
 	{% endassets %}
 </head>
-<body hx-boost="true" hx-ext="head-support,loading-states,alpine-morph">
+<body hx-boost="true" hx-ext="head-support,loading-states">
 	{% include('flash_message.html') %}
 	<div id="bookmarkBar">
 		{% with bookmarks = layout.bookmark_bar %}
@@ -51,20 +51,20 @@
 				</div>
 				<div class="row tab-bar">
 					{% for tab in layout.tabs %}
-						<a href="/tab/{{tab.name}}" 
+						<a href="/tab/{{tab.name}}"
 						   hx-get="/tab/{{tab.name}}"
 						   hx-target="#main-content"
 						   hx-swap="innerHTML transition:true"
 						   hx-push-url="true"
 						   data-loading-class="tab-loading"
 						   data-loading-class-remove="tab-loading"
-						   data-index="{{ loop.index }}"  
+						   data-index="{{ loop.index }}"
 						   data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
 					{% endfor %}
 				</div>
 			</div>
-			<div class="column">  
-				<div class="logo"><!-- Placeholder for the logo --></div> 
+			<div class="column">
+				<div class="logo"><!-- Placeholder for the logo --></div>
 			</div>
 		</div>
 		<div id="main-content">
@@ -77,11 +77,56 @@
 		<footer>
 			<div>
 				<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
-				is a 
-				<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a> 
+				is a
+				<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a>
 				&copy; {{ today_date.year }}
 			</div>
 		</footer>
 	</div>
 </body>
+<script>
+// Dev-only helper: detect and clean up lingering loading indicators which
+// can cause continuous CSS animations and repaints. Runs only on localhost.
+;(function(){
+	try {
+		const host = (location && location.hostname) || '';
+		if (!(host === 'localhost' || host === '127.0.0.1')) return;
+
+		// Periodically log counts for quick diagnosis in DevTools
+		setInterval(() => {
+			const widgetLoading = document.querySelectorAll('.widget-loading').length;
+			const overlays = document.querySelectorAll('.loading-overlay.loading').length;
+			if (widgetLoading || overlays) {
+				console.warn('DEBUG: widget-loading:', widgetLoading, 'loading-overlay.loading:', overlays);
+			}
+		}, 2000);
+
+		// Remove any .widget-loading classes that persist longer than 8s as a
+		// defensive measure during development so stray animations don't burn CPU.
+		const CLEANUP_MS = 8000;
+		const seen = new Map();
+
+		setInterval(() => {
+			document.querySelectorAll('.widget-loading').forEach(el => {
+				const now = Date.now();
+				if (!seen.has(el)) seen.set(el, now);
+				const firstSeen = seen.get(el) || now;
+				if (now - firstSeen > CLEANUP_MS) {
+					console.warn('DEBUG: removing stale .widget-loading on', el);
+					el.classList.remove('widget-loading');
+					el.removeAttribute('aria-busy');
+					el.removeAttribute('aria-live');
+					seen.delete(el);
+				}
+			});
+			// Cleanup map entries for elements that no longer have the class
+			for (const [el] of Array.from(seen.entries())) {
+				if (!el.classList || !el.classList.contains('widget-loading')) seen.delete(el);
+			}
+		}, 1000);
+	} catch (err) {
+		console.error('DEBUG helper failed', err);
+	}
+})();
+</script>
 </html>

@@ -1,18 +1,17 @@
 {% if not skip_htmx and widget.hasattr('hx_get') %}
   <div class="box {{ widget.type }}-box"
-       hx-get="{{ widget.hx_get }}"
-       hx-trigger="load"
-       hx-swap="morph"
-       hx-ext="preload,loading-states,alpine-morph"
-       preload="mouseenter"
+  hx-get="{{ widget.hx_get }}"
+  hx-trigger="load once"
+  hx-swap="outerHTML"
+  hx-ext="loading-states"
        data-loading-class="widget-loading"
        data-loading-class-remove="widget-loading">
     <div class="box {{ widget.type }}-box">
       <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
         <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a>
       </div>
-      <div class="box-content {{ widget.type }}-content">
-        <ul>
+    <div class="box-content {{ widget.type }}-content">
+      <ul x-data="{ open_id: null }">
           {% set name = widget.name %}
           <li>Loading...</li>
         </ul>
@@ -24,17 +23,21 @@
     <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
       <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
     <div class="box-content {{ widget.type }}-content">
-      <ul>
+      <ul x-data="{ open_id: null }">
         {% set name = widget.name %}
-        {% for article in widget.display_items %}
-        <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item" x-data="{ summary_open: false }" @click="summary_open = ! summary_open">
+    {% for article in widget.display_items %}
+  {% if article.summary %}
+  <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item" @click="open_id = (typeof open_id !== 'undefined' && open_id === '{{ article.id }}' ? null : '{{ article.id }}')">
+  {% else %}
+  <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item">
+  {% endif %}
           {% set link = article.tracking_link if article.tracking_link else article.link %}
           <a href="{{ link }}" class="{{ widget.type }}-link" data-hx-boost="false" @click="$event.stopPropagation()">{{ article.name }}</a>
           {% if article.summary %}
           <div class="widget-item-toolbar">
-            <i class="fas fa-chevron-down" :class="summary_open ? 'fa-right' : ''"></i>
+            <i class="fas fa-chevron-down" :class="(typeof open_id !== 'undefined' && open_id === '{{ article.id }}') ? 'fa-right' : ''"></i>
           </div>
-          <div class="summary {{ widget.type }}" x-show="summary_open" @click.outside="summary_open = false" x-transition >{{ article.summary }}</div>
+          <div class="summary {{ widget.type }}" x-show="(typeof open_id !== 'undefined' && open_id === '{{ article.id }}')" @click.outside="if (typeof open_id !== 'undefined' && open_id === '{{ article.id }}') open_id = null">{{ article.summary }}</div>
           {% endif %}
         </li>
         {% else %}
