@@ -37,17 +37,6 @@ line-length = 88
 skip-string-normalization = true
 target-version = ['py312']
 
-[tool.setuptools]
-py-modules = ["run"]
-packages = ["app"]
-
-#[tool.uv]
-# Using a single-project layout; default packaging behavior is enabled
-
-[build-system]
-requires = ["setuptools>=45", "wheel", "uv"]
-build-backend = "setuptools.build_meta"
-
 [dependency-groups]
 dev = [
     "behave",
