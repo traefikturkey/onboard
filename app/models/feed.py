@@ -55,9 +55,21 @@ class Feed(Widget):
 
         # load cached article dicts then convert to FeedArticle
         dicts = self.feed_cache.load_cache(archive_on_load=False)
+        logger.debug(
+            f"Feed.__init__: loaded {len(dicts)} dicts from cache for feed id={self.id} path={self.cache_path}"
+        )
         self.items = []
+        appended = 0
         for article in dicts:
             try:
+                # Parse pub_date defensively; if parsing fails, fall back to now
+                raw_pub = article.get("pub_date") or ""
+                try:
+                    pub_dt = dateutil.parser.parse(str(raw_pub))
+                except Exception:
+                    # Use module-level datetime and timezone (imported at top)
+                    pub_dt = datetime.now(tz=timezone.utc)
+
                 self.items.append(
                     FeedArticle(
                         original_title=str(
@@ -66,16 +78,18 @@ class Feed(Widget):
                         title=str(article.get("title") or ""),
                         link=str(article.get("link") or ""),
                         description=str(article.get("description", "")),
-                        pub_date=dateutil.parser.parse(
-                            str(article.get("pub_date") or "")
-                        ),
+                        pub_date=pub_dt,
                         processed=str(article.get("processed") or ""),
                         parent=self,
                     )
                 )
+                appended += 1
             except Exception:
                 # skip malformed entries
                 continue
+        logger.debug(
+            f"Feed.__init__: appended {appended} articles into self.items for feed id={self.id}"
+        )
         if self.items:
             self._last_updated = datetime.fromtimestamp(
                 os.path.getmtime(self.cache_path)
@@ -91,6 +105,8 @@ class Feed(Widget):
                 hour="*",
                 jitter=30,
                 max_instances=1,
+                misfire_grace_time=120,
+                coalesce=True,
             )
             logger.debug(
                 f"Feed: {self.name} cron job for scheduled with job id: {self.job.id}"

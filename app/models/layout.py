@@ -73,18 +73,28 @@ class Layout:
     def reload(self):
         logger.debug("Beginning Layout reload...")
         Scheduler.clear_jobs()
-
-        with open(self.config_path, "r") as file:
-            content = yaml.safe_load(file)
-            self.tabs = from_list(Tab.from_dict, content.get("tabs", []))
-            self.headers = from_list(
-                Bookmark.from_dict, content.get("headers", []), self
-            )
+        content = self._load_layout_from_file()
+        self.tabs = from_list(Tab.from_dict, content.get("tabs", []))
+        self.headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
 
         self.last_reload = self.mtime
         self.feed_hash = {}
 
         logger.debug("Completed Layout reload!")
+
+    def _load_layout_from_file(self) -> dict:
+        """Helper to load YAML layout content from the configured path.
+
+        Extracted to a separate method so tests can patch it easily.
+        Returns an empty dict on any read/parse error.
+        """
+        try:
+            with open(self.config_path, "r") as file:
+                content = yaml.safe_load(file) or {}
+                return content
+        except Exception:
+            logger.exception("Failed to read layout config; returning empty content")
+            return {}
 
     def tab(self, name: str) -> Tab:
         if name is None:

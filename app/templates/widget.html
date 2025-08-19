@@ -1,7 +1,7 @@
 {% if not skip_htmx and widget.hasattr('hx_get') %}
-  <div class="box {{ widget.type }}-box" 
-       hx-get="{{ widget.hx_get }}" 
-       hx-trigger="load" 
+  <div class="box {{ widget.type }}-box"
+       hx-get="{{ widget.hx_get }}"
+       hx-trigger="load"
        hx-swap="morph"
        hx-ext="preload,loading-states,alpine-morph"
        preload="mouseenter"
@@ -38,7 +38,7 @@
           {% endif %}
         </li>
         {% else %}
-        <li>Loading...</li>
+        <li>No articles yet - feeds will update automatically</li>
         {% endfor %}
       </ul>
     </div>

@@ -47,10 +47,15 @@ class FeedArticle(WidgetItem):
         self.processed = processed
 
         summary = normalize_text(self.description)
-        summary = BeautifulSoup(html.unescape(summary), "lxml").text
+        summary = BeautifulSoup(html.unescape(summary), "html.parser").text
         summary = re.sub(r"\[[\.+|…\]].*$", "", summary)
 
+        # If the extracted summary exactly matches the original title or the
+        # title appears to be the same content, treat it as no summary.
         if summary == self.original_title or summary in self.original_title:
+            self.summary = None
+        elif summary == self.title:
+            # When the summary equals the provided title, clear the summary.
             self.summary = None
         elif (
             self.original_title in summary

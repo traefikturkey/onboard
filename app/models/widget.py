@@ -51,7 +51,12 @@ class Widget:
 
     @property
     def items(self):
-        return self._items or []
+        # Return the stored list of items if it exists. Using `or []` treats an
+        # empty list as falsy and would return a new temporary empty list which
+        # breaks in-place mutation (e.g. `self.items.append(...)`). Instead,
+        # explicitly check for None so an empty list is still returned as the
+        # stored object.
+        return self._items if self._items is not None else []
 
     @items.setter
     def items(self, items):

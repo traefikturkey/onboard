@@ -15,11 +15,11 @@ def _create_background_scheduler() -> BackgroundScheduler:
         {
             "apscheduler.executors.default": {
                 "class": "apscheduler.executors.pool:ThreadPoolExecutor",
-                "max_workers": "5",
+                "max_workers": 10,
             },
             "apscheduler.executors.processpool": {
-                "class": "apscheduler.executors.pool:ThreadPoolExecutor",
-                "max_workers": "20",
+                "class": "apscheduler.executors.pool:ProcessPoolExecutor",
+                "max_workers": 5,
             },
         }
     )
