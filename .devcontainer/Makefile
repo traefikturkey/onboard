@@ -34,7 +34,7 @@ test: uv.lock
 	fi
 	@echo "Running ALL tests (excluding disabled tests)..."
 	# Run pytest but explicitly exclude integration tests during the regular test run
-	uv run --all-packages pytest tests/ --ignore=tests/support --ignore=tests/integration \
+	uv run pytest tests/ --ignore=tests/support --ignore=tests/integration \
 		--cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
 
 # Run full test suite including integration tests. This target depends on the
@@ -42,7 +42,7 @@ test: uv.lock
 # afterwards.
 test-integration: test
 	@echo "Running integration tests..."
-	uv run --all-packages pytest tests/integration --cov=app --cov-report=term-missing -v
+	uv run pytest -m integration tests/integration
 
 # Run linting
 # E203: whitespace before ':' (conflicts with black formatting)

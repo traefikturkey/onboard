@@ -40,13 +40,13 @@
 		"date +%F": true,
 		"ls": true,
 		"/^uv run (pytest|black|isort|behave|python).*/": true,
-		"/^make (test|lint)$/": true,
+    "/^make (?:test(?:-[\\w-]+)?|lint)$/": true,
 		"/^git (status|show\\b.*).*/": true,
 		"docker build": true,
 		"/^make (format|lint|run|test|)$/": true,
 		"behave": true
 	},
-  
+
   // Python indentation settings - force 4 spaces
   "[python]": {
     "editor.tabSize": 4,
@@ -54,7 +54,7 @@
     "editor.detectIndentation": true,
     "editor.formatOnSave": true
   },
-  
+
   // General editor settings to prevent indentation changes
   "editor.detectIndentation": true,
   "editor.tabSize": 4,

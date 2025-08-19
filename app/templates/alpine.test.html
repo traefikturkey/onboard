@@ -1,14 +1,14 @@
 <html>
 <head>
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
+    <!-- Alpine removed for local test; this page demonstrates delegated vanilla JS toggle -->
+    <link href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" rel="stylesheet">
     <style>
 
         .fas {
             vertical-align: middle;
             font-family: 'Font Awesome 5 Free';
             font-weight: 900; /* This ensures the solid style is used */
-            font-size: 0.8em;          
+            font-size: 0.8em;
         }
 
         .fa-chevron-down {
@@ -22,16 +22,33 @@
     </style>
 </head>
 <body>
-    <div x-data="{ open: false }" style="border: 1px solid #ccc; min-height: 1.5em; "> 
-        <i class="fas fa-chevron-down"  @click="open = ! open" :class="open ? 'fa-right' : ''" ></i>
-        <span>&nbsp;</span>
-        <span x-show="open" 
-            x-transition:enter.duration.300ms
-            x-transition:leave.duration.2000ms>
-            Hello 👋
-        </span>
-    </div>
+        <div data-example-toggle style="border: 1px solid #ccc; min-height: 1.5em;">
+                <i class="fas fa-chevron-down" data-example-toggle-button></i>
+                <span>&nbsp;</span>
+                <span data-example-toggle-content hidden>
+                        Hello 👋
+                </span>
+        </div>
+        <script>
+            // Delegated example toggle for the test page (no Alpine required)
+            document.addEventListener('click', function (e) {
+                var btn = e.target.closest('[data-example-toggle-button]');
+                if (!btn) return;
+                var container = btn.closest('[data-example-toggle]');
+                if (!container) return;
+                var content = container.querySelector('[data-example-toggle-content]');
+                if (!content) return;
+                var isHidden = content.hasAttribute('hidden');
+                if (isHidden) {
+                    content.removeAttribute('hidden');
+                    btn.classList.add('fa-right');
+                } else {
+                    content.setAttribute('hidden','');
+                    btn.classList.remove('fa-right');
+                }
+            });
+        </script>
 </div>
-  
+
 </body>
 </html>

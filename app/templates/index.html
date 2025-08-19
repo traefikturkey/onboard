@@ -20,16 +20,10 @@
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-preload@2.0.2/dist/preload.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-head-support@2.0.2/dist/head-support.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-loading-states@2.0.2/dist/loading-states.js"></script>
-	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+	<!-- Dev: Alpine.js was removed from runtime; re-add intentionally if needed for development -->
 
-	<script>
-    // Add Font Awesome icons
-    var script = document.createElement('script');
-    script.src = 'https://use.fontawesome.com/releases/v5.15.3/js/all.js';
-    document.head.appendChild(script);
-  </script>
-
-	<link href="https://use.fontawesome.com/releases/v5.0.1/css/all.css" rel="stylesheet">
+		<!-- Use Font Awesome CSS only (no JS injection) to keep icons as <i> elements which CSS can rotate -->
+		<link href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" rel="stylesheet">
 	{% assets "css_all" %}
 	<link rel="stylesheet" href="{{ ASSET_URL }}">
 	{% endassets %}
@@ -127,6 +121,65 @@
 	} catch (err) {
 		console.error('DEBUG helper failed', err);
 	}
+})();
+</script>
+<script>
+// Lightweight delegated widget controller to replace small Alpine usage.
+(function(){
+	// Toggle summary display when a list item or its toolbar icon is clicked.
+	document.addEventListener('click', function(e){
+		// Stop propagation for links that were marked to stop it
+		if (e.target.closest('[data-stop-propagation]')) {
+			e.stopPropagation();
+			return;
+		}
+
+		var toggle = e.target.closest('[data-toggle-id]');
+		if (!toggle) return;
+		var id = toggle.getAttribute('data-toggle-id');
+		var list = toggle.closest('[data-widget]');
+		if (!list) return;
+
+		// close any open summary
+		var openId = list.getAttribute('data-open-id') || '';
+		if (openId && openId !== id) {
+			var prevSummary = list.querySelector('[data-summary-for="' + openId + '"]');
+			var prevIcon = list.querySelector('[data-toggle-icon-for="' + openId + '"]');
+			if (prevSummary) prevSummary.setAttribute('hidden','');
+			if (prevIcon) {
+				// ensure previous icon is reset to collapsed state
+				prevIcon.classList.remove('fa-chevron-right');
+				prevIcon.classList.add('fa-chevron-down');
+				prevIcon.setAttribute('aria-expanded','false');
+			}
+		}
+
+		var summary = list.querySelector('[data-summary-for="' + id + '"]');
+		var icon = list.querySelector('[data-toggle-icon-for="' + id + '"]');
+		var isHidden = summary && summary.hasAttribute('hidden');
+			if (isHidden) {
+				summary.removeAttribute('hidden');
+				if (icon) {
+					icon.classList.remove('fa-chevron-down');
+					icon.classList.add('fa-chevron-right');
+					icon.setAttribute('aria-expanded','true');
+				}
+				list.setAttribute('data-open-id', id);
+			} else {
+				if (summary) summary.setAttribute('hidden','');
+				if (icon) {
+					icon.classList.remove('fa-chevron-right');
+					icon.classList.add('fa-chevron-down');
+					icon.setAttribute('aria-expanded','false');
+				}
+				list.setAttribute('data-open-id', '');
+			}
+	});
+
+	// Also close summary when clicking outside the list
+	document.addEventListener('click', function(e){
+		// clicking anywhere else will be handled by other handlers; ignore
+	});
 })();
 </script>
 </html>

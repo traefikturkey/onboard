@@ -78,6 +78,11 @@ ul li:last-child {
   position: relative; /* Make the parent container a positioning context */
 }
 
+/* Leave room on the right for the toolbar icon so text doesn't flow underneath it */
+.widget-item {
+  padding-right: 2.5em;
+}
+
 .feed-link {
   position: relative; /* Make the anchor tag a positioning context */
   z-index: 1; /* Ensure the anchor tag is on top of the toolbar */
@@ -91,8 +96,14 @@ ul li:last-child {
 }
 
 .summary {
-  padding: 0.188em 0; 
+  padding: 0.188em 0;
   transition: transform 0.3s ease-in-out;
+}
+
+/* Ensure summaries leave space for the toolbar icon on the right */
+.summary {
+  padding-right: 3em; /* more room for long summaries */
+  word-wrap: break-word;
 }
 
 .fas {
@@ -100,7 +111,7 @@ ul li:last-child {
   font-family: 'Font Awesome 5 Free';
   font-weight: 900; /* This ensures the solid style is used */
   font-size: 0.8em;
-  color: #5e5e5e; 
+  color: #5e5e5e;
 }
 
 .fa-chevron-down {
@@ -108,14 +119,17 @@ ul li:last-child {
   transform: rotate(-90deg);
 }
 
-.fa-right {
+.fa-chevron-right {
   transform: rotate(0deg) !important;
 }
 
 /* Float the collapse icon to the right */
 .widget-item-toolbar {
-  float: right;
+  /* keep toolbar absolutely positioned (defined earlier) and ensure it does not
+     affect flow via floats; add a small top offset for visual centering */
   cursor: pointer;
+  top: 0.25em;
+  right: 0.25em;
 }
 
 /* Clear the float after each list item */
