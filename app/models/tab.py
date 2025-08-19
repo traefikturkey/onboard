@@ -10,6 +10,7 @@ class Tab:
     def from_dict(dictionary: dict) -> "Tab":
         from .column import Column
         from .row import Row
+
         tab = Tab()
         tab.name = dictionary["tab"]
         if "rows" in dictionary:

@@ -25,7 +25,7 @@ class TestFeedIntegrationRegression(unittest.TestCase):
         self.feed_config = {
             "name": "Test RSS Feed",
             "feed_url": "http://example.com/rss.xml",
-            "display_limit": 5
+            "display_limit": 5,
         }
 
     def tearDown(self):
@@ -46,24 +46,26 @@ class TestFeedIntegrationRegression(unittest.TestCase):
                 "title": "Article 1: Important News",
                 "link": "http://example.com/article1",
                 "description": "<p>This is the <strong>first</strong> article description.</p>",
-                "published_parsed": None
+                "published_parsed": None,
             },
             {
                 "title": "Article 2: Breaking Update",
                 "link": "http://example.com/article2",
                 "description": "<p>Second article with <em>emphasis</em> and content.</p>",
-                "published_parsed": None
+                "published_parsed": None,
             },
             {
                 "title": "Article 3: Analysis",
                 "link": "http://example.com/article3",
                 "description": "Simple text description without HTML.",
-                "published_parsed": None
-            }
+                "published_parsed": None,
+            },
         ]
         mock_feed_data.bozo = False
 
-        with patch("app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler):
+        with patch(
+            "app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler
+        ):
             with patch("app.models.feed.feedparser.parse", return_value=mock_feed_data):
                 # Step 1: Initialize feed with empty cache
                 feed = Feed(self.feed_config)
@@ -126,13 +128,15 @@ class TestFeedIntegrationRegression(unittest.TestCase):
                 "title": f"Article {i}",
                 "link": f"http://example.com/article{i}",
                 "description": desc,
-                "published_parsed": None
+                "published_parsed": None,
             }
             for i, desc in enumerate(html_scenarios, 1)
         ]
         mock_feed_data.bozo = False
 
-        with patch("app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler):
+        with patch(
+            "app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler
+        ):
             with patch("app.models.feed.feedparser.parse", return_value=mock_feed_data):
                 feed = Feed(self.feed_config)
 
@@ -166,12 +170,14 @@ class TestFeedIntegrationRegression(unittest.TestCase):
                 "title": "Auto-loaded Article",
                 "link": "http://example.com/auto",
                 "description": "Automatically loaded on init",
-                "published_parsed": None
+                "published_parsed": None,
             }
         ]
         mock_feed_data.bozo = False
 
-        with patch("app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler):
+        with patch(
+            "app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler
+        ):
             with patch("app.models.feed.feedparser.parse", return_value=mock_feed_data):
                 with patch.object(Feed, 'refresh') as mock_refresh:
                     # Initialize feed (should trigger refresh due to needs_update=True)
@@ -202,19 +208,19 @@ class TestFeedIntegrationRegression(unittest.TestCase):
                                             "type": "feed",
                                             "name": "Test Feed 1",
                                             "feed_url": "http://example.com/feed1.xml",
-                                            "display_limit": 10
+                                            "display_limit": 10,
                                         },
                                         {
                                             "type": "feed",
                                             "name": "Test Feed 2",
                                             "feed_url": "http://example.com/feed2.xml",
-                                            "display_limit": 5
-                                        }
+                                            "display_limit": 5,
+                                        },
                                     ]
                                 }
                             ]
                         }
-                    ]
+                    ],
                 }
             ]
         }
@@ -222,8 +228,12 @@ class TestFeedIntegrationRegression(unittest.TestCase):
         mock_scheduler = MagicMock()
         mock_scheduler.running = False
 
-        with patch("app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler):
-            with patch.object(Layout, '_load_layout_from_file', return_value=layout_config):
+        with patch(
+            "app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler
+        ):
+            with patch.object(
+                Layout, '_load_layout_from_file', return_value=layout_config
+            ):
                 # This should not crash even with no cached feeds
                 layout = Layout()
 
