@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import os
-import secrets
 import signal
 import sys
 import warnings
@@ -35,7 +34,10 @@ layout = layout_module.Layout()
 
 app = Flask(__name__)
 app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
-app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
+# The app secret key is not referenced directly in the codebase (flagged by vulture).
+# Commenting this out temporarily to verify tests remain green before removing.
+# If tests fail, this will be reverted.
+# app.secret_key = os.environ.get("FLASK_SECRET_KEY", secrets.token_hex())
 
 
 if os.environ.get("FLASK_DEBUG", "False") == "True":

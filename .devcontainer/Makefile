@@ -40,7 +40,7 @@ test: uv.lock
 # Run full test suite including integration tests. This target depends on the
 # regular 'test' target so unit/BDD tests run first, then integration tests run
 # afterwards.
-test-integration: test
+test-all: test
 	@echo "Running integration tests..."
 	uv run pytest -m integration tests/integration
 
@@ -73,13 +73,13 @@ clean:
 	@echo "Clean completed!"
 
 
-check-deps:
+deptry:
 	@echo "Checking for production dependencies issues..."
 	@uv run deptry ./app
 	@echo "Checking for development dependencies issues..."
 	@uv run deptry . --ignore-notebooks
 
-
+# Check for dead code using vulture (removed)
 # Start background onboard server
 start-app:
 	@echo "Starting onboard server in background..."
