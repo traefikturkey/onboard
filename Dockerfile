@@ -93,6 +93,12 @@ if [ "$(id -u)" = "0" ]; then
 
     echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
+    else
+        # If not running as root, attempt to chown docker.sock using sudo if available
+        if command -v sudo >/dev/null 2>&1; then
+            sudo chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
+            sudo chown -R ${USER}:${USER} ${HOME}
+        fi
 fi
 
 echo "Running: $@"
@@ -235,7 +241,8 @@ RUN --mount=type=cache,target=/var/cache/apt \
 RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
-    uv sync --dev
+    uv sync --dev && \
+    chown -R $USER:$USER /usr/local/lib/python3.12/site-packages/
 
 # Copy application code after dependency installation (keep package layout)
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/

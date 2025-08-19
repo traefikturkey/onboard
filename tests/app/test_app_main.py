@@ -52,7 +52,7 @@ def test_flask_debug_branch_uses_nullcache(monkeypatch):
 
     fake_flask_assets.Bundle = FakeBundle
     fake_flask_assets.Environment = FakeEnvironment
-    sys.modules["flask_assets"] = fake_flask_assets
+    monkeypatch.setitem(sys.modules, "flask_assets", fake_flask_assets)
 
     # Execute the module as __main__ to run top-level code; it will import our fake
     try:
@@ -112,7 +112,7 @@ def test_main_development_calls_stop_scheduler(monkeypatch):
 
     fake_flask_assets.Bundle = FakeBundle
     fake_flask_assets.Environment = FakeEnvironment
-    sys.modules["flask_assets"] = fake_flask_assets
+    monkeypatch.setitem(sys.modules, "flask_assets", fake_flask_assets)
 
     try:
         sys.modules.pop("app.main", None)
@@ -148,8 +148,8 @@ def test_main_production_hypercorn_shutdown(monkeypatch):
         return "SENTINEL"
 
     fake_asyncio.serve = fake_serve
-    sys.modules["hypercorn"] = fake_hypercorn_mod
-    sys.modules["hypercorn.asyncio"] = fake_asyncio
+    monkeypatch.setitem(sys.modules, "hypercorn", fake_hypercorn_mod)
+    monkeypatch.setitem(sys.modules, "hypercorn.asyncio", fake_asyncio)
 
     # Provide a fake Config class expected by the module
     fake_config_mod = types.ModuleType("hypercorn.config")
@@ -158,7 +158,7 @@ def test_main_production_hypercorn_shutdown(monkeypatch):
         pass
 
     fake_config_mod.Config = FakeConfig
-    sys.modules["hypercorn.config"] = fake_config_mod
+    monkeypatch.setitem(sys.modules, "hypercorn.config", fake_config_mod)
 
     # Fake event loop with add_signal_handler and run_until_complete
     class FakeLoop:
@@ -200,7 +200,7 @@ def test_main_production_hypercorn_shutdown(monkeypatch):
 
     fake_flask_assets.Bundle = FakeBundle
     fake_flask_assets.Environment = FakeEnvironment
-    sys.modules["flask_assets"] = fake_flask_assets
+    monkeypatch.setitem(sys.modules, "flask_assets", fake_flask_assets)
 
     try:
         sys.modules.pop("app.main", None)

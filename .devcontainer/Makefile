@@ -33,7 +33,16 @@ test: uv.lock
 		echo "behave not installed in uv environment, skipping BDD tests"; \
 	fi
 	@echo "Running ALL tests (excluding disabled tests)..."
-	uv run --all-packages pytest tests/ --ignore=tests/support --cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
+	# Run pytest but explicitly exclude integration tests during the regular test run
+	uv run --all-packages pytest tests/ --ignore=tests/support --ignore=tests/integration \
+		--cov=app --cov-report=term-missing --cov-report=html:.htmlcov -v
+
+# Run full test suite including integration tests. This target depends on the
+# regular 'test' target so unit/BDD tests run first, then integration tests run
+# afterwards.
+test-integration: test
+	@echo "Running integration tests..."
+	uv run --all-packages pytest tests/integration --cov=app --cov-report=term-missing -v
 
 # Run linting
 # E203: whitespace before ':' (conflicts with black formatting)
