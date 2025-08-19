@@ -91,44 +91,15 @@ class Layout:
         try:
             with open(self.config_path, "r") as file:
                 content = yaml.safe_load(file) or {}
-                # Normalize legacy/alternate keys so tests or older layouts
-                # that used `name` for tabs are handled consistently. We keep
-                # model parsing strict (Tab.from_dict expects `tab`) and do a
-                # non-destructive normalization here with a deprecation log.
-                return self._normalize_layout_content(content)
+                # Return raw content. Keep Tab.from_dict strict and let tests
+                # update fixtures to match canonical `tab` key when needed.
+                return content
         except Exception:
             logger.exception("Failed to read layout config; returning empty content")
             return {}
 
-    def _normalize_layout_content(self, content: dict) -> dict:
-        """Normalize layout content loaded from disk.
-
-        Current normalization: for each tab dict, if `name` exists but
-        `tab` does not, copy `name` -> `tab` and emit a single warning.
-
-        This keeps `Tab.from_dict` strict while allowing legacy layouts to
-        keep working and surface a deprecation warning.
-        """
-        if not isinstance(content, dict):
-            return content
-
-        tabs = content.get("tabs")
-        if not isinstance(tabs, list):
-            return content
-
-        mapped = False
-        for t in tabs:
-            if isinstance(t, dict) and "tab" not in t and "name" in t:
-                t["tab"] = t.get("name")
-                mapped = True
-
-        if mapped:
-            logger.warning(
-                "Layout normalization: mapped legacy 'name'->'tab' for one or more tabs."
-                " Please update your layout.yml to use 'tab' as the canonical key."
-            )
-
-        return content
+    # NOTE: Legacy normalization removed. Parsing is strict and callers/tests
+    # should provide canonical keys (e.g., `tab`).
 
     def tab(self, name: str) -> Tab:
         if name is None:

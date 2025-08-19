@@ -51,12 +51,12 @@
   "[python]": {
     "editor.tabSize": 4,
     "editor.insertSpaces": true,
-    "editor.detectIndentation": false,
-    "editor.formatOnSave": false
+    "editor.detectIndentation": true,
+    "editor.formatOnSave": true
   },
   
   // General editor settings to prevent indentation changes
-  "editor.detectIndentation": false,
+  "editor.detectIndentation": true,
   "editor.tabSize": 4,
   "editor.insertSpaces": true
 }

@@ -1,8 +1,9 @@
 import os
-import sys
 from typing import Any, Optional
 
 from apscheduler.schedulers.background import BackgroundScheduler
+
+from app.modules.testsupport import is_test_environment
 
 from .scheduler_interface import SchedulerInterface
 
@@ -54,22 +55,13 @@ class Scheduler:
         if _BG_SCHEDULER is None:
             _BG_SCHEDULER = _create_background_scheduler()
 
-            # Check if we're in a testing environment
-            is_testing = (
-                # Explicit disable flag
-                os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower() == "true"
-                # pytest is running
-                or "pytest" in sys.modules
-                # Running under pytest
-                or "PYTEST_CURRENT_TEST" in os.environ
-                # Common test runner patterns
-                or any("test" in arg for arg in sys.argv)
-                # Behave BDD testing
-                or "behave" in sys.modules
-            )
-
-            if is_testing:
-                # Don't start scheduler during testing
+            # Consolidated check for test environment
+            if (
+                is_test_environment()
+                or os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower()
+                == "true"
+            ):
+                # Running under a test runner or explicitly disabled: don't start
                 pass
             else:
                 # Start scheduler in production/development environments

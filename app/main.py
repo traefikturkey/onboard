@@ -14,6 +14,7 @@ from flask_caching import Cache
 
 from app.models import apscheduler as apscheduler_module
 from app.models import layout as layout_module
+from app.modules.testsupport import is_test_environment
 from app.services.link_tracker import link_tracker
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)
@@ -64,20 +65,11 @@ css.build()
 # Eagerly load layout and initialize scheduler when running in production.
 # Tests and other CI runs should skip this; use the same detection logic as
 # the Scheduler helper to avoid starting background jobs during tests.
-def _is_test_environment() -> bool:
-    # Mirror checks used by Scheduler.getScheduler() to detect test runs
-    return (
-        os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower() == "true"
-        or "pytest" in sys.modules
-        or "PYTEST_CURRENT_TEST" in os.environ
-        or any("test" in arg for arg in sys.argv)
-        or "behave" in sys.modules
-    )
 
 
 if (
     os.environ.get("FLASK_ENV", "development") == "production"
-    and not _is_test_environment()
+    and not is_test_environment()
 ):
     try:
         logger.info(
