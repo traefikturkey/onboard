@@ -82,15 +82,17 @@ if [ "$(id -u)" = "0" ]; then
 
     # Ensure docker.sock is owned by the target user when running as root
     chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
+    chown -R ${USER}:${USER} ${PROJECT_PATH}
 
     echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
-    else
-        # If not running as root, attempt to chown docker.sock using sudo if available
-        if command -v sudo >/dev/null 2>&1; then
-            sudo chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
-            sudo chown -R ${USER}:${USER} ${HOME}
-        fi
+else
+    # If not running as root, attempt to chown docker.sock using sudo if available
+    if command -v sudo >/dev/null 2>&1; then
+        sudo chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
+        sudo chown -R ${USER}:${USER} ${HOME}
+        sudo chown -R ${USER}:${USER} ${PROJECT_PATH}
+    fi
 fi
 
 echo "Running: $@"
