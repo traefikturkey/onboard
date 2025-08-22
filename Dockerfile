@@ -67,12 +67,11 @@ RUN sed -i 's/UID_MAX .*/UID_MAX    100000/' /etc/login.defs && \
 
 COPY --chmod=755 <<-"EOF" /usr/local/bin/docker-entrypoint.sh
 #!/bin/bash
-set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
-set -o pipefail  # do not hide errors within pipes
-if [ -v DOCKER_ENTRYPOINT_DEBUG ] && [ "$DOCKER_ENTRYPOINT_DEBUG" == 1 ]; then
+# Bash entrypoint: use bash for richer debugging and reliable `pipefail` support.
+# Use strict flags that are bash-compatible.
+set -euo pipefail
+if [ "${DOCKER_ENTRYPOINT_DEBUG:-}" = "1" ]; then
     set -x
-    set -o xtrace
 fi
 
 # If running as root, adjust the ${USER} user's UID/GID and drop to that user
@@ -80,19 +79,30 @@ if [ "$(id -u)" = "0" ]; then
     groupmod -o -g ${PGID:-1000} ${USER} 2>&1 >/dev/null|| true
     usermod -o -u ${PUID:-1000} ${USER} 2>&1 >/dev/null|| true
 
-    # Ensure docker.sock is owned by the target user when running as root
-    chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
-    chown -R ${USER}:${USER} ${PROJECT_PATH}
+    # Run optional devcontainer entrypoint hooks if present. Development-only
+    # scripts placed in ${PROJECT_PATH}/.devcontainer/entrypoint.d/ will be
+    # executed here at container start. Production images don't include this
+    # directory so changes there won't affect production image layer caching.
+    if [ -d "${PROJECT_PATH}/.devcontainer/entrypoint.d" ]; then
+        for hook in "${PROJECT_PATH}"/.devcontainer/entrypoint.d/*.sh; do
+            if [ -f "$hook" ]; then
+                echo "devcontainer hook START: $hook at $(date) PID=$$"
+                set +e # Allow the hook to fail without aborting startup
+                bash "$hook"
+                rc=$?
+                set -e
+                echo "devcontainer hook FINISH: $hook at $(date) rc=${rc}"
+            fi
+        done
+    fi
+
+    # Ensure project path ownership for the runtime user
+    # Only touch the docker socket if it exists (socket or file) - one-liner
+    ( [ -S /var/run/docker.sock ] || [ -e /var/run/docker.sock ] ) && chown ${USER}:${USER} /var/run/docker.sock || true
+    chown -R ${USER}:${USER} ${PROJECT_PATH} || true
 
     echo "Running as user ${USER}: $@"
     exec gosu ${USER} "$@"
-else
-    # If not running as root, attempt to chown docker.sock using sudo if available
-    if command -v sudo >/dev/null 2>&1; then
-        sudo chown ${USER}:${USER} /var/run/docker.sock >/dev/null 2>&1 || true
-        sudo chown -R ${USER}:${USER} ${HOME}
-        sudo chown -R ${USER}:${USER} ${PROJECT_PATH}
-    fi
 fi
 
 echo "Running: $@"
@@ -255,7 +265,7 @@ RUN --mount=type=cache,target=/tmp/.cache/uv \
     --mount=type=cache,target=/root/.cache/pip \
     --mount=type=cache,target=/root/.cache/uv \
     uv sync --dev && \
-    chown -R $USER:$USER /usr/local/lib/python3.12/site-packages/ && \
+    chown -R $USER:$USER /usr/local/lib/python*/site-packages/ && \
     chown -R $USER:$USER /usr/local/bin
 
 

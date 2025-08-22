@@ -1,4 +1,7 @@
 import pytest
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.by import By
 
 # mark this module as integration so pytest -m "not integration" will deselect it
 pytestmark = pytest.mark.integration
@@ -11,13 +14,7 @@ def test_homepage_loads_and_has_body(selenium_url, app_url):
     The test will raise a clear error if it can't connect to the Selenium server or the app.
     Use environment vars SELENIUM_URL and APP_URL to override endpoints.
     """
-    # Skip this test at runtime if selenium isn't available in the environment
-    pytest.importorskip("selenium")
-
     # Import selenium pieces at runtime to avoid module-level import errors
-    from selenium import webdriver
-    from selenium.webdriver.chrome.options import Options
-    from selenium.webdriver.common.by import By
 
     # Create options (headless is fine for remote standalone containers)
     opts = Options()
@@ -31,10 +28,7 @@ def test_homepage_loads_and_has_body(selenium_url, app_url):
     SELENIUM_URL = selenium_url
     APP_URL = app_url
 
-    try:
-        driver = webdriver.Remote(command_executor=SELENIUM_URL, options=opts)
-    except Exception as exc:
-        pytest.skip(f"Unable to connect to Selenium remote at {SELENIUM_URL}: {exc}")
+    driver = webdriver.Remote(command_executor=SELENIUM_URL, options=opts)
 
     try:
         driver.set_page_load_timeout(15)

@@ -20,7 +20,7 @@
     }
   },
   "initializeCommand": "make initialize",
-  "postCreateCommand": "sudo chown -R ${USER}:${USER} ${PROJECT_PATH} && uv sync --dev && ./.devcontainer/setup-dotfiles.sh",
+  "postCreateCommand": "make setup-container",
   "runArgs": [
     "--name","${localWorkspaceFolderBasename}_devcontainer",
     "--hostname","${localWorkspaceFolderBasename}",

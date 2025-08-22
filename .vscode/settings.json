@@ -40,10 +40,10 @@
 		"date +%F": true,
 		"ls": true,
 		"/^uv run (pytest|black|isort|behave|python).*/": true,
-    "uv sync": true,
+    "/^uv sync .*/": true,
     "/^make (?:run|format|lint|test(?:-[\\w-]+)?)$/": true,
 		"/^git (add|log|status|show\\b.*).*/": true,
-		"docker build": true,
+		"/^docker (build|inspect|logs|ps).*/": true,
 		"behave": true
 	},
 

@@ -4,6 +4,7 @@ Integration tests for the complete feed loading workflow.
 Tests the end-to-end process of feed initialization, download, and caching
 to prevent regressions in the production feed loading scenario.
 """
+
 import os
 import tempfile
 import unittest
@@ -157,7 +158,7 @@ class TestFeedIntegrationRegression(unittest.TestCase):
                     self.assertIsNotNone(article.link)
                     # summary can be None for empty/whitespace descriptions
 
-    def test_feed_initialization_triggers_update_in_production_scenario(self):
+    def test_feed_update_in_production_scenario(self):
         """Test that feed initialization properly triggers updates when scheduler is running."""
         # Mock job for scheduler
         mock_job = MagicMock()

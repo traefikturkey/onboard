@@ -15,6 +15,17 @@ initialize:
 	@echo "SEMANTIC_VERSION=$(SEMANTIC_VERSION)" >> .devcontainer/.env
 
 
+
+# One-step container setup invoked by devcontainer postCreateCommand
+setup-container:
+	@echo "Running entrypoint scripts..."
+	@for script in .devcontainer/entrypoint.d/*.sh; do \
+			echo "Running $$script"; \
+			bash "$$script" || echo "entrypoint script failed: $$script"; \
+	done
+	@echo "Entrypoint scripts completed."
+
+
 # Install development dependencies (only if pyproject.toml changed)
 uv.lock:
 	uv lock
