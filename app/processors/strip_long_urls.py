@@ -2,6 +2,8 @@ import os
 import re
 from typing import List
 
+from app.models.feed_article import FeedArticle
+
 
 class StripLongUrls:
     """Processor to strip long http(s) URLs from article titles.
@@ -16,17 +18,7 @@ class StripLongUrls:
 
     def __init__(self, threshold: int | None = None):
         # Allow an env override for tuning in different deployments
-        env = os.getenv("ONBOARD_STRIP_URL_LENGTH")
-        if threshold is not None:
-            self.threshold = int(threshold)
-        elif env is not None:
-            try:
-                self.threshold = int(env)
-            except Exception:
-                self.threshold = 30
-        else:
-            self.threshold = 30
-
+        self.threshold = int(os.getenv("ONBOARD_STRIP_URL_LENGTH", "25"))
         # regex to find http(s) URLs
         self._url_re = re.compile(r"https?://\S+", re.IGNORECASE)
 
@@ -47,21 +39,23 @@ class StripLongUrls:
         new = new.strip(" -:\u2014|,;\n\t")
         return new
 
-    def process(self, articles: List[object]) -> List[object]:
+    def process(self, articles: List[FeedArticle]) -> List[FeedArticle]:
         for a in articles:
             try:
-                title = getattr(a, "title", None)
-                if not title:
-                    continue
-
-                stripped = self._strip_long_urls(title)
-                # Only set the title if we actually removed something or the result is non-empty
-                if stripped and stripped != title:
-                    a.title = stripped
-                elif stripped == "":
-                    # If stripping produced an empty string, prefer leaving original title intact
-                    # so we don't erase useful content. (This avoids blank titles.)
-                    continue
+                # Only process the display 'name' field (widget uses article.name)
+                original = getattr(a, "name", "")
+                # _strip_long_urls returns an empty string when URLs are removed; in
+                # that case we should preserve the original value to avoid blanking
+                # out the display name (conservative behavior required by tests).
+                new = (
+                    self._strip_long_urls(original)
+                    if original is not None
+                    else original
+                )
+                if new:
+                    a.name = new
+                else:
+                    a.name = original
             except Exception:
                 # Be defensive: processors should not raise
                 continue

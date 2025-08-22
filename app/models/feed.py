@@ -16,6 +16,7 @@ from .feed_cache import FeedCache
 from .noop_feed_processor import NoOpFeedProcessor
 from .utils import calculate_sha1_hash, pwd
 from .widget import Widget
+from app.processors.strip_long_urls import StripLongUrls
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -204,6 +205,8 @@ class Feed(Widget):
                 articles = []
 
         articles.sort(key=lambda a: a.pub_date, reverse=True)
+        articles = self.processors(articles)
+
         return articles
 
     def download(self, feed_url: str) -> list[FeedArticle]:
@@ -270,6 +273,20 @@ class Feed(Widget):
         self.items = self.processors(self.items)
 
     def processors(self, articles: list[FeedArticle]) -> list[FeedArticle]:
+        # Always apply conservative global processors first (unless the feed already lists them)
+        try:
+            configured = [p.get("processor") for p in self.widget.get("process", [])]
+        except Exception:
+            configured = []
+
+        try:
+            if "strip_long_urls" not in configured:
+                articles = StripLongUrls().process(articles)
+        except Exception:
+            logger.exception(
+                "Global processor StripLongUrls failed; continuing without it"
+            )
+
         if "process" in self.widget:
             for processor in self.widget["process"]:
                 processor_name = processor["processor"]
