@@ -15,3 +15,20 @@ a:hover, a:focus {
 .box-header-link, .box-header-link:visited, .header a:visited {
   color: #D3D3D3;
 }
+
+/* Prevent bookmark link text from wrapping and show ellipsis when too long */
+.bookmarks-link {
+  display: inline-block; /* allow width control while remaining inline */
+  max-width: 12rem; /* adjust as needed for your layout */
+  min-width: 0; /* allows shrinking inside flex containers */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  vertical-align: middle;
+  word-break: normal;
+  overflow-wrap: normal;
+}
+
+.bookmarks-link:visited {
+  color: #98c379; /* keep same color for visited when using the class */
+}

@@ -39,7 +39,7 @@
 }
 
 #bookmarkBar li:hover > a {
-  
+
   background-color: #525252;
 }
 
@@ -53,6 +53,15 @@
   max-height: 12px;
   padding-right: 2px;
   vertical-align: text-bottom;
+}
+
+#bookmarkBar .bookmark-name {
+  display: inline-block;
+  max-width: 10rem; /* reasonable cap so long names don't blow out the bar */
+  white-space: nowrap; /* prevent wrapping */
+  overflow: hidden; /* hide overflow */
+  text-overflow: ellipsis; /* show ellipsis when truncated */
+  vertical-align: middle;
 }
 
 #bookmarkBar ul ul {

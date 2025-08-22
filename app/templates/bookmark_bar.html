@@ -4,7 +4,7 @@
   <li>
     {% if bookmark.contents %}
       <a href="#">
-        <i class="fa fa-folder"></i> {{ bookmark.name }}
+        <i class="fa fa-folder"></i> <span class="bookmark-name">{{ bookmark.name }}</span>
       </a>
       {% with bookmarks = bookmark.contents %}
         {% include('bookmark_bar.html') %}
@@ -17,7 +17,7 @@
         {% else %}
           <i class="fa fa-link"></i>
         {% endif %}
-        {{ bookmark.name }}
+        <span class="bookmark-name">{{ bookmark.name }}</span>
       </a>
     {% endif %}
   </li>
