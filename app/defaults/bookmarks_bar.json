@@ -9,70 +9,6 @@
     "name": "Links",
     "contents": [
       {
-        "name": "covid",
-        "contents": [
-          {
-            "name": "I Have Been Through This Before - Tablet Magazine",
-            "href": "https://www.tabletmag.com/sections/arts-letters/articles/i-have-been-through-this-before-bauer",
-            "favicon": "/static/assets/icons/tabletmag.com.favicon.ico",
-            "add_date": "1635555309"
-          },
-          {
-            "name": "Physical interventions to interrupt or reduce the spread of respiratory viruses - Jefferson, T - 2023 | Cochrane Library",
-            "href": "https://www.cochranelibrary.com/cdsr/doi/10.1002/14651858.CD006207.pub6/full",
-            "favicon": "/static/assets/icons/cochranelibrary.com.favicon.ico",
-            "add_date": "1675266431"
-          },
-          {
-            "name": "Guess what DID NOT get discussed at today’s G7 meeting – twitchy.com",
-            "href": "https://twitchy.com/gregp-3534/2022/06/26/guess-what-did-not-get-discussed-at-todays-g7-meeting/",
-            "favicon": "/static/assets/icons/twitchy.com.favicon.ico",
-            "add_date": "1656288508"
-          },
-          {
-            "name": "‘SEE how it works?!’ Tweep pulls BACK curtain on woke gender experts refusing to admit women are WOMEN (and how to push back) in EPIC thread – twitchy.com",
-            "href": "https://twitchy.com/samj-3930/2022/06/03/see-how-it-works-tweep-pulls-back-curtain-on-woke-gender-experts-refusing-to-admit-women-are-women-and-how-to-push-back-in-epic-thread/",
-            "favicon": "/static/assets/icons/twitchy.com.favicon.ico",
-            "add_date": "1654321556"
-          },
-          {
-            "name": "Global famines of 'biblical proportions' will be caused by coronavirus pandemic, UN warns - CNN",
-            "href": "https://www.cnn.com/2020/04/22/africa/coronavirus-famine-un-warning-intl/index.html",
-            "favicon": "/static/assets/icons/cnn.com.favicon.ico",
-            "add_date": "1588694083"
-          },
-          {
-            "name": "The dam is about to break on the COVID shots – Behind The Black – Robert Zimmerman",
-            "href": "https://behindtheblack.com/behind-the-black/essays-and-commentaries/the-dam-is-about-to-break-on-the-covid-shots/",
-            "favicon": "/static/assets/icons/behindtheblack.com.favicon.ico",
-            "add_date": "1665507989"
-          },
-          {
-            "name": "The Harm Caused by Masks | City Journal",
-            "href": "https://www.city-journal.org/article/the-harm-caused-by-masks",
-            "favicon": "/static/assets/icons/city-journal.org.favicon.ico",
-            "add_date": "1694804508"
-          }
-        ]
-      },
-      {
-        "name": "news",
-        "contents": [
-          {
-            "name": "Andrew Follett says ‘the media is telling you two major lies’ about mass shootings and gun control – twitchy.com",
-            "href": "https://twitchy.com/brettt-3136/2022/05/25/andrew-follett-says-the-media-is-telling-you-two-major-lies-about-mass-shootings-and-gun-control/",
-            "favicon": "/static/assets/icons/twitchy.com.favicon.ico",
-            "add_date": "1654021212"
-          },
-          {
-            "name": "The Ukrainegate ‘Whisteblower’ Isn’t a Real Whistleblower – Rolling Stone",
-            "href": "https://www.rollingstone.com/politics/political-commentary/whistleblower-ukraine-trump-impeach-cia-spying-895529/",
-            "favicon": "/static/assets/icons/rollingstone.com.favicon.ico",
-            "add_date": "1570463069"
-          }
-        ]
-      },
-      {
         "name": "tech",
         "contents": [
           {
@@ -917,12 +853,6 @@
     "name": "Rearden",
     "contents": [
       {
-        "name": "Homepage",
-        "href": "https://homepage.ilude.com/",
-        "favicon": "/static/assets/icons/ilude.com.favicon.ico",
-        "add_date": "1695587189"
-      },
-      {
         "name": "firewall.ilude.com",
         "href": "https://firewall.ilude.com/#ConfigTree",
         "favicon": "/static/assets/icons/ilude.com.favicon.ico",
@@ -973,6 +903,12 @@
       {
         "name": "Syncthing",
         "href": "https://sync.ilude.com/#",
+        "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Vaultwarden",
+        "href": "https://vaultwarden.ilude.com/",
         "favicon": "/static/assets/icons/ilude.com.favicon.ico",
         "add_date": "1586106632"
       },
@@ -1208,37 +1144,61 @@
     "add_date": "1631327037"
   },
   {
-    "name": "Current",
+    "name": "Tools",
     "contents": [
       {
-        "name": "prebid",
-        "contents": [
-          {
-            "name": "Prebid for beginners",
-            "href": "https://medium.com/ad-tech/prebid-for-beginners-with-examples-a06f806b3abf",
-            "favicon": "/static/assets/icons/medium.com.favicon.ico",
-            "add_date": "1713792709"
-          },
-          {
-            "name": "Basic Example for Header Bidding",
-            "href": "https://docs.prebid.org/dev-docs/examples/basic-example.html",
-            "favicon": "/static/assets/icons/prebid.org.favicon.ico",
-            "add_date": "1713792714"
-          },
-          {
-            "name": "Download Prebid.js for Header Bidding",
-            "href": "https://docs.prebid.org/download.html",
-            "favicon": "/static/assets/icons/prebid.org.favicon.ico",
-            "add_date": "1713792719"
-          },
-          {
-            "name": "Is the Topics API the future of digital advertising",
-            "href": "https://medium.com/ad-tech/the-ad-industrys-future-and-a-possible-solution-a4363bd9feb8",
-            "favicon": "/static/assets/icons/medium.com.favicon.ico",
-            "add_date": "1713795445"
-          }
-        ]
+        "name": "Future AI Tools",
+        "href": "https://www.futuretools.io/",
+        "favicon": "/static/assets/icons/futuretools.io.favicon.ico",
+        "add_date": "1586106632"
       },
+      {
+        "name": "ForwardFuture AI Tools",
+        "href": "https://tools.forwardfuture.ai/",
+        "favicon": "/static/assets/icons/forwardfuture.ai.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Minimax",
+        "href": "https://agent.minimax.io/",
+        "favicon": "/static/assets/icons/minimax.io.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Netlify",
+        "href": "https://app.netlify.com/",
+        "favicon": "/static/assets/icons/netlify.com.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Render",
+        "href": "https://render.com/",
+        "favicon": "/static/assets/icons/render.com.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Meta",
+        "href": "https://www.meta.ai/",
+        "favicon": "/static/assets/icons/meta.ai.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "ReadPartner",
+        "href": "https://readpartner.com/",
+        "favicon": "/static/assets/icons/readpartner.com.favicon.ico",
+        "add_date": "1586106632"
+      },
+      {
+        "name": "Jan AI - Private Desktop AI Chat",
+        "href": "https://jan.ai/",
+        "favicon": "/static/assets/icons/jan.ai.favicon.ico",
+        "add_date": "1586106632"
+      }
+    ]
+  },
+  {
+    "name": "Current",
+    "contents": [
       {
         "name": "JSFiddle - url drop",
         "href": "https://jsfiddle.net/ilude/9gjxnsb4/2/",
@@ -1259,7 +1219,7 @@
       },
       {
         "name": "m0wer/rssfilter",
-        "href": "https://github.com/m0wer/rssfilter/blob/67e6befda4a7c987d2be1cced111232da2e08216/backend/tests/test_recommend.py",
+        "href": "https://github.com/m0wer/rssfilter/",
         "favicon": "/static/assets/icons/github.com.favicon.ico",
         "add_date": "1713125426"
       },
@@ -1268,12 +1228,6 @@
         "href": "https://www.devsfordevs.com/profile/Christopher%20Bell",
         "favicon": "/static/assets/icons/devsfordevs.com.favicon.ico",
         "add_date": "1713135007"
-      },
-      {
-        "name": "m0wer/rssfilter",
-        "href": "https://github.com/m0wer/rssfilter/blob/67e6befda4a7c987d2be1cced111232da2e08216/backend/app/models/article.py#L8",
-        "favicon": "/static/assets/icons/github.com.favicon.ico",
-        "add_date": "1713125421"
       },
       {
         "name": "recommenders-team/recommenders: Best Practices on Recommendation Systems",

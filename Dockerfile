@@ -236,6 +236,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
     sudo \
     tar \
     tree \
+    unison \
     util-linux \
     yarnpkg \
     yq \

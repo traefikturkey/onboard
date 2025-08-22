@@ -35,24 +35,46 @@ tabs:
           link: https://slickdeals.net/
 
     - column:
-      widgets:
-      - name: AI
-        type: bookmarks
-        display_header: False
-        bookmarks:
-        - name: Bing
-          link: https://www.bing.com/chat
-        - name: ChatGPT
-          link: https://chat.openai.com/
-        - name: Claude
-          link: https://claude.ai/chats
-        - name: Groq
-          link: https://chat.groq.com/
-        - name: Perplexity
-          link: https://perplexity.ai/
-        - name: Reka
-          link: https://chat.reka.ai/
-
+      rows:
+      - row:
+        columns:
+        - column:
+          widgets:
+          - name: AI
+            type: bookmarks
+            display_header: False
+            bookmarks:
+              - name: Bing
+                link: https://www.bing.com/chat
+              - name: ChatGPT
+                link: https://chat.openai.com/
+              - name: Claude
+                link: https://claude.ai/chats
+              - name: Grok xAI
+                link: https://grok.com/
+              - name: Groq
+                link: https://chat.groq.com/
+              - name: Perplexity
+                link: https://perplexity.ai/
+        - column:
+          widgets:
+          - name: AI
+            type: bookmarks
+            display_header: False
+            bookmarks:
+              - name: bolt.new
+                link: https://bolt.new/
+              - name: Gemini
+                link: https://gemini.google.com/app
+              - name: MS Copilot
+                link: https://copilot.microsoft.com/chats
+              - name: Qwen
+                link: https://chat.qwen.ai/
+              - name: V0.dev
+                link: https://v0.app/
+              - name: T3 Chat
+                link: https://t3.chat/
+              
     - column:
       widgets:
       - name: Bookmarks
@@ -63,34 +85,60 @@ tabs:
           link: https://www.cloudflare.com/
         - name: Codeword Generator
           link: https://cxxr.github.io/nsa.js/
+        - name: Excalidraw
+          link: https://excalidraw.com/
+        - name: Notion
+          link: https://www.notion.so/
+        
         - name: MoneroOcean
           link: https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL
-        - name: Teams
-          link: https://teams.microsoft.com/
         - name: Tailscale
           link: https://login.tailscale.com/admin/
-        - name: Thingiverse
-          link: https://www.thingiverse.com/
+        
+
       
     - column:
-      widgets:
-      - name: Network
-        type: bookmarks
-        display_header: False
-        bookmarks:
-        - name: Dozzle - ilude.com
-          link: https://dozzle.ilude.com/
-        - name: Dozzle - traefikturkey.icu
-          link: https://dozzle.traefikturkey.icu/
-        - name: Frigate
-          link: https://frigate.traefikturkey.icu/
-        - name: Proxmox - ilude.com
-          link: 'https://pve.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
-        - name: Proxmox - traefikturkey.icu
-          link: 'https://pve-patriot.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
-        - name: Vaultwarden
-          link: https://vaultwarden.ilude.com/
-    
+      rows:
+      - row:
+        columns:
+        - column:
+          widgets:
+          - name: Tools
+            type: bookmarks
+            display_header: False
+            bookmarks:
+            - name: Producer.AI
+              link: https://www.producer.ai/
+            - name: Suno
+              link: https://suno.ai/
+            - name: Udio
+              link: https://www.udio.com/
+            - name: Playground
+              link: https://playground.com/
+            - name: OpenRouter
+              link: https://openrouter.ai/
+            - name: Supabase
+              link: https://supabase.com/
+            
+
+        - column:
+          widgets:
+          - name: Tools
+            type: bookmarks
+            display_header: False
+            bookmarks:
+            - name: Freedium
+              link: https://freedium.cfd/
+            - name: AgentGPT
+              link: https://agentgpt.reworkd.ai/
+            - name: MindStudio
+              link: https://app.mindstudio.ai/
+            - name: SmythOS
+              link: https://app.smythos.com/
+            - name: Toolhouse
+              link: https://toolhouse.ai/
+
+           
     - column:
       widgets:
       - name: Code
@@ -101,14 +149,14 @@ tabs:
           link: https://gist.github.com/
         - name: Github
           link: https://github.com/ilude
-        - name: Onramp - Rearden
-          link: vscode://vscode-remote/ssh-remote+anvil@rearden.ilude.com/apps/onramp
-        - name: Onramp - Patriot
-          link: vscode://vscode-remote/ssh-remote+anvil@patriot-onramp.ilude.com/apps/onramp
-        - name: OnBoard
-          link: vscode://vscode-remote/ssh-remote+anvil@patriot-onramp.ilude.com/apps/onboard
-        - name: Ontology
-          link: vscode://vscode-remote/ssh-remote+anvil@rearden.ilude.com/apps/ontology
+        - name: Dozzle - ilude.com
+          link: https://dozzle.ilude.com/
+        - name: Dozzle - traefikturkey.icu
+          link: https://dozzle.traefikturkey.icu/
+        - name: Proxmox - ilude.com
+          link: 'https://pve.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
+        - name: Proxmox - traefikturkey.icu
+          link: 'https://pve-patriot.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::'
         
   - row:
     columns:
@@ -236,3 +284,11 @@ tabs:
       - name: "Homepage"
         type: "iframe"
         src: "https://homepage.ilude.com/"
+
+- tab: "Doku - Rearden"
+  columns: 
+  - column:
+    widgets:
+      - name: "Doku"
+        type: "iframe"
+        src: "https://doku.ilude.com/"
