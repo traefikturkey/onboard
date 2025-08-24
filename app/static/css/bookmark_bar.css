@@ -38,6 +38,10 @@
   margin-right: 5px;
 }
 
+#bookmarkBar a.bookmark-folder {
+  cursor: pointer;
+}
+
 #bookmarkBar li:hover > a {
 
   background-color: #525252;
@@ -74,6 +78,29 @@
   z-index: 1001;
   border: 1px solid #525252; /* Add a light outline */
   border-radius: 5px; /* Add rounded corners */
+}
+
+/* Multi-column layout for folders with multiColumn attribute (activated on hover). JS adds the class and column count for broader browser support. */
+#bookmarkBar li.multi-column-folder:hover > ul {
+  display: block !important;
+  column-count: var(--column-count, 2);
+  column-gap: 16px;
+  column-fill: balance;
+  padding: 4px 8px;
+  width: auto;
+  min-width: calc(200px * var(--column-count, 2));
+}
+
+#bookmarkBar li.multi-column-folder:hover > ul > li {
+  break-inside: avoid;
+  margin: 0;
+  padding: 0;
+}
+
+#bookmarkBar li.multi-column-folder:hover > ul > li > a {
+  white-space: nowrap;
+  display: block;
+  width: 100%;
 }
 
 #bookmarkBar ul ul ul {

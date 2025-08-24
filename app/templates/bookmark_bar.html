@@ -3,14 +3,14 @@
 {% for bookmark in bookmarks %}
   <li>
     {% if bookmark.contents %}
-      <a href="#">
+      <a href="#" class="bookmark-folder" data-bookmark-folder="true" data-folder-name="{{ bookmark.name }}" data-folder-slug="{{ bookmark.name|lower|replace(' ', '-')|replace('.', '-') }}" {% if bookmark.multiColumn %}data-multi-column="{{ bookmark.multiColumn }}"{% endif %}>
         <i class="fa fa-folder"></i> <span class="bookmark-name">{{ bookmark.name }}</span>
       </a>
-      {% with bookmarks = bookmark.contents %}
+      {% with bookmarks = bookmark.contents, inside_new_tab_folder = (bookmark.openInNewTab or inside_new_tab_folder) %}
         {% include('bookmark_bar.html') %}
       {% endwith %}
     {% else %}
-      <a href="{{ bookmark.href }}">
+      <a href="{{ bookmark.href }}" {% if inside_new_tab_folder %}target="_blank"{% endif %}>
         {% set favicon_url = favicon_path(bookmark.href) %}
         {% if favicon_url %}
           <img src="{{ favicon_url }}" alt="{{ bookmark.name }}">

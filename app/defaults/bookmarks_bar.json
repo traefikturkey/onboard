@@ -114,7 +114,7 @@
           {
             "name": "CI",
             "contents": [
-            
+
               {
                 "name": "pressly/sup: Super simple deployment tool - think of it like 'make' for a network of servers",
                 "href": "https://github.com/pressly/sup/",
@@ -974,7 +974,7 @@
   },
   {
     "name": "3D Printing",
-    "contents": 
+    "contents":
     [
       {
         "name": "CGTrader",
@@ -1080,6 +1080,8 @@
   },
   {
     "name": "Mac.Bids",
+    "multiColumn": 2,
+    "openInNewTab": true,
     "contents": [
       {
         "name": "3d printer",
@@ -1441,7 +1443,7 @@
       }
     ]
   },
-  
+
   {
     "name": "ZeroOne",
     "href": "https://cloud.zeroone.tech/horizon/auth/login/?next=/horizon/",

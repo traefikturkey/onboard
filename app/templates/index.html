@@ -124,6 +124,29 @@
 })();
 </script>
 <script>
+// Enhance folders with multi-column layout based on their data attributes
+(function(){
+	function markMultiColumnFolders(){
+		const targets = document.querySelectorAll('#bookmarkBar a.bookmark-folder[data-multi-column]');
+		targets.forEach(target => {
+			const columnCount = parseInt(target.getAttribute('data-multi-column'), 10);
+			if(columnCount && columnCount > 1) {
+				const li = target.closest('li');
+				if(li) {
+					li.classList.add('multi-column-folder');
+					li.style.setProperty('--column-count', columnCount);
+				}
+			}
+		});
+	}
+	if(document.readyState === 'loading'){
+		document.addEventListener('DOMContentLoaded', markMultiColumnFolders);
+	} else {
+		markMultiColumnFolders();
+	}
+})();
+</script>
+<script>
 // Lightweight delegated widget controller to replace small Alpine usage.
 (function(){
 	// Toggle summary display when a list item or its toolbar icon is clicked.
@@ -179,6 +202,50 @@
 	// Also close summary when clicking outside the list
 	document.addEventListener('click', function(e){
 		// clicking anywhere else will be handled by other handlers; ignore
+	});
+})();
+</script>
+<script>
+// Double-click handler for opening all links in a bookmark folder.
+(function(){
+	function collectLinksRecursive(li){
+		const results = [];
+		if(!li) return results;
+		const ul = li.querySelector(':scope > ul');
+		if(!ul) return results;
+		// Iterate only direct child list items to preserve folder boundaries
+		ul.querySelectorAll(':scope > li').forEach(childLi => {
+			const folder = childLi.querySelector(':scope > a.bookmark-folder[data-bookmark-folder]');
+			if(folder){
+				results.push(...collectLinksRecursive(childLi));
+			} else {
+				const link = childLi.querySelector(':scope > a[href]:not(.bookmark-folder)');
+				if(link) results.push(link);
+			}
+		});
+		return results;
+	}
+
+	document.addEventListener('dblclick', function(e){
+		const folderAnchor = e.target.closest('a.bookmark-folder[data-bookmark-folder]');
+		if(!folderAnchor) return;
+		e.preventDefault();
+		e.stopPropagation();
+		const li = folderAnchor.closest('li');
+		if(!li) return;
+		const links = collectLinksRecursive(li);
+    if (!links.length) return;
+		const confirmMsg = `Do you want to open all these links in new tabs? (Count: ${links.length})`;
+		if(!window.confirm(confirmMsg)) return;
+		// Attempt to open each link. Browsers may block some if too many; first should always succeed.
+
+    for (const a of links){
+      try {
+        window.open(a.href, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        console.error('Error opening link:', { href: a.href, title: a.innerText, error });
+      }
+    };
 	});
 })();
 </script>
