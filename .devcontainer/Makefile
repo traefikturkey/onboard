@@ -110,3 +110,7 @@ stop-app:
 	else \
 		echo "No onboard server PID file found"; \
 	fi
+
+sync-configs:
+	unison app/defaults ${UNISON_SSH_URL}//apps/onramp/etc/onboard/ -path bookmarks_bar.json -path layout.yml
+	unison app/configs ${UNISON_SSH_URL}//apps/onramp/etc/onboard/ -path bookmarks_bar.json -path layout.yml

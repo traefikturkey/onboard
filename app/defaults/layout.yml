@@ -113,14 +113,14 @@ tabs:
               link: https://suno.ai/
             - name: Udio
               link: https://www.udio.com/
+            - name: Flux
+              link: https://playground.bfl.ai/
             - name: Playground
               link: https://playground.com/
-            - name: OpenRouter
-              link: https://openrouter.ai/
-            - name: Supabase
-              link: https://supabase.com/
+            - name: Runway
+              link: https://app.runwayml.com/
             
-
+            
         - column:
           widgets:
           - name: Tools
@@ -133,6 +133,8 @@ tabs:
               link: https://agentgpt.reworkd.ai/
             - name: MindStudio
               link: https://app.mindstudio.ai/
+            - name: OpenRouter
+              link: https://openrouter.ai/
             - name: SmythOS
               link: https://app.smythos.com/
             - name: Toolhouse
