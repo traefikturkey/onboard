@@ -7,6 +7,9 @@ ifneq (,$(wildcard .devcontainer/.env))
 	export
 endif
 
+# Mark all targets as .PHONY to avoid conflicts with the main Makefile default target
+.PHONY: detect-gpu initialize setup-container run test test-all lint format clean uv-update deptry start-app stop-app sync-configs
+
 # GPU detection helper
 detect-gpu:
 	@if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then \

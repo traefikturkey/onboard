@@ -1,13 +1,20 @@
 # https://docs.docker.com/develop/develop-images/build_enhancements/
 # https://www.docker.com/blog/faster-builds-in-compose-thanks-to-buildkit-support/
-export DOCKER_BUILDKIT := 1
-export DOCKER_SCAN_SUGGEST := false
-export COMPOSE_DOCKER_CLI_BUILD := 1
+DOCKER_BUILDKIT := 1
+DOCKER_SCAN_SUGGEST := false
+COMPOSE_DOCKER_CLI_BUILD := 1
+
+export DOCKER_BUILDKIT
+export DOCKER_SCAN_SUGGEST
+export COMPOSE_DOCKER_CLI_BUILD
 
 # Force Git Bash on Windows for Unix command compatibility
 ifeq ($(OS),Windows_NT)
     SHELL := C:/Program Files/Git/bin/bash.exe
 endif
+
+# Default target - must be defined before any includes
+.DEFAULT_GOAL := up
 
 # Include development targets if available
 -include .devcontainer/Makefile
@@ -62,6 +69,8 @@ export CONTAINER_RUNTIME
 export DETECTED_OS
 export SEMANTIC_VERSION
 
+up: build
+	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
 
 .env:
 	touch .env
@@ -74,9 +83,6 @@ build-dev: .env
 
 start: build
 	$(CONTAINER_RUNTIME) run --rm -d --name onboard_prod_run -p 9830:9830 onboard:prod
-
-up: build
-	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
 
 down:
 	$(CONTAINER_RUNTIME) stop onboard_prod_run
