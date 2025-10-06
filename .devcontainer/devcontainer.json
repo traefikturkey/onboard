@@ -3,12 +3,6 @@
 {
   "name": "${localWorkspaceFolderBasename}",
   "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
-  "containerEnv": {
-    "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
-    "PROJECT_NAME": "${localWorkspaceFolderBasename}",
-    "PROJECT_PATH": "${containerWorkspaceFolder}",
-    "FLASK_DEBUG": "True",
-  },
   // Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
   "build": {
     "context": "..",
@@ -21,12 +15,21 @@
   },
   "initializeCommand": "make initialize",
   "postCreateCommand": "make setup-container",
+  "hostRequirements": {
+    "gpu": false
+  },
   "runArgs": [
     "--name","${localWorkspaceFolderBasename}_devcontainer",
     "--hostname","${localWorkspaceFolderBasename}",
     "--env-file",".devcontainer/.env",
-    "--env-file","./.env",
-    "--gpus","all"],
+    "--env-file","./.env"],
+  "containerEnv": {
+    "HOST_PROJECT_PATH": "${localWorkspaceFolder}",
+    "PROJECT_NAME": "${localWorkspaceFolderBasename}",
+    "PROJECT_PATH": "${containerWorkspaceFolder}",
+    "FLASK_DEBUG": "True",
+    "GPU_AVAILABLE": "${localEnv:GPU_AVAILABLE:false}"
+  },
   "mounts": [
     "source=${localWorkspaceFolderBasename}-home,target=/home/anvil,type=volume",
     "source=${localEnv:HOME}${localEnv:USERPROFILE}/.ssh,target=/home/anvil/.ssh,type=bind,consistency=cached",
@@ -76,7 +79,7 @@
             "args": ["-nologo"],
             "icon": "terminal-powershell",
             "path": "pwsh"
-          },
+          }
         },
         "terminal.integrated.tabs.description": "",
         "terminal.integrated.tabs.title": "${local}${separator}${cwdFolder}${separator}${process}",

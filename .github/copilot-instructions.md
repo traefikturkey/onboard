@@ -32,6 +32,11 @@
 - **NEVER add `|| true`** → Only if absolutely necessary
 - **NEVER skip error handling** → Always check and fix issues
 
+### 5. DOCUMENTATION RULES
+- **NEVER create documentation files** → Only create when user explicitly asks
+- **No unsolicited README.md, QUICKSTART.md, IMPLEMENTATION.md, etc.**
+- **Focus on implementation** → Code the solution, skip the documentation
+
 ---
 
 ## 🎯 CORE PHILOSOPHY
@@ -87,6 +92,12 @@
   3. Delete old file
   4. Commit all changes together
 - **Always verify** → Confirm file operations worked correctly
+
+### Rule 4: Documentation
+- **NEVER create documentation files unless explicitly requested**
+- **No README.md, QUICKSTART.md, IMPLEMENTATION.md, etc.** → Only if user asks
+- **Keep changes focused** → Implement the feature, skip the docs
+- **Exception:** Update existing docs if they become outdated by your changes
 
 ---
 

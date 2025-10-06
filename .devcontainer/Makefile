@@ -7,14 +7,27 @@ ifneq (,$(wildcard .devcontainer/.env))
 	export
 endif
 
+# GPU detection helper
+detect-gpu:
+	@if command -v nvidia-smi >/dev/null 2>&1 && nvidia-smi >/dev/null 2>&1; then \
+		echo "true"; \
+	elif command -v lspci >/dev/null 2>&1 && lspci 2>/dev/null | grep -i nvidia >/dev/null 2>&1; then \
+		echo "true"; \
+	else \
+		echo "false"; \
+	fi
+
 # Initialize development environment
 initialize:
 	@echo "Initializing development environment for $(DETECTED_OS)..."
 	@echo "HOSTIP: $(HOSTIP)"
-	@echo "HOSTIP=$(HOSTIP)" > .devcontainer/.env
-	@echo "SEMANTIC_VERSION=$(SEMANTIC_VERSION)" >> .devcontainer/.env
-
-
+	@GPU_AVAILABLE=$$($(MAKE) -s detect-gpu); \
+	echo "GPU_AVAILABLE: $$GPU_AVAILABLE"; \
+	touch .env; \
+	touch .devcontainer/.env; \
+	echo "HOSTIP=$(HOSTIP)" > .devcontainer/.env; \
+	echo "SEMANTIC_VERSION=$(SEMANTIC_VERSION)" >> .devcontainer/.env; \
+	echo "GPU_AVAILABLE=$$GPU_AVAILABLE" >> .devcontainer/.env
 
 # One-step container setup invoked by devcontainer postCreateCommand
 setup-container:
@@ -80,7 +93,6 @@ clean:
 	find . -type d -name "__pycache__" -delete
 	find . -type d -name "*.egg-info" -exec rm -rf {} +
 	rm -rf .coverage .htmlcov/ .pytest_cache/
-#	@rm -f /tmp/joyride-dns.pid 2>/dev/null || true
 	@echo "Clean completed!"
 
 uv-update:
@@ -92,7 +104,6 @@ deptry:
 	@echo "Checking for development dependencies issues..."
 	@uv run deptry . --ignore-notebooks
 
-# Check for dead code using vulture (removed)
 # Start background onboard server
 start-app:
 	@echo "Starting onboard server in background..."

@@ -4,6 +4,11 @@ export DOCKER_BUILDKIT := 1
 export DOCKER_SCAN_SUGGEST := false
 export COMPOSE_DOCKER_CLI_BUILD := 1
 
+# Force Git Bash on Windows for Unix command compatibility
+ifeq ($(OS),Windows_NT)
+    SHELL := C:/Program Files/Git/bin/bash.exe
+endif
+
 # Include development targets if available
 -include .devcontainer/Makefile
 
