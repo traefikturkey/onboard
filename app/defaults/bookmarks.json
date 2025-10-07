@@ -1,0 +1,1663 @@
+{
+  "bar": [
+    {
+      "name": "Gmail",
+      "href": "https://mail.google.com/mail/u/0/#inbox",
+      "favicon": "/static/assets/icons/google.com.favicon.ico",
+      "add_date": "1587496250"
+    },
+    {
+      "name": "Links",
+      "contents": [
+        {
+          "name": "tech",
+          "contents": [
+            {
+              "name": "Hardening SSH With Ansible • Nathan Curry",
+              "href": "https://www.nathancurry.com/blog/23-hardening-ssh-with-ansible/",
+              "favicon": "/static/assets/icons/nathancurry.com.favicon.ico",
+              "add_date": "1609825832"
+            },
+            {
+              "name": "zimmertr/Bootstrap-Kubernetes-with-QEMU: Bootstrap Kubernetes on Proxmox using QEMU, Ansible, and Debian",
+              "href": "https://github.com/zimmertr/Bootstrap-Kubernetes-with-QEMU",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1609828051"
+            },
+            {
+              "name": "self-hosted-cookbook/wikijs.md at master · tborychowski/self-hosted-cookbook",
+              "href": "https://github.com/tborychowski/self-hosted-cookbook",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1609909907"
+            },
+            {
+              "name": "Kubernetes: A curated list of learning material",
+              "href": "https://devopsunlocked.com/kubernetes-learning-material/",
+              "favicon": "/static/assets/icons/devopsunlocked.com.favicon.ico",
+              "add_date": "1610339052"
+            },
+            {
+              "name": "hobby-kube/guide: Kubernetes clusters for the hobbyist.",
+              "href": "https://github.com/hobby-kube/guide#bringing-traffic-to-the-cluster",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1610771991"
+            },
+            {
+              "name": "ProfessorSalty/homelab-ansible",
+              "href": "https://github.com/ProfessorSalty/homelab-ansible",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1611121524"
+            },
+            {
+              "name": "Log - Lenovo M720Q Tiny router/firewall build with aftermarket 4 port NIC | SFF.Network",
+              "href": "https://smallformfactor.net/forum/threads/lenovo-m720q-tiny-router-firewall-build-with-aftermarket-4-port-nic.14793/",
+              "favicon": "/static/assets/icons/smallformfactor.net.favicon.ico",
+              "add_date": "1695346833"
+            }
+          ]
+        },
+        {
+          "name": "MeshMap | Meshtastic Nodes",
+          "href": "https://meshmap.net/",
+          "favicon": "/static/assets/icons/meshmap.net.favicon.ico",
+          "add_date": "1707793344"
+        },
+        {
+          "name": "Dev Container metadata reference",
+          "href": "https://containers.dev/implementors/json_reference/",
+          "favicon": "/static/assets/icons/containers.dev.favicon.ico",
+          "add_date": "1701975974"
+        },
+        {
+          "name": "ZFS Snapshot Backups to an External Drive with LUKS",
+          "href": "https://ryan.himmelwright.net/post/zfs-backups-to-luks-external/",
+          "favicon": "/static/assets/icons/himmelwright.net.favicon.ico",
+          "add_date": "1565617252"
+        },
+        {
+          "name": "(553) I Built a Keypad to Control My Entire Desk Setup",
+          "href": "https://www.youtube.com/watch?v=DTJSREjWH7Y",
+          "favicon": "/static/assets/icons/youtube.com.favicon.ico",
+          "add_date": "1671939599"
+        },
+        {
+          "name": "Making the $250 Proxmox HA Cluster",
+          "href": "https://www.apalrd.net/posts/2022/cluster_ceph/",
+          "favicon": "/static/assets/icons/apalrd.net.favicon.ico",
+          "add_date": "1691183569"
+        },
+        {
+          "name": "Austin's Nerdy Things",
+          "href": "https://austinsnerdythings.com/",
+          "favicon": "/static/assets/icons/austinsnerdythings.com.favicon.ico",
+          "add_date": "1691183561"
+        },
+        {
+          "name": "Ubuntu qemu cli",
+          "href": "https://powersj.io/posts/ubuntu-qemu-cli/",
+          "favicon": "/static/assets/icons/powersj.io.favicon.ico",
+          "add_date": "1691183555"
+        },
+        {
+          "name": "Game Structures",
+          "href": "https://thealexandrian.net/wordpress/15126/roleplaying-games/game-structures",
+          "favicon": "/static/assets/icons/thealexandrian.net.favicon.ico",
+          "add_date": "1706113287"
+        }
+      ]
+    },
+    {
+      "name": "Projects",
+      "contents": [
+        {
+          "name": "Cluster",
+          "contents": [
+            {
+              "name": "CI",
+              "contents": [
+                {
+                  "name": "pressly/sup: Super simple deployment tool - think of it like 'make' for a network of servers",
+                  "href": "https://github.com/pressly/sup/",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1561692206"
+                }
+              ]
+            },
+            {
+              "name": "Docker",
+              "contents": [
+                {
+                  "name": "Cheatsheets",
+                  "contents": [
+                    {
+                      "name": "Linux Performance",
+                      "href": "http://www.brendangregg.com/linuxperf.html",
+                      "favicon": "/static/assets/icons/brendangregg.com.favicon.ico",
+                      "add_date": "1563368622"
+                    }
+                  ]
+                },
+                {
+                  "name": "joyent/containerpilot: A service for autodiscovery and configuration of applications running in containers",
+                  "href": "https://github.com/joyent/containerpilot",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1561059411"
+                },
+                {
+                  "name": "Smashing/smashing: The exceptionally handsome dashboard framework in Ruby and Coffeescript.",
+                  "href": "https://github.com/Smashing/smashing",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1561692871"
+                },
+                {
+                  "name": "n1trux/awesome-sysadmin: A curated list of amazingly awesome open source sysadmin resources.",
+                  "href": "https://github.com/n1trux/awesome-sysadmin",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1561692912"
+                },
+                {
+                  "name": "Privoxy",
+                  "href": "https://www.privoxy.org/",
+                  "favicon": "/static/assets/icons/privoxy.org.favicon.ico",
+                  "add_date": "1561692092"
+                },
+                {
+                  "name": "Docker containers log transport and aggregation at scale",
+                  "href": "https://stefanprodan.com/2017/docker-log-transport-and-aggregation-at-scale/",
+                  "favicon": "/static/assets/icons/stefanprodan.com.favicon.ico",
+                  "add_date": "1561059170"
+                },
+                {
+                  "name": "A monitoring solution for Docker hosts, containers and containerized services",
+                  "href": "https://stefanprodan.com/2016/a-monitoring-solution-for-docker-hosts-containers-and-containerized-services/",
+                  "favicon": "/static/assets/icons/stefanprodan.com.favicon.ico",
+                  "add_date": "1561059196"
+                },
+                {
+                  "name": "Mina",
+                  "href": "http://nadarei.co/mina/",
+                  "favicon": "/static/assets/icons/nadarei.co.favicon.ico",
+                  "add_date": "1561692219"
+                },
+                {
+                  "name": "Security Onion",
+                  "href": "https://securityonion.net/",
+                  "favicon": "/static/assets/icons/securityonion.net.favicon.ico",
+                  "add_date": "1561692360"
+                },
+                {
+                  "name": "Tikal Knowledge - Ofelia - cron tasks on steroids in Docker",
+                  "href": "https://www.tikalk.com/posts/2018/05/08/ofelia-cron-tasks-on-steroids-in-docker/",
+                  "favicon": "/static/assets/icons/tikalk.com.favicon.ico",
+                  "add_date": "1562606870"
+                },
+                {
+                  "name": "sismics/docs: Lightweight document management system packed with all the features you can expect from big expensive solutions",
+                  "href": "https://github.com/sismics/docs",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "Raneto - A free, open, simple Markdown powered Knowledgebase for Nodejs",
+                  "href": "http://raneto.com/",
+                  "favicon": "/static/assets/icons/raneto.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "warner/magic-wormhole: get things from one computer to another, safely",
+                  "href": "https://github.com/warner/magic-wormhole",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "blockstack/gaia: A decentralized high-performance storage system",
+                  "href": "https://github.com/blockstack/gaia",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1601054064"
+                }
+              ]
+            },
+            {
+              "name": "Build your own network simulator using open-source DevOps tools | Open-Source Routing and Network Simulation",
+              "href": "https://www.brianlinkletter.com/build-your-own-network-simulator-using-open-source-devops-tools/",
+              "favicon": "/static/assets/icons/brianlinkletter.com.favicon.ico",
+              "add_date": "1579277973"
+            },
+            {
+              "name": "WtRPM: A Web-based (Wt) suite to power up/down your computers - mupuf.org",
+              "href": "http://www.mupuf.org/blog/2013/05/11/wtrpm-a-web-based-wt-suite-to-power-up-slash-down-your-computers/",
+              "favicon": "/static/assets/icons/mupuf.org.favicon.ico",
+              "add_date": "1579498576"
+            },
+            {
+              "name": "Tyblog | Going Completely Overboard with a Clustered Homelab",
+              "href": "https://blog.tjll.net/distributed-homelab-cluster/",
+              "favicon": "/static/assets/icons/tjll.net.favicon.ico",
+              "add_date": "1569384318"
+            },
+            {
+              "name": "Infrastructure as code in the home - blog.skouf.com",
+              "href": "https://blog.skouf.com/infrastructure-as-code-in-the-home-c72bc588f327",
+              "favicon": "/static/assets/icons/skouf.com.favicon.ico",
+              "add_date": "1570036792"
+            },
+            {
+              "name": "Network setup",
+              "href": "https://coreos.com/matchbox/docs/latest/network-setup.html",
+              "favicon": "/static/assets/icons/coreos.com.favicon.ico",
+              "add_date": "1579530626"
+            },
+            {
+              "name": "Dell Fan Noise Control - Silence Your Poweredge : homelab",
+              "href": "https://www.reddit.com/r/homelab/comments/7xqb11/dell_fan_noise_control_silence_your_poweredge/",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1592829427"
+            },
+            {
+              "name": "Convert LSI 9211-8i HBA card to IT mode",
+              "href": "https://nguvu.org/freenas/Convert-LSI-HBA-card-to-IT-mode/",
+              "favicon": "/static/assets/icons/nguvu.org.favicon.ico",
+              "add_date": "1579659976"
+            },
+            {
+              "name": "One NGINX error page to rule them all · Adriaan's blog",
+              "href": "https://blog.adriaan.io/one-nginx-error-page-to-rule-them-all.html",
+              "favicon": "/static/assets/icons/adriaan.io.favicon.ico",
+              "add_date": "1600787212"
+            },
+            {
+              "name": "The encrypted homelab",
+              "href": "https://blog.haschek.at/2020/the-encrypted-homelab.html",
+              "favicon": "/static/assets/icons/haschek.at.favicon.ico",
+              "add_date": "1600371493"
+            },
+            {
+              "name": "Build your own datacenter with PXE and Alpine",
+              "href": "https://blog.haschek.at/2019/build-your-own-datacenter-with-pxe-and-alpine.html",
+              "favicon": "/static/assets/icons/haschek.at.favicon.ico",
+              "add_date": "1600371331"
+            },
+            {
+              "name": "How to defend your website with ZIP bombs",
+              "href": "https://blog.haschek.at/2017/how-to-defend-your-website-with-zip-bombs.html",
+              "favicon": "/static/assets/icons/haschek.at.favicon.ico",
+              "add_date": "1600371321"
+            },
+            {
+              "name": "bottlerocket-os/bottlerocket: An operating system designed for hosting containers",
+              "href": "https://github.com/bottlerocket-os/bottlerocket",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1600371301"
+            },
+            {
+              "name": "How To Create Infinite Windows Cloud Desktops for Your Nonprofit with BoXenLinux",
+              "href": "https://jphein.com/how-to-create-infinite-windows-cloud-desktops-with-boxenlinux/",
+              "favicon": "/static/assets/icons/jphein.com.favicon.ico",
+              "add_date": "1600267968"
+            },
+            {
+              "name": "Running Hashicorp Nomad, Consul, Pihole and Gitea on Raspberry Pi 3 B+ | by Georgijs Radovs | The Startup | Medium",
+              "href": "https://medium.com/swlh/running-hashicorp-nomad-consul-pihole-and-gitea-on-raspberry-pi-3-b-f3f0d66c907",
+              "favicon": "/static/assets/icons/medium.com.favicon.ico",
+              "add_date": "1598458702"
+            },
+            {
+              "name": "RabbitMQ clustering with Consul in Nomad",
+              "href": "https://andydote.co.uk/2019/01/28/nomad-rabbitmq-consul-cluster/",
+              "favicon": "/static/assets/icons/co.uk.favicon.ico",
+              "add_date": "1569385143"
+            },
+            {
+              "name": "How to avoid conflicts between dnsmasq and systemd-resolved? - Unix & Linux Stack Exchange",
+              "href": "https://unix.stackexchange.com/questions/304050/how-to-avoid-conflicts-between-dnsmasq-and-systemd-resolved",
+              "favicon": "/static/assets/icons/stackexchange.com.favicon.ico",
+              "add_date": "1570170528"
+            },
+            {
+              "name": "Is there any way to provision bare-metal with Packer?",
+              "href": "https://serverfault.com/questions/787007/is-there-any-way-to-provision-bare-metal-with-packer",
+              "favicon": "/static/assets/icons/serverfault.com.favicon.ico",
+              "add_date": "1579725064"
+            },
+            {
+              "name": "Hardware",
+              "contents": [
+                {
+                  "name": "IBM ServeRAID M1015 Part 4: Cross flashing to a LSI9211-8i in IT or IR mode",
+                  "href": "https://www.servethehome.com/ibm-serveraid-m1015-part-4/",
+                  "favicon": "/static/assets/icons/servethehome.com.favicon.ico",
+                  "add_date": "1601477307"
+                },
+                {
+                  "name": "Convert LSI 9211-8i HBA card to IT mode",
+                  "href": "https://nguvu.org/freenas/Convert-LSI-HBA-card-to-IT-mode/",
+                  "favicon": "/static/assets/icons/nguvu.org.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "Dell Fan Noise Control - Silence Your Poweredge : homelab",
+                  "href": "https://www.reddit.com/r/homelab/comments/7xqb11/dell_fan_noise_control_silence_your_poweredge/",
+                  "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+                  "add_date": "1601764708"
+                },
+                {
+                  "name": "Network UPS Tools - Hardware compatibility list",
+                  "href": "https://networkupstools.org/stable-hcl.html",
+                  "favicon": "/static/assets/icons/networkupstools.org.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "New Hard Drive rituals",
+                  "href": "https://blog.linuxserver.io/2018/10/29/new-hard-drive-rituals/",
+                  "favicon": "/static/assets/icons/linuxserver.io.favicon.ico",
+                  "add_date": "1601142673"
+                }
+              ]
+            },
+            {
+              "name": "Windows",
+              "contents": [
+                {
+                  "name": "QTTabBar - QuizoApps",
+                  "href": "http://qttabbar.wikidot.com/",
+                  "favicon": "/static/assets/icons/wikidot.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "XMeters - Taskbar System Monitoring",
+                  "href": "https://entropy6.com/xmeters/",
+                  "favicon": "/static/assets/icons/entropy6.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "Awesome-Windows/Awesome: 🎉 An awesome & curated list of best applications and tools for Windows.",
+                  "href": "https://github.com/Awesome-Windows/Awesome",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "sirredbeard/Awesome-WSL: Awesome list dedicated to Windows Subsystem for Linux",
+                  "href": "https://github.com/sirredbeard/Awesome-WSL",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "Find which hardware can wake up Windows 10",
+                  "href": "https://winaero.com/blog/find-which-hardware-can-wake-up-windows-10/",
+                  "favicon": "/static/assets/icons/winaero.com.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "Prevent & Disable Windows Update from Waking Up PC System - Tech Journey",
+                  "href": "https://techjourney.net/prevent-disable-windows-update-from-waking-up-pc-system/",
+                  "favicon": "/static/assets/icons/techjourney.net.favicon.ico",
+                  "add_date": "1601054064"
+                },
+                {
+                  "name": "How to Transfer PuTTY Sessions To Another Windows Machine - nixCraft",
+                  "href": "https://www.cyberciti.biz/tips/putty-session.html",
+                  "favicon": "/static/assets/icons/cyberciti.biz.favicon.ico",
+                  "add_date": "1601054064"
+                }
+              ]
+            },
+            {
+              "name": "Security",
+              "contents": [
+                {
+                  "name": "Securing SSH with the Vault SSH backend and GitHub authentication",
+                  "href": "https://dickingwithdocker.com/2020/05/securing-ssh-with-the-vault-ssh-backend-and-github-authentication/",
+                  "favicon": "/static/assets/icons/dickingwithdocker.com.favicon.ico",
+                  "add_date": "1611673647"
+                },
+                {
+                  "name": "thinkst/opencanary: Modular and decentralised honeypot",
+                  "href": "https://github.com/thinkst/opencanary",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1609720616"
+                },
+                {
+                  "name": "Secure Proxmox Install",
+                  "href": "https://www.kiloroot.com/secure-proxmox-install-sudo-firewall-with-ipv6-and-more-how-to-configure-from-start-to-finish/",
+                  "favicon": "/static/assets/icons/kiloroot.com.favicon.ico",
+                  "add_date": "1608825899"
+                }
+              ]
+            },
+            {
+              "name": "Cheatsheets",
+              "contents": [
+                {
+                  "name": "Linux Performance",
+                  "href": "http://www.brendangregg.com/linuxperf.html",
+                  "favicon": "/static/assets/icons/brendangregg.com.favicon.ico",
+                  "add_date": "1601054064"
+                }
+              ]
+            },
+            {
+              "name": "Homelab Rat - Homelab Rat",
+              "href": "https://www.homelabrat.com/",
+              "favicon": "/static/assets/icons/homelabrat.com.favicon.ico",
+              "add_date": "1610770510"
+            },
+            {
+              "name": "Wasabi Cloud Storage Pricing | 80% Cheaper Than AWS S3",
+              "href": "https://wasabi.com/cloud-storage-pricing/",
+              "favicon": "/static/assets/icons/wasabi.com.favicon.ico",
+              "add_date": "1602298490"
+            },
+            {
+              "name": "A personal Newspaper : selfhosted",
+              "href": "https://www.reddit.com/r/selfhosted/comments/j30ffb/a_personal_newspaper/",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1602136384"
+            },
+            {
+              "name": "eerotal/LibreSignage: An open source digital signage solution",
+              "href": "https://github.com/eerotal/LibreSignage",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1602046516"
+            },
+            {
+              "name": "The low code framework to build internal tools",
+              "href": "https://www.forestadmin.com/",
+              "favicon": "/static/assets/icons/forestadmin.com.favicon.ico",
+              "add_date": "1602041496"
+            },
+            {
+              "name": "Cloud-init that works",
+              "href": "https://breadnet.co.uk/cloud-init-that-works/",
+              "favicon": "/static/assets/icons/co.uk.favicon.ico",
+              "add_date": "1605936708"
+            }
+          ]
+        },
+        {
+          "name": "RTSP",
+          "contents": [
+            {
+              "name": "How to Generate Better Video Previews with ffmpeg",
+              "href": "https://www.binpress.com/generate-video-previews-ffmpeg/",
+              "favicon": "/static/assets/icons/binpress.com.favicon.ico",
+              "add_date": "1588741258"
+            },
+            {
+              "name": "Scrub image playback demo",
+              "href": "https://jsfiddle.net/r6wz0nz6/2/",
+              "favicon": "/static/assets/icons/jsfiddle.net.favicon.ico",
+              "add_date": "1588741156"
+            },
+            {
+              "name": "blakeblackshear/frigate: Realtime object detection on RTSP cameras with the Google Coral",
+              "href": "https://github.com/blakeblackshear/frigate",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1588346499"
+            },
+            {
+              "name": "VXG Media Player - Chrome Web Store",
+              "href": "https://chrome.google.com/webstore/detail/vxg-media-player/hncknjnnbahamgpjoafdebabmoamcnni/related",
+              "favicon": "/static/assets/icons/google.com.favicon.ico",
+              "add_date": "1551976462"
+            },
+            {
+              "name": "VXG Media Plugin for Chrome OS – Video Experts Group",
+              "href": "https://www.videoexpertsgroup.com/vxg-chrome-plugin/",
+              "favicon": "/static/assets/icons/videoexpertsgroup.com.favicon.ico",
+              "add_date": "1551976466"
+            },
+            {
+              "name": "Kerberos.io - an innovative video surveillance security system built for the community and enterprises.",
+              "href": "https://kerberos.io/",
+              "favicon": "/static/assets/icons/kerberos.io.favicon.ico",
+              "add_date": "1586978282"
+            },
+            {
+              "name": "Raspberry Pi + Deep Learning home security system",
+              "href": "https://blog.haschek.at/2018/raspberry-pi-plus-deep-learning-security-system.html",
+              "favicon": "/static/assets/icons/haschek.at.favicon.ico",
+              "add_date": "1600371392"
+            },
+            {
+              "name": "Capture/Lightning – FFmpeg",
+              "href": "https://trac.ffmpeg.org/wiki/Capture/Lightning",
+              "favicon": "/static/assets/icons/ffmpeg.org.favicon.ico",
+              "add_date": "1600784836"
+            },
+            {
+              "name": "video capture - ffmpeg buffered recording - Video Production Stack Exchange",
+              "href": "https://video.stackexchange.com/questions/18514/ffmpeg-buffered-recording",
+              "favicon": "/static/assets/icons/stackexchange.com.favicon.ico",
+              "add_date": "1600794156"
+            },
+            {
+              "name": "dewgenenny/trigger-sensor: Python script to trigger a binary sensor in Home Assistant via the API",
+              "href": "https://github.com/dewgenenny/trigger-sensor",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1604930832"
+            },
+            {
+              "name": "BlueIris Successfully Running in a Docker Container : BlueIris",
+              "href": "https://www.reddit.com/r/BlueIris/comments/ikr6gh/blueiris_successfully_running_in_a_docker/",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1601644050"
+            },
+            {
+              "name": "jrottenberg/ffmpeg - Docker Hub",
+              "href": "https://hub.docker.com/r/jrottenberg/ffmpeg/",
+              "favicon": "/static/assets/icons/docker.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "ffmpeg/Dockerfile at master · opencoconut/ffmpeg",
+              "href": "https://github.com/opencoconut/ffmpeg/blob/master/Dockerfile",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "Home surveillance and motion detection with the Raspberry Pi, Python, OpenCV, and Dropbox - PyImageSearch",
+              "href": "http://www.pyimagesearch.com/2015/06/01/home-surveillance-and-motion-detection-with-the-raspberry-pi-python-and-opencv/",
+              "favicon": "/static/assets/icons/pyimagesearch.com.favicon.ico",
+              "add_date": "1601147498"
+            },
+            {
+              "name": "pynvr.py · master · Jack Strohm / PyNVR · GitLab",
+              "href": "https://gitlab.com/hoyle.hoyle/pynvr/blob/master/pynvr.py",
+              "favicon": "/static/assets/icons/gitlab.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Process Monitoring with Systemd - Servers for Hackers",
+              "href": "https://serversforhackers.com/video/process-monitoring-with-systemd",
+              "favicon": "/static/assets/icons/serversforhackers.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "video - rtsp stream capturing - Stack Overflow",
+              "href": "http://stackoverflow.com/questions/7932389/rtsp-stream-capturing?noredirect=1&lq=1",
+              "favicon": "/static/assets/icons/stackoverflow.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "How to generate better video previews with ffmpeg - Tutorial - Binpress",
+              "href": "https://www.binpress.com/tutorial/how-to-generate-video-previews-with-ffmpeg/138",
+              "favicon": "/static/assets/icons/binpress.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Edit fiddle - JSFiddle",
+              "href": "http://jsfiddle.net/r6wz0nz6/2/",
+              "favicon": "/static/assets/icons/jsfiddle.net.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "How to use ffmpeg to extract live stream into a sequence of mp4 - Super User",
+              "href": "http://superuser.com/questions/999400/how-to-use-ffmpeg-to-extract-live-stream-into-a-sequence-of-mp4",
+              "favicon": "/static/assets/icons/superuser.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "OpenCV detect movement in python - Stack Overflow",
+              "href": "http://stackoverflow.com/questions/40514508/opencv-detect-movement-in-python?rq=1",
+              "favicon": "/static/assets/icons/stackoverflow.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Scene change/shot detection/image extraction using ffmpeg from video - Stack Overflow",
+              "href": "http://stackoverflow.com/questions/24875752/scene-change-shot-detection-image-extraction-using-ffmpeg-from-video?rq=1",
+              "favicon": "/static/assets/icons/stackoverflow.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "jooray/motion-detection: OpenCV motion detection for Raspberry Pi + Web interface",
+              "href": "https://github.com/jooray/motion-detection",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "johmathe/Shotdetect: Automated shot detection software",
+              "href": "https://github.com/johmathe/Shotdetect",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Record and archive video from IP cameras | LucaTNT's",
+              "href": "https://lucatnt.com/2014/08/record-and-archive-video-from-ip-cameras/",
+              "favicon": "/static/assets/icons/lucatnt.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "How to run a cron job inside a docker container? - Stack Overflow",
+              "href": "http://stackoverflow.com/questions/37458287/how-to-run-a-cron-job-inside-a-docker-container",
+              "favicon": "/static/assets/icons/stackoverflow.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Concatenate – FFmpeg",
+              "href": "https://trac.ffmpeg.org/wiki/Concatenate",
+              "favicon": "/static/assets/icons/ffmpeg.org.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "How To Install Ruby on Rails with rbenv on Ubuntu 16.04 | DigitalOcean",
+              "href": "https://www.digitalocean.com/community/tutorials/how-to-install-ruby-on-rails-with-rbenv-on-ubuntu-16-04",
+              "favicon": "/static/assets/icons/digitalocean.com.favicon.ico",
+              "add_date": "1601147623"
+            },
+            {
+              "name": "Multiple cameras with the Raspberry Pi and OpenCV - PyImageSearch",
+              "href": "http://www.pyimagesearch.com/2016/01/18/multiple-cameras-with-the-raspberry-pi-and-opencv/",
+              "favicon": "/static/assets/icons/pyimagesearch.com.favicon.ico",
+              "add_date": "1601147498"
+            },
+            {
+              "name": "FFmpeg - ArchWiki",
+              "href": "https://wiki.archlinux.org/index.php/FFmpeg",
+              "favicon": "/static/assets/icons/archlinux.org.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "How to make an animated thumbnail | Webdesigner Depot",
+              "href": "https://www.webdesignerdepot.com/2012/12/how-to-make-an-animated-thumbnail/",
+              "favicon": "/static/assets/icons/webdesignerdepot.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "html video progress bar with js - Trivantis Community",
+              "href": "http://community.trivantis.com/forums/topic/html-video-progress-bar-with-js/",
+              "favicon": "/static/assets/icons/trivantis.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "A Plugin For Mediaelement.js For Preview Thumbnails on Hover Over the Time Rail Using WebVTT | Preliminary Inventory of Digital Collections by Jason Ronallo",
+              "href": "http://ronallo.com/blog/a-plugin-for-mediaelement-js-for-preview-thumbnails-on-hover-over-the-time-rail/",
+              "favicon": "/static/assets/icons/ronallo.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "Combine multiple images to form a strip of images ffmpeg - Super User",
+              "href": "https://superuser.com/questions/625189/combine-multiple-images-to-form-a-strip-of-images-ffmpeg",
+              "favicon": "/static/assets/icons/superuser.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "html5 - Create a image every XX seconds of the video [FFMPEG] - Super User",
+              "href": "https://superuser.com/questions/984686/create-a-image-every-xx-seconds-of-the-video-ffmpeg",
+              "favicon": "/static/assets/icons/superuser.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "ffmpeg - Automatically split large .mov video files into smaller files at black frames (scene changes)? - Super User",
+              "href": "https://superuser.com/questions/692489/automatically-split-large-mov-video-files-into-smaller-files-at-black-frames-s/726149#726149",
+              "favicon": "/static/assets/icons/superuser.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "On-Hover/Toggle Play HTML5 Video with only Vanilla JavaScript",
+              "href": "https://labs.redantler.com/on-hover-toggle-play-html5-video-with-only-vanilla-javascript-c8689e633b41",
+              "favicon": "/static/assets/icons/redantler.com.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "OnHover HTML Video Vanilla JS",
+              "href": "https://codepen.io/jfrancisayres/pen/bwpqQP",
+              "favicon": "/static/assets/icons/codepen.io.favicon.ico",
+              "add_date": "1601147426"
+            },
+            {
+              "name": "Kerberos.io - an innovative video surveillance security system built for the community and enterprises.",
+              "href": "https://kerberos.io/",
+              "favicon": "/static/assets/icons/kerberos.io.favicon.ico",
+              "add_date": "1601142673"
+            }
+          ]
+        },
+        {
+          "name": "Plex",
+          "contents": [
+            {
+              "name": "Hardware Transcoding with Plex Docker : PleX",
+              "href": "https://www.reddit.com/r/PleX/comments/749hnc/hardware_transcoding_with_plex_docker/",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1579668789"
+            },
+            {
+              "name": "(2) UNLOCK NVIDIA Cards for More Plex Transcoding! - YouTube",
+              "href": "https://www.youtube.com/watch?v=bQLgbc9NFdU",
+              "favicon": "/static/assets/icons/youtube.com.favicon.ico",
+              "add_date": "1580141553"
+            },
+            {
+              "name": "linuxserver/plex - LinuxServer.io",
+              "href": "https://docs.linuxserver.io/images/docker-plex",
+              "favicon": "/static/assets/icons/linuxserver.io.favicon.ico",
+              "add_date": "1580142125"
+            },
+            {
+              "name": "Roku Recommended FFMPEG h264 Preset",
+              "href": "https://gist.github.com/brookemckim/1015107",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1580225915"
+            },
+            {
+              "name": "Quadro P400 Encoding 8 streams in Linux on Xeon E3-1226 (Lenovo TS140) : PleX",
+              "href": "https://www.reddit.com/r/PleX/comments/9fs3z7/quadro_p400_encoding_8_streams_in_linux_on_xeon/?utm_source=reddit-android",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1600780145"
+            },
+            {
+              "name": "Tutorial on setting up unlimited transcodes for Nvidia GPUs : PleX",
+              "href": "https://www.reddit.com/r/PleX/comments/ahf0l1/tutorial_on_setting_up_unlimited_transcodes_for/",
+              "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+              "add_date": "1600780156"
+            },
+            {
+              "name": "keylase/nvidia-patch: This patch removes restriction on maximum number of simultaneous NVENC video encoding sessions imposed by Nvidia to consumer-grade GPUs.",
+              "href": "https://github.com/keylase/nvidia-patch",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1600780178"
+            },
+            {
+              "name": "jantenhove/NvencSessionLimitBump: C++ program to disable NvEnc session limit for D3D on patched systems",
+              "href": "https://github.com/jantenhove/NvencSessionLimitBump",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1600780218"
+            },
+            {
+              "name": "nVidia Hardware Transcoding Calculator for Plex Estimates",
+              "href": "https://www.elpamsoft.com/?p=Plex-Hardware-Transcoding",
+              "favicon": "/static/assets/icons/elpamsoft.com.favicon.ico",
+              "add_date": "1600780365"
+            },
+            {
+              "name": "Passthrough Intel iGPU with GVT-g to a VM and use Quick Sync with Plex in docker on Proxmox",
+              "href": "https://blog.ktz.me/passthrough-intel-igpu-with-gvt-g-to-a-vm-and-use-it-with-plex/",
+              "favicon": "/static/assets/icons/ktz.me.favicon.ico",
+              "add_date": "1608155229"
+            }
+          ]
+        },
+        {
+          "name": "Home Automation",
+          "contents": [
+            {
+              "name": "Teckin SB50 800lm RGBW Bulb Template for Tasmota",
+              "href": "https://templates.blakadder.com/teckin_SB50.html",
+              "favicon": "/static/assets/icons/blakadder.com.favicon.ico",
+              "add_date": "1599829233"
+            },
+            {
+              "name": "blakeblackshear/frigate at release-0.8.0",
+              "href": "https://github.com/blakeblackshear/frigate/tree/release-0.8.0",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1609471864"
+            },
+            {
+              "name": "A collection of scripts to flash Tuya IoT devices to alternative firmwares",
+              "href": "https://github.com/ct-Open-Source/tuya-convert",
+              "favicon": "/static/assets/icons/github.com.favicon.ico",
+              "add_date": "1602167937"
+            },
+            {
+              "name": "Split Single-phase Energy Meter | Crowd Supply",
+              "href": "https://www.crowdsupply.com/circuitsetup/split-single-phase-energy-meter",
+              "favicon": "/static/assets/icons/crowdsupply.com.favicon.ico",
+              "add_date": "1610845962"
+            },
+            {
+              "name": "LYWSD03MMC Temp",
+              "contents": [
+                {
+                  "name": "Telink Flasher",
+                  "href": "https://atc1441.github.io/TelinkFlasher.html",
+                  "favicon": "/static/assets/icons/github.io.favicon.ico",
+                  "add_date": "1602082679"
+                },
+                {
+                  "name": "atc1441/ATC_MiThermometer: Custom firmware for the Xiaomi Thermometer LYWSD03MMC and Telink Flasher via USB to Serial converter",
+                  "href": "https://github.com/atc1441/ATC_MiThermometer",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1602104249"
+                },
+                {
+                  "name": "LYWSD03MMC support (implemented since 0.6.0) · Issue #7 · custom-components/sensor.mitemp_bt",
+                  "href": "https://github.com/custom-components/sensor.mitemp_bt/issues/7#issuecomment-567640160",
+                  "favicon": "/static/assets/icons/github.com.favicon.ico",
+                  "add_date": "1602081171"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Kerberos.io - video surveillance system",
+          "href": "https://kerberos.io/",
+          "favicon": "/static/assets/icons/kerberos.io.favicon.ico",
+          "add_date": "1586978282"
+        },
+        {
+          "name": "Debian PXE boot image from scratch",
+          "href": "https://djlab.com/2014/10/debian-pxe-boot-image-from-scratch/",
+          "favicon": "/static/assets/icons/djlab.com.favicon.ico",
+          "add_date": "1579726605"
+        },
+        {
+          "name": "Self Hosted CICD with Gitea and Drone CI",
+          "href": "https://dev.to/ruanbekker/self-hosted-cicd-with-gitea-and-drone-ci-200l",
+          "favicon": "/static/assets/icons/dev.to.favicon.ico",
+          "add_date": "1605936727"
+        }
+      ]
+    },
+    {
+      "name": "Rearden",
+      "contents": [
+        {
+          "name": "firewall.ilude.com",
+          "href": "https://firewall.ilude.com/#ConfigTree",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363715"
+        },
+        {
+          "name": "Frigate",
+          "href": "https://frigate.traefikturkey.icu/events?cameras=front&labels=horse",
+          "favicon": "/static/assets/icons/traefikturkey.icu.favicon.ico",
+          "add_date": "1682466876"
+        },
+        {
+          "name": "Movies - Radarr",
+          "href": "https://radarr.ilude.com/",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363028"
+        },
+        {
+          "name": "Plex",
+          "href": "https://plex.ilude.com/web/index.html",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363704"
+        },
+        {
+          "name": "Prowlarr - Indexers",
+          "href": "https://prowlarr.ilude.com/",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1707934569"
+        },
+        {
+          "name": "SABnzbd",
+          "href": "https://sabnzbd.ilude.com/",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363136"
+        },
+        {
+          "name": "TV Shows - Sonarr",
+          "href": "https://sonarr.ilude.com/",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363003"
+        },
+        {
+          "name": "unifi.ilude.com",
+          "href": "https://unifi.ilude.com/manage/site/default/dashboard",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1558363152"
+        },
+        {
+          "name": "Syncthing",
+          "href": "https://sync.ilude.com/#",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Vaultwarden",
+          "href": "https://vaultwarden.ilude.com/",
+          "favicon": "/static/assets/icons/ilude.com.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "NZB",
+          "contents": [
+            {
+              "name": "Elitenzb.info",
+              "href": "https://www.elitenzb.info/index.php?/login/",
+              "favicon": "/static/assets/icons/elitenzb.info.favicon.ico",
+              "add_date": "1601423867"
+            },
+            {
+              "name": "NZBgeek",
+              "href": "https://nzbgeek.info/",
+              "favicon": "/static/assets/icons/nzbgeek.info.favicon.ico",
+              "add_date": "1601423906"
+            },
+            {
+              "name": "DrunkenSlug",
+              "href": "https://drunkenslug.com/#donate",
+              "favicon": "/static/assets/icons/drunkenslug.com.favicon.ico",
+              "add_date": "1683326847"
+            },
+            {
+              "name": "NZBIndex",
+              "href": "https://www.nzbindex.nl/",
+              "favicon": "/static/assets/icons/nzbindex.nl.favicon.ico",
+              "add_date": "1601423918"
+            },
+            {
+              "name": "abNZB",
+              "href": "https://www.abnzb.com/donate",
+              "favicon": "/static/assets/icons/abnzb.com.favicon.ico",
+              "add_date": "1683326841"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Machining",
+      "contents": [
+        {
+          "name": "HGR Industrial Surplus",
+          "href": "https://hgrinc.com/",
+          "favicon": "/static/assets/icons/hgrinc.com.favicon.ico",
+          "add_date": "1555394236"
+        },
+        {
+          "name": "www.hartlandauctions.com/Upcoming_Auctions.html",
+          "href": "http://www.hartlandauctions.com/Upcoming_Auctions.html",
+          "favicon": "/static/assets/icons/hartlandauctions.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Laser Cutters | Toolots",
+          "href": "https://www.toolots.com/advertising-signage-industry/laser-cnc-engraving/laser-cutter.html",
+          "favicon": "/static/assets/icons/toolots.com.favicon.ico",
+          "add_date": "1607464224"
+        }
+      ]
+    },
+    {
+      "name": "3D Printing",
+      "contents": [
+        {
+          "name": "CGTrader",
+          "href": "https://www.cgtrader.com/",
+          "favicon": "/static/assets/icons/cgtrader.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Cults3D",
+          "href": "https://cults3d.com/en",
+          "favicon": "/static/assets/icons/cults3d.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Makerworld",
+          "href": "https://makerworld.com/en",
+          "favicon": "/static/assets/icons/makerworld.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "My MiniFactory",
+          "href": "https://www.myminifactory.com/",
+          "favicon": "/static/assets/icons/myminifactory.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Pinshape",
+          "href": "https://pinshape.com/",
+          "favicon": "/static/assets/icons/pinshape.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Printables",
+          "href": "https://www.printables.com/",
+          "favicon": "/static/assets/icons/printables.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Shapeways",
+          "href": "https://www.shapeways.com/",
+          "favicon": "/static/assets/icons/shapeways.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Thangs",
+          "href": "https://thangs.com/",
+          "favicon": "/static/assets/icons/thangs.com.favicon.ico",
+          "add_date": "1598536238"
+        },
+        {
+          "name": "Thingiverse",
+          "href": "https://www.thingiverse.com/",
+          "favicon": "/static/assets/icons/thingiverse.com.favicon.ico",
+          "add_date": "1598536238"
+        }
+      ]
+    },
+    {
+      "name": "Deals",
+      "contents": [
+        {
+          "name": "shopping",
+          "contents": [
+            {
+              "name": "Amazon.com: YITAHOME 5 Drawer Chest, Mobile File Cabinet with Wheels, Home Office Storage Dresser Cabinet, Black : Office Products",
+              "href": "https://www.amazon.com/YITAHOME-5-Drawer-Storage-Dresser-Cabinet/dp/B085N6R65G/ref=sr_1_17?keywords=tool%2Bchest%2Bwith%2Bdrawers&qid=1690426007&sprefix=tool%2Bche%2Caps%2C114&sr=8-17&th=1",
+              "favicon": "/static/assets/icons/amazon.com.favicon.ico",
+              "add_date": "1690427463"
+            },
+            {
+              "name": "Amazon.com: QLLY 28 inch Adjustable Metal Desk Legs, Office Table Furniture Leg Set, Set of 4 (Black) : Tools & Home Improvement",
+              "href": "https://www.amazon.com/QLLY-Inches-Height-Adjustable-Furniture/dp/B07JR33TJC/ref=sr_1_32?crid=3HLGFRL52EF1C&keywords=table%2Blegs&qid=1690426710&sprefix=table%2Blegs%2Caps%2C115&sr=8-32&th=1",
+              "favicon": "/static/assets/icons/amazon.com.favicon.ico",
+              "add_date": "1690427457"
+            },
+            {
+              "name": "Ebern Designs Ashendon Ergonomic Mesh Task Chair & Reviews | Wayfair",
+              "href": "https://www.wayfair.com/furniture/pdp/ebern-designs-ashendon-ergonomic-mesh-task-chair-w002291366.html",
+              "favicon": "/static/assets/icons/wayfair.com.favicon.ico",
+              "add_date": "1679343362"
+            }
+          ]
+        },
+        {
+          "name": "Harbor Freight ",
+          "href": "https://www.harborfreight.com/",
+          "favicon": "/static/assets/icons/harborfreight.com.favicon.ico",
+          "add_date": "1559399537"
+        },
+        {
+          "name": "Harbor Freight Coupon Database",
+          "href": "https://www.hfqpdb.com/",
+          "favicon": "/static/assets/icons/hfqpdb.com.favicon.ico",
+          "add_date": "1698630942"
+        },
+        {
+          "name": "Struggleville",
+          "href": "https://www.struggleville.net/",
+          "favicon": "/static/assets/icons/struggleville.net.favicon.ico",
+          "add_date": "1699019699"
+        }
+      ]
+    },
+    {
+      "name": "Mac.Bids",
+      "multiColumn": 2,
+      "openInNewTab": true,
+      "contents": [
+        {
+          "name": "3d printer",
+          "href": "https://www.mac.bid/search?q=3d%20printer",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "abu garcia",
+          "href": "https://www.mac.bid/search?q=Abu%20Garcia",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "active earbud",
+          "href": "https://www.mac.bid/search?q=active%20earbud",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "armless chair",
+          "href": "https://www.mac.bid/search?q=armless%20chair",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "assortment",
+          "href": "https://www.mac.bid/search?q=assortment",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "cnc",
+          "href": "https://www.mac.bid/search?q=cnc",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "criss cross",
+          "href": "https://www.mac.bid/search?q=criss%20cross",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "cue",
+          "href": "https://www.mac.bid/search?q=cue",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "desk",
+          "href": "https://www.mac.bid/search?q=Desk",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "drawing",
+          "href": "https://www.mac.bid/search?q=drawing",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "fish",
+          "href": "https://www.mac.bid/search?q=fish",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "gauge",
+          "href": "https://www.mac.bid/search?q=gauge",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "hyper tough",
+          "href": "https://www.mac.bid/search?q=Hyper%20Tough",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "klein",
+          "href": "https://www.mac.bid/search?q=Klein",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "kobalt",
+          "href": "https://www.mac.bid/search?q=KOBALT",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "laptop",
+          "href": "https://www.mac.bid/search?q=laptop",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "laser",
+          "href": "https://www.mac.bid/search?q=laser",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "magnet",
+          "href": "https://www.mac.bid/search?q=magnet",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "ottomann",
+          "href": "https://www.mac.bid/search?q=ottomann",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "pathfinder",
+          "href": "https://www.mac.bid/search?q=pathfinder",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "pegboard",
+          "href": "https://www.mac.bid/search?q=pegboard",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "phone charger",
+          "href": "https://www.mac.bid/search?q=phone%20charger",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "propane fryer",
+          "href": "https://www.mac.bid/search?q=propane%20fryer",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "radio",
+          "href": "https://www.mac.bid/search?q=radio",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "router",
+          "href": "https://www.mac.bid/search?q=router",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "ruler",
+          "href": "https://www.mac.bid/search?q=ruler",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "ryobi",
+          "href": "https://www.mac.bid/search?q=ryobi",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "rythflo",
+          "href": "https://www.mac.bid/search?q=Rythflo",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "screw",
+          "href": "https://www.mac.bid/search?q=screw",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "steelseries",
+          "href": "https://www.mac.bid/search?q=SteelSeries",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "vevor",
+          "href": "https://www.mac.bid/search?q=VEVOR",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "vise",
+          "href": "https://www.mac.bid/search?q=vise",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "welder",
+          "href": "https://www.mac.bid/search?q=welder",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "wen",
+          "href": "https://www.mac.bid/search?q=wen",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        },
+        {
+          "name": "wiha",
+          "href": "https://www.mac.bid/search?q=Wiha",
+          "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+          "add_date": "1724457600"
+        }
+      ]
+    },
+    {
+      "name": "YouTube",
+      "href": "https://www.youtube.com/",
+      "favicon": "/static/assets/icons/youtube.com.favicon.ico",
+      "add_date": "1563757631"
+    },
+    {
+      "name": "Reddit",
+      "href": "https://www.reddit.com/",
+      "favicon": "/static/assets/icons/reddit.com.favicon.ico",
+      "add_date": "1566479421"
+    },
+    {
+      "name": "Twitch",
+      "href": "https://www.twitch.tv/moderator",
+      "favicon": "/static/assets/icons/twitch.tv.favicon.ico",
+      "add_date": "1631327037"
+    },
+    {
+      "name": "Tools",
+      "contents": [
+        {
+          "name": "Future AI Tools",
+          "href": "https://www.futuretools.io/",
+          "favicon": "/static/assets/icons/futuretools.io.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "ForwardFuture AI Tools",
+          "href": "https://tools.forwardfuture.ai/",
+          "favicon": "/static/assets/icons/forwardfuture.ai.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Minimax",
+          "href": "https://agent.minimax.io/",
+          "favicon": "/static/assets/icons/minimax.io.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Netlify",
+          "href": "https://app.netlify.com/",
+          "favicon": "/static/assets/icons/netlify.com.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Render",
+          "href": "https://render.com/",
+          "favicon": "/static/assets/icons/render.com.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Meta",
+          "href": "https://www.meta.ai/",
+          "favicon": "/static/assets/icons/meta.ai.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "ReadPartner",
+          "href": "https://readpartner.com/",
+          "favicon": "/static/assets/icons/readpartner.com.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Jan AI - Private Desktop AI Chat",
+          "href": "https://jan.ai/",
+          "favicon": "/static/assets/icons/jan.ai.favicon.ico",
+          "add_date": "1586106632"
+        },
+        {
+          "name": "Taiga",
+          "href": "https://tree.taiga.io/project/ilude-agpm-demo/kanban",
+          "favicon": "/static/assets/icons/taiga.io.favicon.ico",
+          "add_date": "1713923017"
+        }
+      ]
+    },
+    {
+      "name": "Current",
+      "contents": [
+        {
+          "name": "JSFiddle - url drop",
+          "href": "https://jsfiddle.net/ilude/9gjxnsb4/2/",
+          "favicon": "/static/assets/icons/jsfiddle.net.favicon.ico",
+          "add_date": "1714056288"
+        },
+        {
+          "name": "Dev Container metadata reference",
+          "href": "https://containers.dev/implementors/json_reference/",
+          "favicon": "/static/assets/icons/containers.dev.favicon.ico",
+          "add_date": "1711116989"
+        },
+        {
+          "name": "Prompt Engineering Guide",
+          "href": "https://www.promptingguide.ai/",
+          "favicon": "/static/assets/icons/promptingguide.ai.favicon.ico",
+          "add_date": "1713643757"
+        },
+        {
+          "name": "m0wer/rssfilter",
+          "href": "https://github.com/m0wer/rssfilter/",
+          "favicon": "/static/assets/icons/github.com.favicon.ico",
+          "add_date": "1713125426"
+        },
+        {
+          "name": "sunshine - selfhosted gaming",
+          "href": "https://www.devsfordevs.com/profile/Christopher%20Bell",
+          "favicon": "/static/assets/icons/devsfordevs.com.favicon.ico",
+          "add_date": "1713135007"
+        },
+        {
+          "name": "recommenders-team/recommenders: Best Practices on Recommendation Systems",
+          "href": "https://github.com/recommenders-team/recommenders",
+          "favicon": "/static/assets/icons/github.com.favicon.ico",
+          "add_date": "1713125390"
+        },
+        {
+          "name": "Deep-Learning/T5-Fake-News-Detector",
+          "href": "https://github.com/priya-dwivedi/Deep-Learning/blob/master/T5-Fake-News-Detector/T5-fake-news-detector-github.ipynb",
+          "favicon": "/static/assets/icons/github.com.favicon.ico",
+          "add_date": "1713125378"
+        },
+        {
+          "name": "python port of arc90's readability tool, updated to match latest readability.js",
+          "href": "https://github.com/buriy/python-readability",
+          "favicon": "/static/assets/icons/github.com.favicon.ico",
+          "add_date": "1713125368"
+        },
+        {
+          "name": "Readeck lets you save readable web pages",
+          "href": "https://codeberg.org/readeck/readeck",
+          "favicon": "/static/assets/icons/codeberg.org.favicon.ico",
+          "add_date": "1712972660"
+        },
+        {
+          "name": "sudo-bmitch/jenkins-docker",
+          "href": "https://github.com/sudo-bmitch/jenkins-docker/blob/main/entrypoint.sh#L32-L36",
+          "favicon": "/static/assets/icons/github.com.favicon.ico",
+          "add_date": "1712095934"
+        },
+        {
+          "name": "Build your Flask admin panel with ease following your guide",
+          "href": "https://www.forestadmin.com/blog/flask-tastic-admin-panel-a-step-by-step-guide-to-building-your-own-2/",
+          "favicon": "/static/assets/icons/forestadmin.com.favicon.ico",
+          "add_date": "1712090081"
+        }
+      ]
+    },
+    {
+      "name": "ZeroOne",
+      "href": "https://cloud.zeroone.tech/horizon/auth/login/?next=/horizon/",
+      "favicon": "/static/assets/icons/zeroone_32x32.ico",
+      "add_date": "1742994137"
+    },
+    {
+      "name": "Mac.Bid",
+      "href": "https://www.mac.bid/",
+      "favicon": "/static/assets/icons/mac.bid.favicon.ico",
+      "add_date": "1713923017"
+    }
+  ],
+  "sections": {
+    "shopping": {
+      "displayName": "Shopping",
+      "bookmarks": [
+        {
+          "name": "Ali Express",
+          "link": "https://www.aliexpress.com/"
+        },
+        {
+          "name": "Amazon",
+          "link": "https://www.amazon.com/"
+        },
+        {
+          "name": "Ebay",
+          "link": "https://www.ebay.com/"
+        },
+        {
+          "name": "Humble Bundle",
+          "link": "https://www.humblebundle.com/books"
+        },
+        {
+          "name": "Is There Any Deal",
+          "link": "https://isthereanydeal.com/"
+        },
+        {
+          "name": "Slickdeals",
+          "link": "https://slickdeals.net/"
+        }
+      ]
+    },
+    "ai": {
+      "displayName": "AI",
+      "bookmarks": [
+        {
+          "name": "Bing",
+          "link": "https://www.bing.com/chat"
+        },
+        {
+          "name": "ChatGPT",
+          "link": "https://chat.openai.com/"
+        },
+        {
+          "name": "Claude",
+          "link": "https://claude.ai/chats"
+        },
+        {
+          "name": "Grok xAI",
+          "link": "https://grok.com/"
+        },
+        {
+          "name": "Groq",
+          "link": "https://chat.groq.com/"
+        },
+        {
+          "name": "Perplexity",
+          "link": "https://perplexity.ai/"
+        }
+      ]
+    },
+    "ai-2": {
+      "displayName": "AI (2)",
+      "bookmarks": [
+        {
+          "name": "bolt.new",
+          "link": "https://bolt.new/"
+        },
+        {
+          "name": "Gemini",
+          "link": "https://gemini.google.com/app"
+        },
+        {
+          "name": "MS Copilot",
+          "link": "https://copilot.microsoft.com/chats"
+        },
+        {
+          "name": "Qwen",
+          "link": "https://chat.qwen.ai/"
+        },
+        {
+          "name": "V0.dev",
+          "link": "https://v0.app/"
+        },
+        {
+          "name": "T3 Chat",
+          "link": "https://t3.chat/"
+        }
+      ]
+    },
+    "bookmarks": {
+      "displayName": "Bookmarks",
+      "bookmarks": [
+        {
+          "name": "Cloudflare",
+          "link": "https://www.cloudflare.com/"
+        },
+        {
+          "name": "Codeword Generator",
+          "link": "https://cxxr.github.io/nsa.js/"
+        },
+        {
+          "name": "Excalidraw",
+          "link": "https://excalidraw.com/"
+        },
+        {
+          "name": "Notion",
+          "link": "https://www.notion.so/"
+        },
+        {
+          "name": "MoneroOcean",
+          "link": "https://moneroocean.stream/#/dashboard?addr=47JaiTVAxoujSKhibhmTS3hHaN8mW6Jfr46N1msSBsFhAyJj91KJ2maEk3DMf6gM9Ndmx81CqPAo41XPakFM3NTpUtn9dxL"
+        },
+        {
+          "name": "Tailscale",
+          "link": "https://login.tailscale.com/admin/"
+        }
+      ]
+    },
+    "tools": {
+      "displayName": "Tools",
+      "bookmarks": [
+        {
+          "name": "Producer.AI",
+          "link": "https://www.producer.ai/"
+        },
+        {
+          "name": "Suno",
+          "link": "https://suno.ai/"
+        },
+        {
+          "name": "Udio",
+          "link": "https://www.udio.com/"
+        },
+        {
+          "name": "Flux",
+          "link": "https://playground.bfl.ai/"
+        },
+        {
+          "name": "Playground",
+          "link": "https://playground.com/"
+        },
+        {
+          "name": "Runway",
+          "link": "https://app.runwayml.com/"
+        }
+      ]
+    },
+    "tools-2": {
+      "displayName": "Tools (2)",
+      "bookmarks": [
+        {
+          "name": "Freedium",
+          "link": "https://freedium.cfd/"
+        },
+        {
+          "name": "AgentGPT",
+          "link": "https://agentgpt.reworkd.ai/"
+        },
+        {
+          "name": "MindStudio",
+          "link": "https://app.mindstudio.ai/"
+        },
+        {
+          "name": "OpenRouter",
+          "link": "https://openrouter.ai/"
+        },
+        {
+          "name": "SmythOS",
+          "link": "https://app.smythos.com/"
+        },
+        {
+          "name": "Toolhouse",
+          "link": "https://toolhouse.ai/"
+        }
+      ]
+    },
+    "code": {
+      "displayName": "Code",
+      "bookmarks": [
+        {
+          "name": "Gists",
+          "link": "https://gist.github.com/"
+        },
+        {
+          "name": "Github",
+          "link": "https://github.com/ilude"
+        },
+        {
+          "name": "Dozzle - ilude.com",
+          "link": "https://dozzle.ilude.com/"
+        },
+        {
+          "name": "Dozzle - traefikturkey.icu",
+          "link": "https://dozzle.traefikturkey.icu/"
+        },
+        {
+          "name": "Proxmox - ilude.com",
+          "link": "https://pve.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::"
+        },
+        {
+          "name": "Proxmox - traefikturkey.icu",
+          "link": "https://pve-patriot.ilude.com:8006/#v1:0:=qemu%2F101:4:::::::"
+        }
+      ]
+    }
+  }
+}

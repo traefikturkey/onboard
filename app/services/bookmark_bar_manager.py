@@ -2,6 +2,8 @@ import json
 import logging
 import os
 import time
+from pathlib import Path
+from typing import Any
 
 from app.models.utils import pwd
 from app.services.favicon_store import FaviconStore
@@ -11,8 +13,18 @@ logger.setLevel(logging.DEBUG)
 
 
 class BookmarkBarManager:
-    def __init__(self, bookmark_bar_file: str = "configs/bookmarks_bar.json"):
-        self.bookmark_bar_path = pwd.joinpath(bookmark_bar_file)
+    def __init__(self, bookmark_bar_file: str = "configs/bookmarks.json"):
+        self.bookmark_bar_path = Path(pwd.joinpath(bookmark_bar_file))
+        # Check for legacy bookmarks_bar.json as fallback
+        if not self.bookmark_bar_path.exists():
+            legacy_path = Path(
+                pwd.joinpath(
+                    bookmark_bar_file.replace("bookmarks.json", "bookmarks_bar.json")
+                )
+            )
+            if legacy_path.exists():
+                logger.info("Using legacy bookmarks file: %s", legacy_path)
+                self.bookmark_bar_path = legacy_path
 
         self.favicon_store = FaviconStore()
 
@@ -24,6 +36,12 @@ class BookmarkBarManager:
         if not self._bar or self.is_modified():
             self.reload()
         return self._bar
+
+    def get_section(self, section_key: str) -> dict[str, Any] | None:
+        """Retrieve a bookmark section by its key from the consolidated schema."""
+        if not hasattr(self, "_sections"):
+            return None
+        return self._sections.get(section_key)
 
     def is_modified(self):
         logger.info(f"Bookmark Bar modified?: {self.mtime > self.last_reload}")
@@ -50,7 +68,15 @@ class BookmarkBarManager:
                 content = file.read()
 
             try:
-                new_bar = json.loads(content)
+                data = json.loads(content)
+                # Support new consolidated schema with bar + sections
+                if isinstance(data, dict) and "bar" in data:
+                    new_bar = data.get("bar", [])
+                    self._sections = data.get("sections", {})
+                else:
+                    # Legacy flat array schema
+                    new_bar = data if isinstance(data, list) else []
+                    self._sections = {}
             except json.JSONDecodeError as e:
                 # Backup the corrupt file for inspection and keep previous bar in memory
                 logger.error("Failed to parse bookmark bar JSON: %s", e)
@@ -75,6 +101,7 @@ class BookmarkBarManager:
                         "No previous bookmark bar available; falling back to empty list."
                     )
                     new_bar = []
+                    self._sections = {}
 
             # Assign the parsed content and update mtime
             self._bar = new_bar
@@ -96,9 +123,13 @@ class BookmarkBarManager:
             # Ensure we have a bar to render
             if not hasattr(self, "_bar") or self._bar is None:
                 self._bar = []
+            if not hasattr(self, "_sections"):
+                self._sections = {}
             self.last_reload = 0
         except Exception:
             # Catch-all to prevent reload failures from bubbling up into requests
             logger.exception("Unexpected error while reloading bookmark bar")
             if not hasattr(self, "_bar") or self._bar is None:
                 self._bar = []
+            if not hasattr(self, "_sections"):
+                self._sections = {}

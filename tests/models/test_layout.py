@@ -80,6 +80,8 @@ class TestLayout(unittest.TestCase):
     def setUp(self):
         # Create a layout instance without running __init__
         self.layout = object.__new__(Layout)
+        # Mock bar_manager since reload() needs it
+        self.layout.bar_manager = MagicMock()
         # ensure scheduler methods are patched when reload runs
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
