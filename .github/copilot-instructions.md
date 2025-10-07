@@ -37,6 +37,15 @@
 - **No unsolicited README.md, QUICKSTART.md, IMPLEMENTATION.md, etc.**
 - **Focus on implementation** → Code the solution, skip the documentation
 
+### 6. FILE CREATION RULES
+- Do **not** create new files unless the user explicitly authorizes it (by name or clearly worded approval).
+- When the user wants a new file but omits the name, choose a sensible filename that matches project conventions.
+- If a task seems to require a new file without explicit approval, pause, summarize the need, and ask for confirmation before proceeding.
+- Whenever file creation is declined or unclear, propose alternatives that reuse existing files.
+
+### 7. VERSION CONTROL RULES
+- When the user requests a commit and push, finish with a clean `git status` by committing and pushing every modified file.
+
 ---
 
 ## 🎯 CORE PHILOSOPHY
