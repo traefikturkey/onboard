@@ -418,18 +418,19 @@
 
 				<template x-for="(bookmark, index) in currentBookmarks" :key="index">
 					<div class="bookmark-card">
-						<img :src="bookmark.favicon || '/static/icons_test/default.png'"
-							 class="bookmark-favicon"
-							 :alt="bookmark.name"
-							 @error="$el.src='/static/icons_test/default.png'">
+						<div class="bookmark-favicon" style="display: flex; align-items: center; justify-content: center;">
+							<i class="fas" :class="bookmark.contents ? 'fa-folder' : 'fa-bookmark'" 
+							   style="font-size: 18px;"
+							   :style="{ color: bookmark.contents ? '#0d6efd' : '#999' }"></i>
+						</div>
 						<div class="bookmark-info">
 							<div class="bookmark-name">
 								<span x-text="bookmark.name"></span>
 								<span x-show="bookmark.contents" class="folder-badge">
-									<i class="fas fa-folder"></i> Folder
+									<i class="fas fa-folder"></i> Folder (<span x-text="bookmark.contents?.length || 0"></span>)
 								</span>
 							</div>
-							<div class="bookmark-url" x-text="bookmark.href || 'Folder with ' + (bookmark.contents?.length || 0) + ' items'"></div>
+							<div class="bookmark-url" x-text="bookmark.href || 'Click to expand folder'"></div>
 						</div>
 						<div class="bookmark-actions">
 							<button class="btn btn-primary" @click="openEditBookmarkModal(index)">
