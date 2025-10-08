@@ -1,0 +1,799 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Bookmark Manager - {{ site_title }}</title>
+
+	<meta name="author" content="iLude">
+	<meta name="description" content="Bookmark Manager">
+
+	<!-- Alpine.js for reactive UI -->
+	<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+
+	<!-- Font Awesome for icons -->
+	<link href="https://use.fontawesome.com/releases/v5.15.3/css/all.css" rel="stylesheet">
+
+	{% assets "css_all" %}
+	<link rel="stylesheet" href="{{ ASSET_URL }}">
+	{% endassets %}
+
+	<style>
+		.bookmark-manager {
+			display: flex;
+			height: 100vh;
+			font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			background: #1a1a1a;
+			color: #e0e0e0;
+		}
+
+		.sidebar {
+			width: 250px;
+			background: #252525;
+			border-right: 1px solid #404040;
+			padding: 20px;
+			overflow-y: auto;
+		}
+
+		.sidebar h2 {
+			font-size: 1.2rem;
+			margin-bottom: 1rem;
+			color: #e0e0e0;
+		}
+
+		.nav-item {
+			padding: 10px 15px;
+			margin: 5px 0;
+			cursor: pointer;
+			border-radius: 5px;
+			transition: background 0.2s;
+			color: #b0b0b0;
+		}
+
+		.nav-item:hover {
+			background: #333333;
+			color: #e0e0e0;
+		}
+
+		.nav-item.active {
+			background: #0d6efd;
+			color: white;
+		}
+
+		.nav-item i {
+			margin-right: 8px;
+		}
+
+		.content {
+			flex: 1;
+			padding: 30px;
+			overflow-y: auto;
+			background: #1a1a1a;
+		}
+
+		.content-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 30px;
+		}
+
+		.content-header h1 {
+			font-size: 1.8rem;
+			color: #e0e0e0;
+		}
+
+		.btn {
+			padding: 10px 20px;
+			border: none;
+			border-radius: 5px;
+			cursor: pointer;
+			font-size: 0.9rem;
+			transition: all 0.2s;
+		}
+
+		.btn-primary {
+			background: #0d6efd;
+			color: white;
+		}
+
+		.btn-primary:hover {
+			background: #0a58ca;
+		}
+
+		.btn-success {
+			background: #198754;
+			color: white;
+		}
+
+		.btn-success:hover {
+			background: #146c43;
+		}
+
+		.btn-danger {
+			background: #dc3545;
+			color: white;
+		}
+
+		.btn-danger:hover {
+			background: #bb2d3b;
+		}
+
+		.btn-secondary {
+			background: #6c757d;
+			color: white;
+		}
+
+		.btn-secondary:hover {
+			background: #5c636a;
+		}
+
+		.bookmark-card {
+			display: flex;
+			align-items: center;
+			padding: 15px;
+			margin-bottom: 10px;
+			border: 1px solid #404040;
+			border-radius: 5px;
+			background: #2a2a2a;
+			transition: all 0.2s;
+		}
+
+		.bookmark-card:hover {
+			box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+			border-color: #505050;
+		}
+
+		.bookmark-favicon {
+			width: 24px;
+			height: 24px;
+			margin-right: 15px;
+			flex-shrink: 0;
+		}
+
+		.bookmark-info {
+			flex: 1;
+		}
+
+		.bookmark-name {
+			font-weight: 500;
+			color: #e0e0e0;
+			margin-bottom: 5px;
+		}
+
+		.bookmark-url {
+			font-size: 0.85rem;
+			color: #999;
+			word-break: break-all;
+		}
+
+		.bookmark-actions {
+			display: flex;
+			gap: 10px;
+		}
+
+		.bookmark-actions button {
+			padding: 6px 12px;
+			font-size: 0.85rem;
+		}
+
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0,0,0,0.8);
+			z-index: 1000;
+			align-items: center;
+			justify-content: center;
+		}
+
+		.modal.show {
+			display: flex;
+		}
+
+		.modal-content {
+			background: #2a2a2a;
+			padding: 30px;
+			border-radius: 8px;
+			width: 90%;
+			max-width: 600px;
+			max-height: 80vh;
+			overflow-y: auto;
+			border: 1px solid #404040;
+		}
+
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+
+		.modal-header h2 {
+			margin: 0;
+			font-size: 1.5rem;
+			color: #e0e0e0;
+		}
+
+		.modal-close {
+			background: none;
+			border: none;
+			font-size: 1.5rem;
+			cursor: pointer;
+			color: #999;
+		}
+
+		.modal-close:hover {
+			color: #e0e0e0;
+		}
+
+		.form-group {
+			margin-bottom: 20px;
+		}
+
+		.form-group label {
+			display: block;
+			margin-bottom: 8px;
+			font-weight: 500;
+			color: #e0e0e0;
+		}
+
+		.form-group input,
+		.form-group select {
+			width: 100%;
+			padding: 10px;
+			border: 1px solid #404040;
+			border-radius: 5px;
+			font-size: 0.9rem;
+			background: #1a1a1a;
+			color: #e0e0e0;
+		}
+
+		.form-group input:focus,
+		.form-group select:focus {
+			outline: none;
+			border-color: #0d6efd;
+		}
+
+		.form-group small {
+			color: #999;
+		}
+
+		.form-actions {
+			display: flex;
+			justify-content: flex-end;
+			gap: 10px;
+			margin-top: 30px;
+		}
+
+		.notification {
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			padding: 15px 20px;
+			border-radius: 5px;
+			z-index: 2000;
+			animation: slideIn 0.3s ease-out;
+		}
+
+		.notification.success {
+			background: #198754;
+			color: white;
+		}
+
+		.notification.error {
+			background: #dc3545;
+			color: white;
+		}
+
+		@keyframes slideIn {
+			from {
+				transform: translateX(400px);
+				opacity: 0;
+			}
+			to {
+				transform: translateX(0);
+				opacity: 1;
+			}
+		}
+
+		.empty-state {
+			text-align: center;
+			padding: 60px 20px;
+			color: #999;
+		}
+
+		.empty-state i {
+			font-size: 4rem;
+			margin-bottom: 20px;
+			color: #555;
+		}
+
+		.folder-badge {
+			display: inline-block;
+			padding: 2px 8px;
+			margin-left: 10px;
+			background: #0d6efd;
+			color: white;
+			font-size: 0.75rem;
+			border-radius: 3px;
+		}
+
+		.loading {
+			text-align: center;
+			padding: 40px;
+			color: #999;
+		}
+
+		.loading i {
+			font-size: 2rem;
+			animation: spin 1s linear infinite;
+		}
+
+		@keyframes spin {
+			from { transform: rotate(0deg); }
+			to { transform: rotate(360deg); }
+		}
+
+		.checkbox-group {
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			margin-top: 10px;
+		}
+
+		.checkbox-group input[type="checkbox"] {
+			width: auto;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="bookmark-manager" x-data="bookmarkManager()">
+		<!-- Sidebar Navigation -->
+		<div class="sidebar">
+			<h2>Bookmarks</h2>
+
+			<div class="nav-item"
+				 :class="{ 'active': currentContext === 'bar' }"
+				 @click="switchContext('bar')">
+				<i class="fas fa-star"></i> Bookmark Bar
+			</div>
+
+			<div style="margin: 20px 0; border-top: 1px solid #ddd; padding-top: 20px;">
+				<div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+					<h2>Sections</h2>
+					<button class="btn btn-success" style="padding: 5px 10px; font-size: 0.8rem;" @click="showSectionModal = true">
+						<i class="fas fa-plus"></i>
+					</button>
+				</div>
+
+				<template x-for="section in sections" :key="section.id">
+					<div class="nav-item"
+						 :class="{ 'active': currentContext === section.id }"
+						 @click="switchContext(section.id)">
+						<i class="fas fa-folder"></i>
+						<span x-text="section.displayName"></span>
+					</div>
+				</template>
+
+				<div x-show="sections.length === 0" style="padding: 10px 15px; color: #999; font-size: 0.85rem;">
+					No sections yet
+				</div>
+			</div>
+		</div>
+
+		<!-- Main Content Area -->
+		<div class="content">
+			<div class="content-header">
+				<h1 x-text="currentContextName"></h1>
+				<div style="display: flex; gap: 10px;">
+					<button class="btn btn-primary" @click="openAddBookmarkModal()">
+						<i class="fas fa-plus"></i> Add Bookmark
+					</button>
+					<button x-show="currentContext !== 'bar'" class="btn btn-danger" @click="confirmDeleteSection()">
+						<i class="fas fa-trash"></i> Delete Section
+					</button>
+				</div>
+			</div>
+
+			<!-- Loading State -->
+			<div x-show="loading" class="loading">
+				<i class="fas fa-spinner"></i>
+				<p>Loading bookmarks...</p>
+			</div>
+
+			<!-- Bookmark List -->
+			<div x-show="!loading">
+				<template x-if="currentBookmarks.length === 0">
+					<div class="empty-state">
+						<i class="fas fa-bookmark"></i>
+						<p>No bookmarks yet. Click "Add Bookmark" to get started.</p>
+					</div>
+				</template>
+
+				<template x-for="(bookmark, index) in currentBookmarks" :key="index">
+					<div class="bookmark-card">
+						<img :src="bookmark.favicon || '/static/icons_test/default.png'"
+							 class="bookmark-favicon"
+							 :alt="bookmark.name"
+							 @error="$el.src='/static/icons_test/default.png'">
+						<div class="bookmark-info">
+							<div class="bookmark-name">
+								<span x-text="bookmark.name"></span>
+								<span x-show="bookmark.contents" class="folder-badge">
+									<i class="fas fa-folder"></i> Folder
+								</span>
+							</div>
+							<div class="bookmark-url" x-text="bookmark.href || 'Folder with ' + (bookmark.contents?.length || 0) + ' items'"></div>
+						</div>
+						<div class="bookmark-actions">
+							<button class="btn btn-primary" @click="openEditBookmarkModal(index)">
+								<i class="fas fa-edit"></i> Edit
+							</button>
+							<button class="btn btn-danger" @click="confirmDeleteBookmark(index)">
+								<i class="fas fa-trash"></i> Delete
+							</button>
+						</div>
+					</div>
+				</template>
+			</div>
+		</div>
+
+		<!-- Add/Edit Bookmark Modal -->
+		<div class="modal" :class="{ 'show': showBookmarkModal }" @click.self="closeBookmarkModal()">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2 x-text="editingIndex === null ? 'Add Bookmark' : 'Edit Bookmark'"></h2>
+					<button class="modal-close" @click="closeBookmarkModal()">&times;</button>
+				</div>
+
+				<form @submit.prevent="saveBookmark()">
+					<div class="form-group">
+						<label for="bookmark-name">Name *</label>
+						<input type="text" id="bookmark-name" x-model="bookmarkForm.name" required>
+					</div>
+
+					<div class="form-group">
+						<label for="bookmark-href">URL</label>
+						<input type="url" id="bookmark-href" x-model="bookmarkForm.href" placeholder="https://example.com">
+						<small style="color: #666; font-size: 0.85rem;">Leave empty to create a folder</small>
+					</div>
+
+					<div class="form-group">
+						<label for="bookmark-favicon">Favicon URL</label>
+						<input type="url" id="bookmark-favicon" x-model="bookmarkForm.favicon" placeholder="https://example.com/favicon.ico">
+					</div>
+
+					<div class="checkbox-group">
+						<input type="checkbox" id="is-folder" x-model="isFolder">
+						<label for="is-folder" style="margin: 0;">This is a folder</label>
+					</div>
+
+					<template x-if="isFolder">
+						<div>
+							<div class="form-group">
+								<div class="checkbox-group">
+									<input type="checkbox" id="multi-column" x-model="bookmarkForm.multiColumn">
+									<label for="multi-column" style="margin: 0;">Multi-column layout</label>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<div class="checkbox-group">
+									<input type="checkbox" id="open-new-tab" x-model="bookmarkForm.openInNewTab">
+									<label for="open-new-tab" style="margin: 0;">Open links in new tab</label>
+								</div>
+							</div>
+						</div>
+					</template>
+
+					<div class="form-actions">
+						<button type="button" class="btn btn-secondary" @click="closeBookmarkModal()">Cancel</button>
+						<button type="submit" class="btn btn-success">
+							<span x-text="editingIndex === null ? 'Add' : 'Save'"></span>
+						</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Add/Edit Section Modal -->
+		<div class="modal" :class="{ 'show': showSectionModal }" @click.self="closeSectionModal()">
+			<div class="modal-content">
+				<div class="modal-header">
+					<h2>Create Section</h2>
+					<button class="modal-close" @click="closeSectionModal()">&times;</button>
+				</div>
+
+				<form @submit.prevent="createSection()">
+					<div class="form-group">
+						<label for="section-id">Section ID *</label>
+						<input type="text" id="section-id" x-model="sectionForm.id" required pattern="[a-zA-Z0-9_]+" title="Alphanumeric characters and underscores only">
+						<small style="color: #666; font-size: 0.85rem;">Alphanumeric and underscores only (e.g., "work_links")</small>
+					</div>
+
+					<div class="form-group">
+						<label for="section-name">Display Name *</label>
+						<input type="text" id="section-name" x-model="sectionForm.displayName" required>
+					</div>
+
+					<div class="form-actions">
+						<button type="button" class="btn btn-secondary" @click="closeSectionModal()">Cancel</button>
+						<button type="submit" class="btn btn-success">Create</button>
+					</div>
+				</form>
+			</div>
+		</div>
+
+		<!-- Notification -->
+		<div x-show="notification.show"
+			 class="notification"
+			 :class="notification.type"
+			 x-text="notification.message"
+			 @click="notification.show = false"></div>
+	</div>
+
+	<script>
+		function bookmarkManager() {
+			return {
+				// State
+				currentContext: 'bar',
+				sections: [],
+				barBookmarks: [],
+				sectionBookmarks: {},
+				loading: true,
+
+				// Modals
+				showBookmarkModal: false,
+				showSectionModal: false,
+				editingIndex: null,
+
+				// Forms
+				bookmarkForm: {
+					name: '',
+					href: '',
+					favicon: '',
+					multiColumn: false,
+					openInNewTab: false,
+					contents: []
+				},
+				sectionForm: {
+					id: '',
+					displayName: ''
+				},
+				isFolder: false,
+
+				// Notifications
+				notification: {
+					show: false,
+					type: 'success',
+					message: ''
+				},
+
+				// Computed
+				get currentContextName() {
+					if (this.currentContext === 'bar') {
+						return 'Bookmark Bar';
+					}
+					const section = this.sections.find(s => s.id === this.currentContext);
+					return section ? section.displayName : '';
+				},
+
+				get currentBookmarks() {
+					if (this.currentContext === 'bar') {
+						return this.barBookmarks;
+					}
+					return this.sectionBookmarks[this.currentContext] || [];
+				},
+
+				// Initialize
+				async init() {
+					await this.loadData();
+				},
+
+				async loadData() {
+					this.loading = true;
+					try {
+						// Load bar bookmarks
+						const barResponse = await fetch('/api/bookmarks/bar');
+						const barData = await barResponse.json();
+						this.barBookmarks = barData.bookmarks || [];
+
+						// Load sections
+						const sectionsResponse = await fetch('/api/bookmarks/sections');
+						const sectionsData = await sectionsResponse.json();
+						this.sections = sectionsData.sections || [];
+
+						// Load bookmarks for each section
+						for (const section of this.sections) {
+							const response = await fetch(`/api/bookmarks/sections/${section.id}/bookmarks`);
+							const data = await response.json();
+							this.sectionBookmarks[section.id] = data.bookmarks || [];
+						}
+					} catch (error) {
+						this.showNotification('error', 'Failed to load bookmarks');
+						console.error('Load error:', error);
+					} finally {
+						this.loading = false;
+					}
+				},
+
+				switchContext(context) {
+					this.currentContext = context;
+				},
+
+				// Bookmark operations
+				openAddBookmarkModal() {
+					this.editingIndex = null;
+					this.bookmarkForm = {
+						name: '',
+						href: '',
+						favicon: '',
+						multiColumn: false,
+						openInNewTab: false,
+						contents: []
+					};
+					this.isFolder = false;
+					this.showBookmarkModal = true;
+				},
+
+				openEditBookmarkModal(index) {
+					this.editingIndex = index;
+					const bookmark = this.currentBookmarks[index];
+					this.bookmarkForm = { ...bookmark };
+					this.isFolder = !!bookmark.contents;
+					this.showBookmarkModal = true;
+				},
+
+				closeBookmarkModal() {
+					this.showBookmarkModal = false;
+					this.editingIndex = null;
+				},
+
+				async saveBookmark() {
+					try {
+						const bookmarkData = {
+							name: this.bookmarkForm.name,
+							href: this.bookmarkForm.href || undefined,
+							favicon: this.bookmarkForm.favicon || undefined
+						};
+
+						if (this.isFolder) {
+							bookmarkData.contents = this.bookmarkForm.contents || [];
+							bookmarkData.multiColumn = this.bookmarkForm.multiColumn || false;
+							bookmarkData.openInNewTab = this.bookmarkForm.openInNewTab || false;
+						}
+
+						let response;
+						if (this.editingIndex === null) {
+							// Add new bookmark
+							const url = this.currentContext === 'bar'
+								? '/api/bookmarks/bar'
+								: `/api/bookmarks/sections/${this.currentContext}/bookmarks`;
+							response = await fetch(url, {
+								method: 'POST',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify(bookmarkData)
+							});
+						} else {
+							// Update existing bookmark
+							const url = this.currentContext === 'bar'
+								? `/api/bookmarks/bar/${this.editingIndex}`
+								: `/api/bookmarks/sections/${this.currentContext}/bookmarks/${this.editingIndex}`;
+							response = await fetch(url, {
+								method: 'PUT',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify(bookmarkData)
+							});
+						}
+
+						if (!response.ok) {
+							const error = await response.json();
+							throw new Error(error.error || 'Failed to save bookmark');
+						}
+
+						await this.loadData();
+						this.closeBookmarkModal();
+						this.showNotification('success', this.editingIndex === null ? 'Bookmark added' : 'Bookmark updated');
+					} catch (error) {
+						this.showNotification('error', error.message);
+						console.error('Save error:', error);
+					}
+				},
+
+				async confirmDeleteBookmark(index) {
+					if (!confirm('Are you sure you want to delete this bookmark?')) {
+						return;
+					}
+
+					try {
+						const url = this.currentContext === 'bar'
+							? `/api/bookmarks/bar/${index}`
+							: `/api/bookmarks/sections/${this.currentContext}/bookmarks/${index}`;
+
+						const response = await fetch(url, { method: 'DELETE' });
+
+						if (!response.ok) {
+							const error = await response.json();
+							throw new Error(error.error || 'Failed to delete bookmark');
+						}
+
+						await this.loadData();
+						this.showNotification('success', 'Bookmark deleted');
+					} catch (error) {
+						this.showNotification('error', error.message);
+						console.error('Delete error:', error);
+					}
+				},
+
+				// Section operations
+				closeSectionModal() {
+					this.showSectionModal = false;
+					this.sectionForm = { id: '', displayName: '' };
+				},
+
+				async createSection() {
+					try {
+						const response = await fetch('/api/bookmarks/sections', {
+							method: 'POST',
+							headers: { 'Content-Type': 'application/json' },
+							body: JSON.stringify(this.sectionForm)
+						});
+
+						if (!response.ok) {
+							const error = await response.json();
+							throw new Error(error.error || 'Failed to create section');
+						}
+
+						await this.loadData();
+						this.closeSectionModal();
+						this.showNotification('success', 'Section created');
+						this.switchContext(this.sectionForm.id);
+					} catch (error) {
+						this.showNotification('error', error.message);
+						console.error('Create section error:', error);
+					}
+				},
+
+				async confirmDeleteSection() {
+					if (!confirm(`Are you sure you want to delete the section "${this.currentContextName}"? This will delete all bookmarks in this section.`)) {
+						return;
+					}
+
+					try {
+						const response = await fetch(`/api/bookmarks/sections/${this.currentContext}`, {
+							method: 'DELETE'
+						});
+
+						if (!response.ok) {
+							const error = await response.json();
+							throw new Error(error.error || 'Failed to delete section');
+						}
+
+						await this.loadData();
+						this.switchContext('bar');
+						this.showNotification('success', 'Section deleted');
+					} catch (error) {
+						this.showNotification('error', error.message);
+						console.error('Delete section error:', error);
+					}
+				},
+
+				// Notifications
+				showNotification(type, message) {
+					this.notification = { show: true, type, message };
+					setTimeout(() => {
+						this.notification.show = false;
+					}, 3000);
+				}
+			};
+		}
+	</script>
+</body>
+
+</html>

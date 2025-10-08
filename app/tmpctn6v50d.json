@@ -1,0 +1,23 @@
+{
+  "bar": [
+    {
+      "name": "New Bookmark",
+      "href": "https://new.com/"
+    }
+  ],
+  "sections": {
+    "shopping": {
+      "displayName": "Shopping",
+      "bookmarks": [
+        {
+          "name": "Walmart",
+          "link": "https://walmart.com/"
+        }
+      ]
+    },
+    "new_section": {
+      "displayName": "New Section",
+      "bookmarks": []
+    }
+  }
+}

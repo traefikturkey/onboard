@@ -1,0 +1,19 @@
+{
+  "bar": [
+    {
+      "name": "New Bookmark",
+      "href": "https://new.com/"
+    }
+  ],
+  "sections": {
+    "new_section": {
+      "displayName": "New Section",
+      "bookmarks": [
+        {
+          "name": "Link",
+          "link": "https://link.com/"
+        }
+      ]
+    }
+  }
+}

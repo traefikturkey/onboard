@@ -62,7 +62,8 @@
         "ms-python.black-formatter",
         "ms-python.isort",
         "ms-python.autopep8",
-        "ms-python.python"
+        "ms-python.python",
+        "MarkdownViewer.enhanced-md-editor"
       ],
       "settings": {
         "dev.containers.copyGitConfig": false,

@@ -19,6 +19,14 @@
   
   ❌ WRONG: make target -j1
   ✅ CORRECT: make target
+
+  ❌ WRONG: FLASK_ENV=development FLASK_DEBUG=True uv run python run.py
+  ✅ CORRECT: uv run python run.py
+  ```
+- **ALWAYS use uv to run python commands**
+  ```
+  ❌ WRONG: python -m pytest tests/
+  ✅ CORRECT: uv run pytest tests/
   ```
 
 ### 3. NAVIGATION RULES
