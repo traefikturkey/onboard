@@ -52,7 +52,9 @@
 - Whenever file creation is declined or unclear, propose alternatives that reuse existing files.
 
 ### 7. VERSION CONTROL RULES
-- When the user requests a commit and push, finish with a clean `git status` by committing and pushing every modified file.
+- **NEVER push unless explicitly requested** → Only push when user asks
+- When the user requests a commit (or commit and push), finish with a clean `git status` by committing every modified file.
+- If user requests push, verify all commits are included before pushing.
 
 ---
 
