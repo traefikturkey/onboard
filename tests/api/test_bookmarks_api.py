@@ -48,7 +48,11 @@ class TestBarBookmarkRoutes:
 
     def test_add_bar_bookmark_success(self, client, mock_bookmark_manager):
         """Test adding a bar bookmark."""
-        new_bookmark = {"name": "Test", "href": "https://test.com", "favicon": "https://test.com/favicon.ico"}
+        new_bookmark = {
+            "name": "Test",
+            "href": "https://test.com",
+            "favicon": "https://test.com/favicon.ico",
+        }
         mock_bookmark_manager.add_bar_bookmark.return_value = new_bookmark
 
         response = client.post(
@@ -111,7 +115,9 @@ class TestBarBookmarkRoutes:
 
     def test_update_bar_bookmark_invalid_index(self, client, mock_bookmark_manager):
         """Test updating with invalid index."""
-        mock_bookmark_manager.update_bar_bookmark.side_effect = InvalidIndexError("Invalid index")
+        mock_bookmark_manager.update_bar_bookmark.side_effect = InvalidIndexError(
+            "Invalid index"
+        )
 
         response = client.put(
             "/api/bookmarks/bar/999",
@@ -133,7 +139,9 @@ class TestBarBookmarkRoutes:
 
     def test_delete_bar_bookmark_not_found(self, client, mock_bookmark_manager):
         """Test deleting non-existent bookmark."""
-        mock_bookmark_manager.delete_bar_bookmark.side_effect = BookmarkNotFoundError("Not found")
+        mock_bookmark_manager.delete_bar_bookmark.side_effect = BookmarkNotFoundError(
+            "Not found"
+        )
 
         response = client.delete("/api/bookmarks/bar/999")
 
@@ -165,7 +173,9 @@ class TestSectionRoutes:
 
         response = client.post(
             "/api/bookmarks/sections",
-            data=json.dumps({"section_id": "new_section", "displayName": "New Section"}),
+            data=json.dumps(
+                {"section_id": "new_section", "displayName": "New Section"}
+            ),
             content_type="application/json",
         )
         data = json.loads(response.data)
@@ -176,7 +186,9 @@ class TestSectionRoutes:
 
     def test_create_section_duplicate(self, client, mock_bookmark_manager):
         """Test creating duplicate section."""
-        mock_bookmark_manager.create_section.side_effect = ValueError("Section already exists")
+        mock_bookmark_manager.create_section.side_effect = ValueError(
+            "Section already exists"
+        )
 
         response = client.post(
             "/api/bookmarks/sections",
@@ -198,7 +210,9 @@ class TestSectionRoutes:
 
     def test_delete_section_not_found(self, client, mock_bookmark_manager):
         """Test deleting non-existent section."""
-        mock_bookmark_manager.delete_section.side_effect = SectionNotFoundError("Not found")
+        mock_bookmark_manager.delete_section.side_effect = SectionNotFoundError(
+            "Not found"
+        )
 
         response = client.delete("/api/bookmarks/sections/nonexistent")
 
@@ -287,10 +301,16 @@ class TestAdvancedOperations:
 
         response = client.post(
             "/api/bookmarks/move",
-            data=json.dumps({
-                "source": {"type": "bar", "index": 0},
-                "destination": {"type": "section", "section_id": "work", "index": 0}
-            }),
+            data=json.dumps(
+                {
+                    "source": {"type": "bar", "index": 0},
+                    "destination": {
+                        "type": "section",
+                        "section_id": "work",
+                        "index": 0,
+                    },
+                }
+            ),
             content_type="application/json",
         )
         data = json.loads(response.data)
@@ -305,7 +325,7 @@ class TestAdvancedOperations:
                 "bar": [{"name": "Test", "href": "https://test.com"}],
                 "sections": {"work": {"displayName": "Work", "bookmarks": []}},
             },
-            "merge": False
+            "merge": False,
         }
         mock_bookmark_manager.import_bookmarks.return_value = None
 
@@ -367,7 +387,9 @@ class TestErrorHandling:
 
     def test_internal_server_error(self, client, mock_bookmark_manager):
         """Test handling of unexpected errors."""
-        mock_bookmark_manager.get_bar_bookmarks.side_effect = Exception("Unexpected error")
+        mock_bookmark_manager.get_bar_bookmarks.side_effect = Exception(
+            "Unexpected error"
+        )
 
         response = client.get("/api/bookmarks/bar")
 

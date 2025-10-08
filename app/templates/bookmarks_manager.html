@@ -419,7 +419,7 @@
 				<template x-for="(bookmark, index) in currentBookmarks" :key="index">
 					<div class="bookmark-card">
 						<div class="bookmark-favicon" style="display: flex; align-items: center; justify-content: center;">
-							<i class="fas" :class="bookmark.contents ? 'fa-folder' : 'fa-bookmark'" 
+							<i class="fas" :class="bookmark.contents ? 'fa-folder' : 'fa-bookmark'"
 							   style="font-size: 18px;"
 							   :style="{ color: bookmark.contents ? '#0d6efd' : '#999' }"></i>
 						</div>
@@ -608,7 +608,7 @@
 						// Load sections
 						const sectionsResponse = await fetch('/api/bookmarks/sections');
 						const sectionsData = await sectionsResponse.json();
-						
+
 						// Convert sections object to array
 						const sectionsObj = sectionsData.data || {};
 						this.sections = Object.keys(sectionsObj).map(id => ({
