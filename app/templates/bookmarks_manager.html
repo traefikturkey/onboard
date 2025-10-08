@@ -602,18 +602,18 @@
 						// Load bar bookmarks
 						const barResponse = await fetch('/api/bookmarks/bar');
 						const barData = await barResponse.json();
-						this.barBookmarks = barData.bookmarks || [];
+						this.barBookmarks = barData.data || [];
 
 						// Load sections
 						const sectionsResponse = await fetch('/api/bookmarks/sections');
 						const sectionsData = await sectionsResponse.json();
-						this.sections = sectionsData.sections || [];
+						this.sections = sectionsData.data || [];
 
 						// Load bookmarks for each section
 						for (const section of this.sections) {
 							const response = await fetch(`/api/bookmarks/sections/${section.id}/bookmarks`);
 							const data = await response.json();
-							this.sectionBookmarks[section.id] = data.bookmarks || [];
+							this.sectionBookmarks[section.id] = data.data || [];
 						}
 					} catch (error) {
 						this.showNotification('error', 'Failed to load bookmarks');
