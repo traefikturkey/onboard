@@ -1,3 +1,4 @@
+```markdown
 # Goal:
 - create a new .github/prompts/update-make-prompts.prompt.md that does the following procedure
 
@@ -11,3 +12,5 @@
 - run `date +%F` to get the current date in YYYY-MM-DD format
 - update .github/prompts/VERSION to the new version using using the current date and YYYY-MM-DD.DAILY_INCREMENT_NUMBER  
   - If the current date is the same as the value already in INSTRUCTION_VERSION increment the DAILY_INCREMENT_NUMBER by 1
+
+```
