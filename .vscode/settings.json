@@ -59,4 +59,10 @@
   "editor.detectIndentation": true,
   "editor.tabSize": 4,
   "editor.insertSpaces": true
+  ,
+  "files.associations": {
+    "**/.github/instructions/dockerfile.instructions.md": "markdown",
+    "**/dockerfile.instructions.md": "markdown",
+    "**/*.instructions.md": "markdown"
+  }
 }
