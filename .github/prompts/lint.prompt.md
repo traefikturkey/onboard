@@ -1,27 +1,27 @@
----
 mode: agent
-description: Run lint via make lint (or fallback) and apply focused fixes without scope creep.
-model: 'GPT-5 mini (Preview)'
+description: Lint wrapper; prefer unified /check workflow. Run isort/black/flake8 directly with uv.
+model: gpt-5-mini
 ---
 
 # /lint – Run and Resolve Linting
 
 IMMEDIACY: Run lint immediately; no intro text.
 
+Unified workflow: Prefer using `.github/prompts/check.prompt.md` (tests first, optional lint). Use this prompt for lint-only runs.
+
 ## Preconditions
 - From repo root.
 - Dependencies installed, assume they are unless error shows otherwise (if needed run): `uv sync --dev` (contains flake8, black, isort, pylint).
 
 ## Command Strategy
-1. Preferred: `make lint`
-2. If target missing, sequential fallback:
-   - Style/format: `uv run black --check .`
-   - Import order: `uv run isort --check-only .`
-   - Lint rules: `uv run flake8 .`
-   - (Optional) Static analysis: `uv run pylint app tests` (only on request; can be noisy)
+Run directly with uv in this order:
+1. `uv run isort .`
+2. `uv run black .`
+3. `uv run flake8 .`
+4. (Optional) Static analysis: `uv run pylint app tests` (only on request; can be noisy)
 
 ## Execution
-Run `make lint` (or fallback). Suppress verbose formatter output in response unless issues remain.
+Run isort/black/flake8 in order. Suppress verbose formatter output in response unless issues remain.
 
 ## Issue Classification
 | Type | Example Tools | Typical Fix |
@@ -66,7 +66,7 @@ If issues:
 - If many style errors in one file, batch edits rather than one patch per error.
 - If massive import reordering required, confirm before applying (risk of noisy diff).
 
-## If make lint Exists Later
-Update this prompt to just run that target and interpret consolidated output.
+## If a make lint Target Exists Later
+You may switch to that target and interpret consolidated output, but keep uv commands as fallback.
 
-Respond by executing the lint plan now.
+Respond by executing the lint plan now, or switch to the unified /check prompt for end-to-end quality.
