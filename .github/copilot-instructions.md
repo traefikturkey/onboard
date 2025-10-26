@@ -51,6 +51,12 @@
 - **Provide choices simply** → Use [A, B, C] or [1, 2, 3] format
 - **Iterate until complete** → Continue working until problem is fully solved
 
+### Pre-work plan (mandatory)
+- Before running tools or editing files, start with a very brief plan so the user can redirect early if needed.
+- Keep it tiny and skimmable: 1 sentence for simple tasks, or 2–3 bullets for multi-step work.
+- Include what you’re about to do next and the expected outcome (e.g., "Search repo for X, then update Y to fix Z; outcome: A works without breaking B").
+- Proceed immediately after stating the plan; do not wait for approval unless the user interrupts.
+
 ---
 
 ## 💻 PYTHON PROJECT STANDARDS
