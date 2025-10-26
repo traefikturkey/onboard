@@ -1,7 +1,6 @@
----
 mode: agent
-model: 'GPT-5 mini (Preview)'
-description: Run tests via make test and systematically resolve failures/import issues.
+model: gpt-5-mini
+description: Unified test run wrapper; uses uv run pytest. Prefer the /check prompt for full triage.
 ---
 
 # /test – Execute and Triage Test Run
@@ -13,9 +12,8 @@ IMMEDIACY: Run the command first with no preamble. Only then output results.
 - Dependencies installed, assume they are unless error shows otherwise (if needed run): `uv sync --dev`.
 
 ## Command Strategy
-1. Primary (defined in `.devcontainer/Makefile`): `make test` (runs behave + pytest with coverage)
-2. Fallback if target ever absent: `uv run pytest -q` (or explicit `uv run pytest tests -q`)
-3. Re-run only failing tests: `uv run pytest <path>::<TestClass>::<test_name> -q`
+1. `uv run pytest -q` (primary)
+2. Re-run only failing tests as needed: `uv run pytest <path>::<TestClass>::<test_name> -q`
 
 ## Execution
 Run immediately. Capture details internally; emit minimal success line. On failure/warning, include classified details.
@@ -42,7 +40,7 @@ If imports fail:
 1. Ensure working directory is repository root.
 2. Avoid modifying `sys.path`; rely on package layout.
 3. Add missing `__init__.py` where needed.
-4. If still failing, run `uv run python -c "import sys, pprint; pprint.pp(sys.path)"` to inspect path.
+4. Prefer absolute imports that match package structure (e.g., `from app.models.bookmark import Bookmark`).
 
 ## Re-run Loop
 After fixes, re-run only failing subset first. When all pass, perform full run again to confirm no regressions.
@@ -68,7 +66,9 @@ If failures or warnings:
 - Run explicit: `uv run pytest tests -q`.
 
 ## Optional Enhancements (Do Not Add Unless Requested)
-- Coverage: `uv run pytest --maxfail=1 --cov=app --cov-report=term-missing`.
+- Coverage: `uv run pytest --maxfail=1 --cov=app --cov-report=term-missing -q`.
 - Parallel: `pytest -n auto` (add `pytest-xdist` first).
+
+For end-to-end quality (tests + optional lint), prefer `.github/prompts/check.prompt.md`.
 
 Respond now by executing the plan.
