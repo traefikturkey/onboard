@@ -202,10 +202,10 @@
 
 ## 📁 DOCUMENTATION DIRECTORY
 
-You may create a `.devplanning` directory for organizing thoughts:
+You may create a `.spec` directory for organizing specifications and planning:
 
 - **README.md** → Overview of directory purpose and contents
 - **PRD.md** → Product requirements and specifications  
-- **Feature folders** → Organized by component or feature
+- **Feature folders** → Under `.spec/features/` organized by component or feature
 - **Decision logs** → Document tradeoffs and reasoning
 

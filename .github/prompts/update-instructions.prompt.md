@@ -54,10 +54,10 @@ This prompt replicates a proven workflow that:
    **Output Usage**: Copy the list of files shown above for processing in step 3. This handles both incremental analysis (files newer than VERSION) and full analysis (all files) automatically.
 
 2. **Create Analysis Directory**
-   ```bash
-   mkdir -p .devplanning/prompt-improvements-$(date +%Y-%m-%d)
-   cd .devplanning/prompt-improvements-$(date +%Y-%m-%d)
-   ```
+    ```bash
+    mkdir -p .spec/features/prompt-improvements-$(date +%Y-%m-%d)
+    cd .spec/features/prompt-improvements-$(date +%Y-%m-%d)
+    ```
 
 3. **Analyze Conversation History**
    
@@ -224,7 +224,7 @@ This prompt replicates a proven workflow that:
 
 15. **Commit All Changes**
     ```bash
-    git add .devplanning/prompt-improvements-$(date +%Y-%m-%d)/
+    git add .spec/features/prompt-improvements-$(date +%Y-%m-%d)/
     git add .github/VERSION
     git add .github/copilot-instructions.md
     git add .github/instructions/

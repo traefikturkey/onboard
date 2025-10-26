@@ -51,7 +51,7 @@ applyTo: "**/Dockerfile*"
 
 ### Build Context Optimization
 - Maintain comprehensive .dockerignore files
-- Exclude: tests/, .git/, __pycache__/, *.pyc, .coverage/, notebooks/, .devplanning/
+- Exclude: tests/, .git/, __pycache__/, *.pyc, .coverage/, notebooks/, .spec/
 - Include only necessary files in build context
 - Regularly audit .dockerignore for new directories
 
