@@ -64,7 +64,7 @@ This document outlines the user interface design and user experience for the boo
   <button class="bookmark-menu-trigger" aria-label="Bookmark options">
     <i class="fa fa-ellipsis-v"></i>
   </button>
-</li>
+  </li>
 ```
 
 #### Edit Mode
@@ -531,7 +531,7 @@ document.addEventListener('keydown', function(e) {
 <div class="bookmark-validation-error" role="alert">
   <i class="fa fa-exclamation-triangle"></i>
   <span class="error-text">Bookmark name cannot be empty</span>
-</div>
+  </div>
 ```
 
 ### Toast Notifications

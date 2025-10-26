@@ -1,3 +1,4 @@
+````markdown
 # Technical Design - Bookmark Editing Feature
 
 ## Architecture Overview
@@ -443,3 +444,5 @@ describe('BookmarkEditor', () => {
 - Implement virtual scrolling for large collections
 - Use efficient diff algorithms for updates
 - Monitor and profile real-world usage
+
+````
