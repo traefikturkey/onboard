@@ -129,3 +129,80 @@ version:
 integration-test:
 	@echo "Running integration tests..."
 	uv run pytest tests/integration -q || true
+
+.PHONY: test-if-py-changed
+test-if-py-changed:
+	@echo "[tests] Checking for Python changes..."
+	@if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then \
+	  changed=$$( (git diff --name-only HEAD; git ls-files --others --exclude-standard) | grep -E '\\.py$$' | sort -u ); \
+	  if [ -n "$$changed" ]; then \
+	    echo "[tests] Python changes detected:"; echo "$$changed"; \
+	    uv run pytest; \
+	  else \
+	    echo "[tests] No Python changes detected; skipping pytest."; \
+	  fi; \
+	else \
+	  echo "[tests] Not a git repo; running pytest to be safe."; \
+	  uv run pytest; \
+	fi
+
+# -------------------------------
+# Personalization utilities
+#
+# Vector store configuration (CHROMA_URL):
+# - If CHROMA_URL starts with http(s)://, it's treated as a remote Chroma server URL.
+# - Otherwise it's treated as a filesystem path for local on-disk persistence.
+# - If unset, defaults to a local path under app/configs/.
+#
+# Common flow:
+#   make ingest          # parse bookmarks/layout and (re)embed new items
+#   make discover        # print a short summary and sample recommendations
+#   make sync-clicks     # optional: import legacy CLICK_EVENTS
+#   make topics-backfill # optional: update topics from historical clicks
+# -------------------------------
+.PHONY: ingest
+ingest:
+	@echo "[ingest] Ingesting bookmarks and layout into SQLite..."
+	uv run python -m onboard.jobs.ingest_bookmarks
+	@echo "[ingest] Running embedding refresher..."
+	uv run python -m onboard.jobs.embed_refresher
+
+.PHONY: discover
+discover:
+	@echo "[discover] Summarizing ingested data and recommendations..."
+	uv run python -m onboard.jobs.discover
+
+.PHONY: ctr-update
+ctr-update:
+	@echo "[ctr-update] Updating per-source CTR priors from recent clicks..."
+	uv run python -m onboard.jobs.ctr_updater
+
+.PHONY: hydrate-clicks
+hydrate-clicks:
+	@echo "[hydrate-clicks] Adding clicked URLs missing from items and embedding..."
+	uv run python -m onboard.jobs.hydrate_clicked_items
+
+.PHONY: topics-seed-bookmarks
+topics-seed-bookmarks:
+	@echo "[topics] Seeding topics from bookmark titles..."
+	uv run python -m onboard.jobs.seed_topics_from_bookmarks
+
+.PHONY: topics-from-titles
+topics-from-titles:
+	@echo "[topics] Populating topics from all item titles (small bumps)..."
+	uv run python -m onboard.jobs.topics_from_titles
+
+.PHONY: prune-topics
+prune-topics:
+	@echo "[topics] Pruning stopwords and generic terms from topics..."
+	uv run python -m onboard.jobs.prune_topics
+
+.PHONY: sync-clicks
+sync-clicks:
+	@echo "[sync-clicks] Syncing app CLICK_EVENTS to personalization click_events..."
+	uv run python -m onboard.jobs.sync_clicks
+
+.PHONY: topics-backfill
+topics-backfill:
+	@echo "[topics] Backfilling topics from click events..."
+	uv run python -m onboard.jobs.topics_backfill
