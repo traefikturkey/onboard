@@ -57,7 +57,26 @@ class LinkTracker:
         self.cursor.execute("SELECT TIMESTAMP, LINK FROM CLICK_EVENTS")
         rows = self.cursor.fetchall()
         df = pd.DataFrame(rows, columns=["TIMESTAMP", "LINK"])
-        df["TIMESTAMP"] = pd.to_datetime(df["TIMESTAMP"])
+        # If there are no rows, return the empty dataframe immediately
+        if df.empty:
+            return df
+
+        # Try parsing with the common microsecond format first (fast path).
+        # Some timestamps are stored as ISO strings with a 'T' separator
+        # (e.g. 2025-08-15T16:02:33.206513). Pandas may infer a single
+        # homogeneous format for an array and raise if mixed formats exist.
+        # Use a try/except to attempt the fast format parse and fall back to
+        # a more flexible parser that will handle ISO formats and mixed inputs.
+        try:
+            df["TIMESTAMP"] = pd.to_datetime(
+                df["TIMESTAMP"], format="%Y-%m-%d %H:%M:%S.%f"
+            )
+        except (ValueError, TypeError):
+            # Fallback: let pandas infer formats per-element and coerce
+            # unparsable values to NaT instead of raising.
+            df["TIMESTAMP"] = pd.to_datetime(
+                df["TIMESTAMP"], errors="coerce", infer_datetime_format=True
+            )
         return df
 
     def __del__(self):
