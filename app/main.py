@@ -14,6 +14,14 @@ from flask_caching import Cache
 from app.models import apscheduler as apscheduler_module
 from app.models import layout as layout_module
 from app.modules.testsupport import is_test_environment
+
+try:
+    # Initialize personalization DB schema on app import
+    from onboard.utils.db import init_db  # type: ignore
+
+    init_db()
+except Exception:
+    pass
 from app.services.link_tracker import link_tracker
 
 logging.basicConfig(format="%(asctime)s - %(message)s", level=logging.WARN)
@@ -67,6 +75,19 @@ assets = Environment(app)
 css = Bundle("css/*.css", filters="cssmin", output="assets/common.css")
 assets.register("css_all", css)
 css.build()
+
+# Register personalization API blueprints
+try:
+    from onboard.api.recommendations import bp as rec_bp  # type: ignore
+    from onboard.api.interest_map import bp as im_bp  # type: ignore
+    from onboard.api.feedback import bp as fb_bp  # type: ignore
+
+    app.register_blueprint(rec_bp)
+    app.register_blueprint(im_bp)
+    app.register_blueprint(fb_bp)
+except Exception:
+    # Keep app running even if personalization modules are missing during tests or partial installs
+    pass
 
 
 # Eagerly load layout and initialize scheduler when running in production.
@@ -230,6 +251,36 @@ def bookmarks_manage():
 @app.route("/api/healthcheck")
 def healthcheck():
     return "OK", 200
+
+
+@app.get("/widget/recommendations")
+def widget_recommendations():
+    """Return a fragment rendering top recommendations as a widget list.
+
+    This is a lightweight HTMX endpoint that mirrors the discover job's candidate
+    selection: recent embedded items limited to a window, then ranked.
+    """
+    try:
+        # Late import so tests can run without optional deps
+        from onboard.services.ranking import RankingEngine  # type: ignore
+        from onboard.utils.db import get_db as _get_db  # type: ignore
+
+        db = _get_db()
+        rows = db.execute(
+            """
+            SELECT item_id FROM items
+            WHERE vec_id IS NOT NULL
+            ORDER BY COALESCE(last_embedded_at, 0) DESC, rowid DESC
+            LIMIT 100
+            """
+        ).fetchall()
+        ids = [r[0] for r in rows]
+        engine = RankingEngine(db=db)
+        scored = engine.score_items(ids)[:10]
+    except Exception:
+        scored = []
+
+    return render_template("recommendations_widget.html", items=scored)
 
 
 ###############################################################################

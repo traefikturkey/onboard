@@ -1,3 +1,4 @@
+````prompt
 # Instruction Metrics Setup Prompt
 
 Goal: Initialize and maintain instruction improvement tracking infrastructure.
@@ -47,3 +48,4 @@ Quality Gates (auto after entry append):
 - If large_rewrite == Y and scope_creep == Y → emit escalation note.
 
 Output: Confirmation summary with any warnings.
+````

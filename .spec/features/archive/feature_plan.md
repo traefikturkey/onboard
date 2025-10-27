@@ -1,3 +1,4 @@
+```markdown
 Feature Plan: Layout & Feed robustness, test seams, and baseline
 
 Summary
@@ -31,7 +32,7 @@ Quality gates
 - Manual smoke: run app in minimal environment (no lxml) and request a feed endpoint. ✅
 
 Deliverables / artifacts
-- `.devplanning/feature_plan.md` (this file)
+- `.spec/feature_plan.md` (this file)
 - Small PRs (one per change):
   - parser fallback & tests
   - loader normalization or test updates
@@ -51,3 +52,5 @@ Notes
 Next steps (immediate)
 - Commit this plan as a baseline.
 - Run full `make lint` + `make test` to confirm baseline health.
+
+```

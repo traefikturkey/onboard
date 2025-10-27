@@ -62,6 +62,25 @@
 			</div>
 		</div>
 		<div id="main-content">
+			<!-- Recommended for You widget (HTMX) -->
+			<div
+				class="box feed-box"
+				hx-get="/widget/recommendations"
+				hx-trigger="load once"
+				hx-swap="outerHTML"
+				hx-ext="loading-states"
+				data-loading-class="widget-loading"
+				data-loading-class-remove="widget-loading"
+			>
+				<div class="box feed-box">
+					<div class="box-header feed-header">
+						<span class="box-header-link feed-header-link">Recommended for You</span>
+					</div>
+					<div class="box-content feed-content">
+						<ul data-widget="feed" data-open-id=""><li>Loading...</li></ul>
+					</div>
+				</div>
+			</div>
 			{% for row in layout.tab(tab_name).rows:  %}
 				{% with row=row %}
 					{% include "row.html" %}

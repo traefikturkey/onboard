@@ -8,7 +8,7 @@
 
 ### 1. EXECUTION RULES
 - **NEVER ask "Would you like me to..."** → Execute immediately
-- **NEVER end without verification** → Always run build/lint/test
+- **NEVER end without required verification** → Run build/lint/test after Python (*.py) code changes; if only non-Python files changed (e.g., README/Makefile/Dockerfile/config) and no runtime behavior is affected, you do not need to re-run tests
 - **NEVER provide code blocks** → Use edit tools instead (unless explicitly requested)
 
 ### 2. COMMAND RULES  
@@ -67,13 +67,19 @@
 2. **Verify facts with tools** → Use `fetch_webpage` for current information  
 3. **Execute, don't ask** → Only request input for missing critical information
 4. **Make minimal changes** → Smallest possible edits that solve the problem
-5. **Always verify completion** → Run build/lint/test and report results
+5. **Always verify completion** → If you changed Python (*.py) files, run build/lint/test and report results; for non-Python-only changes, summarize what changed without re-running tests
 
 ### Communication Style:
 - **Be direct and concise** → No unnecessary explanations
 - **Execute immediately** → Don't ask permission for obvious next steps  
 - **Provide choices simply** → Use [A, B, C] or [1, 2, 3] format
 - **Iterate until complete** → Continue working until problem is fully solved
+
+### Pre-work plan (mandatory)
+- Before running tools or editing files, start with a very brief plan so the user can redirect early if needed.
+- Keep it tiny and skimmable: 1 sentence for simple tasks, or 2–3 bullets for multi-step work.
+- Include what you’re about to do next and the expected outcome (e.g., "Search repo for X, then update Y to fix Z; outcome: A works without breaking B").
+- Proceed immediately after stating the plan; do not wait for approval unless the user interrupts.
 
 ---
 
@@ -161,12 +167,12 @@
 ### Step 3: Implementation Phase
 1. **Read context** → Always read 2000+ lines before editing
 2. **Make small changes** → Incremental, testable modifications
-3. **Test frequently** → Run `uv run pytest` after changes
+3. **Test frequently** → Run `uv run pytest` after Python (*.py) changes; skip for docs/Makefile-only changes
 4. **Debug issues** → Use `get_errors` tool to identify problems
 5. **Iterate until complete** → Fix all issues before finishing
 
 ### Step 4: Verification Phase
-1. **Run final tests** → `uv run pytest` and any other relevant checks
+1. **Run final tests (when applicable)** → `uv run pytest` if Python (*.py) changed; otherwise skip test re-run
 2. **Validate completion** → Ensure original request is fully addressed
 3. **Report results** → Summarize what was accomplished
 
@@ -214,7 +220,7 @@
 **Before completing ANY task, verify you have NOT:**
 
 1. ❌ Asked "Would you like me to..."
-2. ❌ Ended without running build/lint/test verification  
+2. ❌ Ended without running build/lint/test verification when Python (*.py) changed  
 3. ❌ Added unnecessary flags like `-m` in `uv run -m python`
 4. ❌ Added `cd` prefixes or `|| true` suffixes unnecessarily
 5. ❌ Provided unsolicited code blocks
@@ -226,10 +232,10 @@
 
 ## 📁 DOCUMENTATION DIRECTORY
 
-You may create a `.devplanning` directory for organizing thoughts:
+You may create a `.spec` directory for organizing specifications and planning:
 
 - **README.md** → Overview of directory purpose and contents
 - **PRD.md** → Product requirements and specifications  
-- **Feature folders** → Organized by component or feature
+- **Feature folders** → Under `.spec/features/` organized by component or feature
 - **Decision logs** → Document tradeoffs and reasoning
 
