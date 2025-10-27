@@ -201,3 +201,77 @@ class InterestMapService:
                 (tok, bump, now, now),
             )
         self.db.commit()
+
+    # --- Phase 4: lightweight feedback ---
+    def apply_feedback(self, item_id: str, signal: str) -> int:
+        """Apply immediate user feedback to topics.
+
+        For 'up', lightly bump short- and long-term topic weights for the item's tokens.
+        For 'down', reduce short-term weights and gently reduce long-term, flooring at 0.
+
+        Returns number of tokens updated.
+        """
+        row = self.db.execute(
+            "SELECT url, COALESCE(title, '') FROM items WHERE item_id = ?",
+            (item_id,),
+        ).fetchone()
+        if not row:
+            return 0
+        url, title = row[0], row[1]
+
+        text = title or ""
+        try:
+            # Attempt extraction but tolerate failures
+            extractor = TextExtractor()
+            ext = extractor.extract(url)
+            if ext and ext.text:
+                text = (title or "") + "\n\n" + (ext.text or "")
+        except Exception:
+            pass
+
+        tokens = extract_tokens(text, max_tokens=80)
+        if not tokens:
+            return 0
+
+        now = int(time.time())
+        updated = 0
+
+        if signal == "up":
+            bump_s = 0.20
+            bump_l = 0.05
+            for tok in tokens:
+                self.db.execute(
+                    """
+                    INSERT INTO topics(token, wt_long, wt_short, last_updated)
+                    VALUES(?, ?, ?, ?)
+                    ON CONFLICT(token) DO UPDATE SET
+                      wt_long = wt_long + excluded.wt_long,
+                      wt_short = wt_short + excluded.wt_short,
+                      last_updated = ?
+                    """,
+                    (tok, bump_l, bump_s, now, now),
+                )
+                updated += 1
+            self.db.commit()
+            return updated
+
+        if signal == "down":
+            dec_s = 0.20
+            dec_l = 0.02
+            for tok in tokens:
+                # Floor at 0 to avoid negative weights
+                self.db.execute(
+                    """
+                    UPDATE topics
+                    SET wt_short = MAX(0.0, wt_short - ?),
+                        wt_long  = MAX(0.0, wt_long  - ?),
+                        last_updated = ?
+                    WHERE token = ?
+                    """,
+                    (dec_s, dec_l, now, tok),
+                )
+                updated += self.db.total_changes and 1 or 0
+            self.db.commit()
+            return updated
+
+        return 0
