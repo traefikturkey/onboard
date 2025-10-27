@@ -19,6 +19,14 @@
   
   ❌ WRONG: make target -j1
   ✅ CORRECT: make target
+
+  ❌ WRONG: FLASK_ENV=development FLASK_DEBUG=True uv run python run.py
+  ✅ CORRECT: uv run python run.py
+  ```
+- **ALWAYS use uv to run python commands**
+  ```
+  ❌ WRONG: python -m pytest tests/
+  ✅ CORRECT: uv run pytest tests/
   ```
 
 ### 3. NAVIGATION RULES
@@ -44,7 +52,9 @@
 - Whenever file creation is declined or unclear, propose alternatives that reuse existing files.
 
 ### 7. VERSION CONTROL RULES
-- When the user requests a commit and push, finish with a clean `git status` by committing and pushing every modified file.
+- **NEVER push unless explicitly requested** → Only push when user asks
+- When the user requests a commit (or commit and push), finish with a clean `git status` by committing every modified file.
+- If user requests push, verify all commits are included before pushing.
 
 ---
 
