@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.4
+# syntax=docker/dockerfile:1.7-labs
 ARG PYTHON_VERSION=3.12-slim-bookworm
 
 FROM python:${PYTHON_VERSION} as base
@@ -122,6 +122,9 @@ ENV UV_SYSTEM_PYTHON=1
 ENV UV_PROJECT_ENVIRONMENT=/usr/local
 # Allow modifying the system environment inside containers
 ENV UV_BREAK_SYSTEM_PACKAGES=1
+# Ensure cache directories are stable and match our cache mounts
+ENV XDG_CACHE_HOME=/root/.cache
+ENV UV_CACHE_DIR=/root/.cache/uv
 
 ENV ONBOARD_PORT=${ONBOARD_PORT:-9830}
 
@@ -165,14 +168,17 @@ FROM build-base as build
 
 # Copy lockfile and root pyproject for reproducible resolution
 COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
-# Copy source needed to build the package (setuptools expects run.py and app/)
-COPY app ${PROJECT_PATH}/app
-COPY run.py ${PROJECT_PATH}/run.py
 
 # Install Python dependencies into the system environment using uv
-RUN --mount=type=cache,target=/root/.cache/uv \
-    --mount=type=cache,target=/root/.cache/pip \
-    uv sync --no-editable --no-dev
+# IMPORTANT: do this BEFORE copying application sources so dependency layers cache
+# even when app code changes (only invalidated when pyproject/uv.lock changes).
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked \
+    --mount=type=cache,id=pip-cache,target=/root/.cache/pip,sharing=locked \
+    uv sync --frozen --no-editable --no-dev
+
+# Copy source needed to build/run the package
+COPY app ${PROJECT_PATH}/app
+COPY run.py ${PROJECT_PATH}/run.py
 
 
 # ----------------------------------------------------------------------
@@ -262,10 +268,9 @@ FROM development-base as devcontainer
 COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
 
 # Install Python dependencies into the system environment (run as root)
-RUN --mount=type=cache,target=/tmp/.cache/uv \
-    --mount=type=cache,target=/root/.cache/pip \
-    --mount=type=cache,target=/root/.cache/uv \
-    uv sync --dev && \
+RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked \
+    --mount=type=cache,id=pip-cache,target=/root/.cache/pip,sharing=locked \
+    uv sync --dev --frozen && \
     chown -R $USER:$USER /usr/local/lib/python*/site-packages/ && \
     chown -R $USER:$USER /usr/local/bin
 
