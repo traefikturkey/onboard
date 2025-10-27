@@ -57,7 +57,19 @@ class LinkTracker:
         self.cursor.execute("SELECT TIMESTAMP, LINK FROM CLICK_EVENTS")
         rows = self.cursor.fetchall()
         df = pd.DataFrame(rows, columns=["TIMESTAMP", "LINK"])
-        df["TIMESTAMP"] = pd.to_datetime(df["TIMESTAMP"])
+        # If there are no rows, return the empty dataframe immediately
+        if df.empty:
+            return df
+
+        # Parse timestamps with mixed format support. Timestamps may be stored
+        # in different formats:
+        # - ISO8601: 2025-08-15T16:02:33.206513
+        # - Space-separated: 2025-08-15 16:02:33.206513
+        # Use format='mixed' to handle both formats and coerce unparsable
+        # values to NaT instead of raising an error.
+        df["TIMESTAMP"] = pd.to_datetime(
+            df["TIMESTAMP"], format="mixed", errors="coerce"
+        )
         return df
 
     def __del__(self):
