@@ -74,11 +74,15 @@ buildx-setup:
 		echo "[buildx] Skipping setup: buildx is only available with docker runtime (current: $(CONTAINER_RUNTIME))"; \
 		exit 0; \
 	fi
-	@docker buildx ls | grep -q "onboard-builder" || docker buildx create --name onboard-builder --use >/dev/null
+	@sh -c 'if docker buildx version >/dev/null 2>&1; then \
+	  docker buildx ls | grep -q "onboard-builder" || docker buildx create --name onboard-builder --use >/dev/null; \
+	else \
+	  echo "[buildx] Plugin not available; will fall back to standard docker build"; \
+	fi'
 	@mkdir -p .buildcache
 
 buildx: .env buildx-setup
-	@if [ "$(CONTAINER_RUNTIME)" != "docker" ]; then \
+	@if [ "$(CONTAINER_RUNTIME)" != "docker" ] || ! docker buildx version >/dev/null 2>&1; then \
 		echo "[buildx] Using standard build since runtime is $(CONTAINER_RUNTIME)"; \
 		$(CONTAINER_RUNTIME) build -t onboard:prod --target production .; \
 	else \
@@ -93,7 +97,7 @@ buildx: .env buildx-setup
 	fi
 
 buildx-dev: .env buildx-setup
-	@if [ "$(CONTAINER_RUNTIME)" != "docker" ]; then \
+	@if [ "$(CONTAINER_RUNTIME)" != "docker" ] || ! docker buildx version >/dev/null 2>&1; then \
 		echo "[buildx] Using standard build since runtime is $(CONTAINER_RUNTIME)"; \
 		$(CONTAINER_RUNTIME) build --target devcontainer -t onboard .; \
 	else \
