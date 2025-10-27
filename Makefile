@@ -107,10 +107,10 @@ buildx-dev: .env buildx-setup
 			.; \
 	fi
 
-start: build
+start: buildx
 	$(CONTAINER_RUNTIME) run --rm -d --name onboard_prod_run -p 9830:9830 onboard:prod
 
-up: build
+up: buildx
 	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
 
 down:
@@ -120,7 +120,7 @@ logs:
 	$(CONTAINER_RUNTIME) logs onboard_prod_run -f
 
 
-restart: build down start
+restart: buildx down start
 
 # -------------------------------
 # Semantic version bumping logic
