@@ -41,6 +41,7 @@ app/configs/*
 app/static/.*-cache
 app/static/assets
 app/.working/
+app/tmp*.json
 
 # Notebooks data
 notebooks/data/
