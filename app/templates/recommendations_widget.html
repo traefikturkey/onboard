@@ -1,0 +1,38 @@
+<div class="box feed-box">
+  <div class="box-header feed-header">
+    <span class="box-header-link feed-header-link">Recommended for You</span>
+  </div>
+  <div class="box-content feed-content">
+    <ul data-widget="feed" data-open-id="">
+      {% if not items %}
+        <li>No recommendations yet</li>
+      {% else %}
+        {% for s in items %}
+          <li class="widget-item feed-item">
+            <a href="{{ s.url }}" class="feed-link" data-hx-boost="false" target="_blank" rel="noopener noreferrer">{{ s.title or s.url }}</a>
+            <div class="widget-item-toolbar" style="gap: 8px; display: inline-flex; margin-left: 8px;">
+              <button
+                class="btn-feedback-up"
+                title="More like this"
+                hx-post="/api/feedback"
+                hx-trigger="click"
+                hx-vals='{"item_id": "{{ s.item_id }}", "signal": "up"}'
+                hx-swap="none">
+                <i class="fas fa-thumbs-up"></i>
+              </button>
+              <button
+                class="btn-feedback-down"
+                title="Less like this"
+                hx-post="/api/feedback"
+                hx-trigger="click"
+                hx-vals='{"item_id": "{{ s.item_id }}", "signal": "down"}'
+                hx-swap="none">
+                <i class="fas fa-thumbs-down"></i>
+              </button>
+            </div>
+          </li>
+        {% endfor %}
+      {% endif %}
+    </ul>
+  </div>
+</div>

@@ -46,6 +46,10 @@ app/tmp*.json
 # Notebooks data
 notebooks/data/
 
+# Personalization data (generated)
+data/onboard.db
+data/chroma/
+
 # Specstory chat history checkpoint
 .devplanning/**/specstory_history_checkpoint/*.md
 

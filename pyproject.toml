@@ -28,6 +28,9 @@ dependencies = [
     "unidecode",
     "cssmin>=0.2.0",
     "pydantic>=2.0",
+    "sentence-transformers>=5.1.2",
+    "chromadb>=1.2.1",
+    "readability-lxml>=0.8.4.1",
 ]
 
 [tool.deptry.per_rule_ignores]
