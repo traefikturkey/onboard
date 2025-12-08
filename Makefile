@@ -187,3 +187,46 @@ version:
 integration-test:
 	@echo "Running integration tests..."
 	uv run pytest tests/integration -q || true
+
+# -------------------------------
+# Docker build benchmarking and testing
+# -------------------------------
+.PHONY: build-bench build-bench-dev test-build test-build-prod test-build-dev
+
+build-bench: .env
+	@echo "=== PRODUCTION BUILD BENCHMARK ==="
+	@echo "Build context size:"
+	@tar -cf - . 2>/dev/null | wc -c | awk '{printf "%.2f MB\n", $$1/1024/1024}'
+	@echo ""
+	time $(CONTAINER_RUNTIME) build -t onboard:bench-prod --target production .
+	@echo ""
+	@echo "Production image size: $$($(CONTAINER_RUNTIME) images onboard:bench-prod --format '{{.Size}}')"
+
+build-bench-dev: .env
+	@echo "=== DEVCONTAINER BUILD BENCHMARK ==="
+	@echo "Build context size:"
+	@tar -cf - . 2>/dev/null | wc -c | awk '{printf "%.2f MB\n", $$1/1024/1024}'
+	@echo ""
+	time $(CONTAINER_RUNTIME) build -t onboard:bench-dev --target devcontainer .
+	@echo ""
+	@echo "Devcontainer image size: $$($(CONTAINER_RUNTIME) images onboard:bench-dev --format '{{.Size}}')"
+
+test-build-prod: .env
+	@echo "=== Testing production build ==="
+	$(CONTAINER_RUNTIME) build -t onboard:test-prod --target production .
+	$(CONTAINER_RUNTIME) run --rm onboard:test-prod uv --version
+	$(CONTAINER_RUNTIME) run --rm onboard:test-prod python --version
+	@echo "Production build test PASSED"
+
+test-build-dev: .env
+	@echo "=== Testing devcontainer build ==="
+	$(CONTAINER_RUNTIME) build -t onboard:test-dev --target devcontainer .
+	$(CONTAINER_RUNTIME) run --rm onboard:test-dev uv --version
+	$(CONTAINER_RUNTIME) run --rm onboard:test-dev python --version
+	$(CONTAINER_RUNTIME) run --rm onboard:test-dev which claude
+	$(CONTAINER_RUNTIME) run --rm onboard:test-dev claude --version
+	@echo "Devcontainer build test PASSED"
+
+test-build: test-build-prod test-build-dev
+	@echo ""
+	@echo "=== ALL BUILD TESTS PASSED ==="

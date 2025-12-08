@@ -18,15 +18,21 @@ Maintain `.gitignore` and `.dockerignore` files with alphabetical ordering and p
 **Both files must include:**
 - Python bytecode (`*.pyc`, `__pycache__/`)
 - Build artifacts (`build/`, `dist/`, `*.egg-info/`)
-- Testing outputs (`.coverage`, `.htmlcov/`, `.pytest_cache/`)
-- Environment files (`.env.*`)
-- vscode extensions files (`.specstory/`)
+- Testing outputs (`.coverage*`, `htmlcov/`, `.pytest_cache/`)
+- Environment files (`.env`, `.env.*`)
+- AI/editor tool files (`.specstory/`, `.claude/`, `.spec/`)
+- Type checking (`.mypy_cache/`)
 
 **Only .gitignore:**
 - Editor files (`.vscode/`, `.idea/`)
 - Local development files
+- Build cache (`.buildcache/`)
 
 **Only .dockerignore:**
-- Documentation (`README.md`, `docs/`)  
+- Documentation (`*.md`, `LICENSE`, `CHANGELOG*`)
 - CI/CD files (`.github/`)
-- Git metadata (`.git/`, `.gitignore`)
+- Git metadata (`.git/`, `.gitignore`, `.gitattributes`)
+- Development environments (`.devcontainer/`, `.vscode/`, `.idea/`)
+- Tests (`tests/`)
+- Notebooks (`notebooks/`)
+- Data directories (`data/`)

@@ -10,8 +10,8 @@ ENV TZ=${TZ}
 ENV DEBIAN_FRONTEND=noninteractive
 ENV DEBCONF_NONINTERACTIVE_SEEN=true
 
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
+RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lists,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     bash \
     ca-certificates \
@@ -134,8 +134,8 @@ ENV ONBOARD_PORT=${ONBOARD_PORT:-9830}
 FROM base as build-base
 
 # Install build dependencies needed for compiling Python packages
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
+RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lists,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     bash \
     binutils \
@@ -167,7 +167,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 FROM build-base as build
 
 # Copy lockfile and root pyproject for reproducible resolution
-COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
+COPY uv.lock pyproject.toml ${PROJECT_PATH}/
 
 # Install Python dependencies into the system environment using uv
 # IMPORTANT: do this BEFORE copying application sources so dependency layers cache
@@ -211,8 +211,8 @@ CMD ["uv", "run", "--no-sync", "-m", "gunicorn", "run:app", "--bind", "0.0.0.0:9
 # ----------------------------------------------------------------------
 FROM build-base as development-base
 
-RUN --mount=type=cache,target=/var/cache/apt \
-    --mount=type=cache,target=/var/lib/apt/lists \
+RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
+    --mount=type=cache,id=apt-lists,target=/var/lib/apt/lists,sharing=locked \
     apt-get update && apt-get install -y --no-install-recommends \
     bash-completion \
     coreutils \
@@ -265,7 +265,7 @@ RUN --mount=type=cache,target=/var/cache/apt \
 FROM development-base as devcontainer
 
 # Copy lockfile and root pyproject for reproducible resolution
-COPY uv.lock* pyproject.toml ${PROJECT_PATH}/
+COPY uv.lock pyproject.toml ${PROJECT_PATH}/
 
 # Install Python dependencies into the system environment (run as root)
 RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked \
@@ -276,25 +276,15 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked \
 
 # ----------------------------------------------------------------------
 # Dev-only tools: install Claude Code CLI (devcontainer stage only)
-# - Claude Code is provided by Anthropic and is available as an npm package
-#   and via their bootstrap installer. Here we install the official npm
-#   package globally so the `claude` CLI is available in the developer
-#   container image without affecting production stages.
+# Uses the official bootstrap installer with explicit failure handling
 # ----------------------------------------------------------------------
-RUN --mount=type=cache,target=/home/${USER}/.claude/downloads \
-    --mount=type=cache,target=/home/${USER}/.cache \
-    mkdir -p /home/${USER}/.claude/downloads /home/${USER}/.cache /home/${USER}/.local/bin && \
-    chown -R ${USER}:${USER} /home/${USER}/.claude /home/${USER}/.cache /home/${USER}/.local || true && \
-    # Run the official bootstrap installer as the dev user while explicitly
-    # forcing the install to use a user-writable XDG cache and putting
-    # any launcher into the user's local bin. After installation, if a
-    # native binary was downloaded we create a stable symlink under
-    # /usr/local/bin so the command is on PATH for convenience.
-    gosu ${USER} env XDG_CACHE_HOME=/home/${USER}/.cache bash -lc 'curl -fsSL https://claude.ai/install.sh | bash -s -- stable' || true && \
-    # locate the native claude binary (if any) and symlink into a PATH'd
-    # location so it's immediately usable by the dev user and tools.
-    BINPATH=$(ls -1 /home/${USER}/.local/bin/claude 2>/dev/null || ls -1 /home/${USER}/.claude/downloads/*/claude 2>/dev/null || true) && \
-    if [ -n "${BINPATH}" ]; then ln -sf "${BINPATH}" /usr/local/bin/claude && chmod a+x /usr/local/bin/claude || true; fi
+RUN --mount=type=cache,id=claude-cache,target=/home/${USER}/.cache,sharing=locked \
+    mkdir -p /home/${USER}/.cache /home/${USER}/.local/bin && \
+    chown -R ${USER}:${USER} /home/${USER}/.cache /home/${USER}/.local && \
+    gosu ${USER} env XDG_CACHE_HOME=/home/${USER}/.cache \
+        bash -c 'curl -fsSL https://claude.ai/install.sh | bash -s -- stable' && \
+    ln -sf /home/${USER}/.local/bin/claude /usr/local/bin/claude && \
+    claude --version
 
 
 # Switch to non-root user for development

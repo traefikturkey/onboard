@@ -39,19 +39,22 @@ applyTo: "**/Dockerfile*"
 
 ### BuildKit Features
 - Use cache mounts for RUN commands
+- Use named cache IDs with `sharing=locked` for cross-stage cache sharing
 
 ### Build Performance Optimization
 - Order COPY operations from least to most frequently changing
 - Copy dependency files (requirements.txt, pyproject.toml, package.json) before source code
-- Use cache mounts for package managers: `--mount=type=cache,target=/root/.cache/pip`
+- Use cache mounts for package managers: `--mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked`
+- Use named APT cache IDs for cross-stage sharing: `--mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked`
 - Implement multi-stage builds with dedicated dependency stages
 - Pin base image versions to exact patches for consistent caching
-- Use BuildKit cache exports for CI/CD: `--cache-to=type=registry` and `--cache-from=type=registry`
+- Use BuildKit cache exports for CI/CD: `--cache-to=type=local,dest=.buildcache` and `--cache-from=type=local,src=.buildcache`
 - Keep .dockerignore comprehensive to minimize build context
+- Avoid glob patterns in COPY commands (use explicit filenames like `COPY uv.lock` not `COPY uv.lock*`)
 
 ### Build Context Optimization
 - Maintain comprehensive .dockerignore files
-- Exclude: tests/, .git/, __pycache__/, *.pyc, .coverage/, notebooks/, .spec/
+- Exclude: tests/, .git/, .github/, .devcontainer/, __pycache__/, *.pyc, .coverage/, notebooks/, .spec/, .claude/, .specstory/, *.md, .env*
 - Include only necessary files in build context
 - Regularly audit .dockerignore for new directories
 

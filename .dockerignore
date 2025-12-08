@@ -1,3 +1,92 @@
-app/config
-app/archive
-app/.working
+# =============================================================================
+# Docker Build Context Exclusions
+# Reduces build context size significantly
+# =============================================================================
+
+# --- Version Control ---
+.git/
+.gitignore
+.gitattributes
+
+# --- Development Environments ---
+.venv/
+.devcontainer/
+.vscode/
+.idea/
+*.code-workspace
+
+# --- Python Artifacts ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+
+# --- Testing ---
+.pytest_cache/
+.coverage*
+coverage.xml
+htmlcov/
+.tox/
+.nox/
+
+# --- Type Checking ---
+.mypy_cache/
+
+# --- Environment and Secrets ---
+.env
+.env.*
+*.local
+
+# --- Claude/AI Tools ---
+.claude/
+.specstory/
+.spec/
+
+# --- Build Artifacts ---
+.buildcache/
+*.log
+
+# --- Project-specific exclusions ---
+app/config/
+app/archive/
+app/.working/
+app/configs/*.db
+app/configs/*.sqlite3
+app/static/.*-cache
+app/static/assets/
+app/feed_cache/
+notebooks/
+data/
+
+# --- Documentation ---
+*.md
+!app/**/*.md
+LICENSE
+CHANGELOG*
+CONTRIBUTING*
+
+# --- IDE and Editor ---
+.editorconfig
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# --- CI/CD ---
+.github/
+
+# --- Tests (not needed in production image) ---
+tests/
+
+# --- Temporary Files ---
+*.tmp
+*.temp
+*.bak
+tmp/
+temp/

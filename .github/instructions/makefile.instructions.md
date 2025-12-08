@@ -102,6 +102,13 @@ export SEMANTIC_VERSION
 - `run` - Start application locally
 - include version management targets
 
+### Docker Build Targets
+- `build` / `build-dev` - Standard Docker builds for production/devcontainer
+- `buildx` / `buildx-dev` - BuildKit builds with local cache export/import
+- `build-bench` / `build-bench-dev` - Benchmarking builds with timing and context size
+- `test-build-prod` / `test-build-dev` - Validation builds that verify key binaries work
+- `test-build` - Run both production and devcontainer validation
+
 #### Version Management Example
 
 ```makefile
