@@ -274,6 +274,28 @@ RUN --mount=type=cache,id=uv-cache,target=/root/.cache/uv,sharing=locked \
     chown -R $USER:$USER /usr/local/lib/python*/site-packages/ && \
     chown -R $USER:$USER /usr/local/bin
 
+# ----------------------------------------------------------------------
+# Dev-only tools: install Claude Code CLI (devcontainer stage only)
+# - Claude Code is provided by Anthropic and is available as an npm package
+#   and via their bootstrap installer. Here we install the official npm
+#   package globally so the `claude` CLI is available in the developer
+#   container image without affecting production stages.
+# ----------------------------------------------------------------------
+RUN --mount=type=cache,target=/home/${USER}/.claude/downloads \
+    --mount=type=cache,target=/home/${USER}/.cache \
+    mkdir -p /home/${USER}/.claude/downloads /home/${USER}/.cache /home/${USER}/.local/bin && \
+    chown -R ${USER}:${USER} /home/${USER}/.claude /home/${USER}/.cache /home/${USER}/.local || true && \
+    # Run the official bootstrap installer as the dev user while explicitly
+    # forcing the install to use a user-writable XDG cache and putting
+    # any launcher into the user's local bin. After installation, if a
+    # native binary was downloaded we create a stable symlink under
+    # /usr/local/bin so the command is on PATH for convenience.
+    gosu ${USER} env XDG_CACHE_HOME=/home/${USER}/.cache bash -lc 'curl -fsSL https://claude.ai/install.sh | bash -s -- stable' || true && \
+    # locate the native claude binary (if any) and symlink into a PATH'd
+    # location so it's immediately usable by the dev user and tools.
+    BINPATH=$(ls -1 /home/${USER}/.local/bin/claude 2>/dev/null || ls -1 /home/${USER}/.claude/downloads/*/claude 2>/dev/null || true) && \
+    if [ -n "${BINPATH}" ]; then ln -sf "${BINPATH}" /usr/local/bin/claude && chmod a+x /usr/local/bin/claude || true; fi
+
 
 # Switch to non-root user for development
 USER ${USER}
