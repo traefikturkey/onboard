@@ -1,6 +1,9 @@
 # Development-specific Makefile targets
 # This file contains targets that are primarily useful in development environments
 
+# Ensure uv cache is writable by non-root user (fallback for older containers)
+export UV_CACHE_DIR := $(HOME)/.cache/uv
+
 # read and include .devcontainer/.env exporting all variables
 ifneq (,$(wildcard .devcontainer/.env))
 	include .devcontainer/.env

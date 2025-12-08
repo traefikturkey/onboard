@@ -186,6 +186,10 @@ COPY run.py ${PROJECT_PATH}/run.py
 # ----------------------------------------------------------------------
 FROM base as production
 
+# Override cache paths for non-root user in production
+ENV XDG_CACHE_HOME=/home/${USER}/.cache
+ENV UV_CACHE_DIR=/home/${USER}/.cache/uv
+
 # Copy application code into the project directory root (creates ${PROJECT_PATH}/app)
 COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
 # Copy the run script at project root so gunicorn can import `run:app`
@@ -289,6 +293,10 @@ RUN --mount=type=cache,id=claude-cache,target=/home/${USER}/.cache,sharing=locke
 
 # Switch to non-root user for development
 USER ${USER}
+
+# Override cache paths for non-root user in devcontainer
+ENV XDG_CACHE_HOME=/home/${USER}/.cache
+ENV UV_CACHE_DIR=/home/${USER}/.cache/uv
 
 # Note: For production images, don't set DOCKER_BUILDKIT/COMPOSE_DOCKER_CLI_BUILD.
 # We set DOCKER_BUILDKIT=1 only in the devcontainer stage to affect the docker CLI inside the container.
