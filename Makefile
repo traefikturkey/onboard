@@ -69,9 +69,6 @@ export CONTAINER_RUNTIME
 export DETECTED_OS
 export SEMANTIC_VERSION
 
-up: build
-	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
-
 .env:
 	touch .env
 
