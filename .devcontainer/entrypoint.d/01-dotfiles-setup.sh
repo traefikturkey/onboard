@@ -1,6 +1,5 @@
 #!/bin/bash
 set -o errexit   # abort on nonzero exitstatus
-set -o nounset   # abort on unbound variable
 set -o pipefail  # don't hide errors within pipes
 # set -x # Uncomment for debugging
 
@@ -9,10 +8,14 @@ set -o pipefail  # don't hide errors within pipes
 
 DOTFILES_DIR="$HOME/.dotfiles"
 
-if [ -z "$USER_DOTFILES_URL" ]; then
+# Check if USER_DOTFILES_URL is set (without nounset so we can check safely)
+if [ -z "${USER_DOTFILES_URL:-}" ]; then
     echo "USER_DOTFILES_URL not set, skipping dotfiles setup"
     exit 0
 fi
+
+# Now that we know it's set, enable nounset for the rest of the script
+set -o nounset
 
 echo "Setting up dotfiles from: $USER_DOTFILES_URL"
 
@@ -22,14 +25,14 @@ NEED_INSTALL=false
 if [ -d "$DOTFILES_DIR" ]; then
     echo "Dotfiles directory exists, updating..."
     cd "$DOTFILES_DIR"
-    
+
     # Check if there are any uncommitted changes
     if ! git diff-index --quiet HEAD --; then
         echo "Uncommitted changes detected, checking if they're just VS Code .gitconfig helpers..."
-        
+
         # Get list of modified files
         MODIFIED_FILES=$(git diff-index --name-only HEAD --)
-        
+
         # Check if only .gitconfig is modified
         if [ "$MODIFIED_FILES" = ".gitconfig" ] || [ "$MODIFIED_FILES" = "git/.gitconfig" ] || [ "$MODIFIED_FILES" = "gitconfig" ]; then
             # Check if changes are only VS Code credential helper additions
@@ -44,15 +47,15 @@ if [ -d "$DOTFILES_DIR" ]; then
             echo "Changes to files other than .gitconfig detected, keeping changes and attempting pull..."
         fi
     fi
-    
+
     # Capture current HEAD before pull
     OLD_HEAD=$(git rev-parse HEAD)
-    
+
     git pull || {
         echo "Failed to update dotfiles repository"
         exit 1
     }
-    
+
     # Check if pull resulted in new commits
     NEW_HEAD=$(git rev-parse HEAD)
     if [ "$OLD_HEAD" != "$NEW_HEAD" ]; then
