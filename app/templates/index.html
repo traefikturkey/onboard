@@ -79,6 +79,35 @@
 	</div>
 </body>
 <script>
+// Clean up any loading classes that may have been added during page initialization.
+// The loading-states HTMX extension should only add these during actual requests,
+// but race conditions during page load can leave stale classes.
+;(function(){
+	function cleanupLoadingStates() {
+		document.querySelectorAll('.tab-loading').forEach(el => {
+			el.classList.remove('tab-loading');
+		});
+		document.querySelectorAll('.widget-loading').forEach(el => {
+			el.classList.remove('widget-loading');
+			el.removeAttribute('aria-busy');
+			el.removeAttribute('aria-live');
+		});
+	}
+	// Run cleanup after DOM is ready and after a short delay to catch late additions
+	if (document.readyState === 'loading') {
+		document.addEventListener('DOMContentLoaded', () => {
+			cleanupLoadingStates();
+			setTimeout(cleanupLoadingStates, 100);
+		});
+	} else {
+		cleanupLoadingStates();
+		setTimeout(cleanupLoadingStates, 100);
+	}
+	// Also clean up after HTMX settles, in case the extension misbehaves
+	document.addEventListener('htmx:afterSettle', cleanupLoadingStates);
+})();
+</script>
+<script>
 // Dev-only helper: detect and clean up lingering loading indicators which
 // can cause continuous CSS animations and repaints. Runs only on localhost.
 ;(function(){
@@ -89,25 +118,26 @@
 		// Periodically log counts for quick diagnosis in DevTools
 		setInterval(() => {
 			const widgetLoading = document.querySelectorAll('.widget-loading').length;
+			const tabLoading = document.querySelectorAll('.tab-loading').length;
 			const overlays = document.querySelectorAll('.loading-overlay.loading').length;
-			if (widgetLoading || overlays) {
-				console.warn('DEBUG: widget-loading:', widgetLoading, 'loading-overlay.loading:', overlays);
+			if (widgetLoading || tabLoading || overlays) {
+				console.warn('DEBUG: widget-loading:', widgetLoading, 'tab-loading:', tabLoading, 'loading-overlay.loading:', overlays);
 			}
 		}, 2000);
 
-		// Remove any .widget-loading classes that persist longer than 8s as a
+		// Remove any loading classes that persist longer than 8s as a
 		// defensive measure during development so stray animations don't burn CPU.
 		const CLEANUP_MS = 8000;
 		const seen = new Map();
 
 		setInterval(() => {
-			document.querySelectorAll('.widget-loading').forEach(el => {
+			document.querySelectorAll('.widget-loading, .tab-loading').forEach(el => {
 				const now = Date.now();
 				if (!seen.has(el)) seen.set(el, now);
 				const firstSeen = seen.get(el) || now;
 				if (now - firstSeen > CLEANUP_MS) {
-					console.warn('DEBUG: removing stale .widget-loading on', el);
-					el.classList.remove('widget-loading');
+					console.warn('DEBUG: removing stale loading class on', el);
+					el.classList.remove('widget-loading', 'tab-loading');
 					el.removeAttribute('aria-busy');
 					el.removeAttribute('aria-live');
 					seen.delete(el);
@@ -115,7 +145,7 @@
 			});
 			// Cleanup map entries for elements that no longer have the class
 			for (const [el] of Array.from(seen.entries())) {
-				if (!el.classList || !el.classList.contains('widget-loading')) seen.delete(el);
+				if (!el.classList || (!el.classList.contains('widget-loading') && !el.classList.contains('tab-loading'))) seen.delete(el);
 			}
 		}, 1000);
 	} catch (err) {
