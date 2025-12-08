@@ -118,7 +118,7 @@ def test_from_dict_dispatch(widget_data):
     ) as mock_bookmarks:
         result = Widget.from_dict(widget_data)
         assert result == "bookmarks_instance"
-        mock_bookmarks.assert_called_once_with(widget_data)
+        mock_bookmarks.assert_called_once_with(widget_data, bookmark_manager=None)
 
     # Iframe type
     widget_data["type"] = "iframe"

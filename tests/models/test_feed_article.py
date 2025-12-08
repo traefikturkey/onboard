@@ -115,8 +115,14 @@ class TestFeed(unittest.TestCase):
 
 class TestBookmarksColumnExceptions(unittest.TestCase):
     def test_bookmarks_from_dict(self):
-        widget = {"bookmarks": [{"name": "b1", "link": "l1"}], "name": "bookmarks1"}
-        b = Bookmarks(widget)
+        # Create a mock bookmark_manager with sections
+        mock_manager = MagicMock()
+        mock_manager.get_section.return_value = {
+            "displayName": "Test",
+            "bookmarks": [{"name": "b1", "link": "l1"}],
+        }
+        widget = {"bookmarks_section": "test-section", "name": "bookmarks1"}
+        b = Bookmarks(widget, bookmark_manager=mock_manager)
         self.assertTrue(len(b.items) == 1)
 
     def test_column_from_dict_empty(self):

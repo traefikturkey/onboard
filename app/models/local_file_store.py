@@ -1,5 +1,7 @@
 import json
+import os
 import shutil
+import tempfile
 from pathlib import Path
 from typing import List
 
@@ -14,12 +16,21 @@ class LocalFileStore(CacheStore):
             return json.load(f)
 
     def write_json_atomic(self, path: Path, data: dict) -> None:
-        tmp = path.with_suffix(path.suffix + ".tmp")
+        # Ensure parent directory exists
         path.parent.mkdir(parents=True, exist_ok=True)
-        with open(tmp, "w", encoding="utf-8") as f:
-            json.dump(data, f, indent=2)
-        # os.replace or Path.replace is atomic on POSIX
-        tmp.replace(path)
+
+        # Use tempfile.NamedTemporaryFile for safer temp file handling
+        # Create in same directory to ensure atomic rename works
+        with tempfile.NamedTemporaryFile(
+            mode="w", encoding="utf-8", dir=path.parent, delete=False, suffix=".tmp"
+        ) as tmp:
+            json.dump(data, tmp, indent=2)
+            tmp.flush()
+            os.fsync(tmp.fileno())
+            tmp_path = Path(tmp.name)
+
+        # Atomic replace (POSIX guarantees atomicity)
+        os.replace(tmp_path, path)
 
     def list_dir(self, path: Path) -> List[Path]:
         if not path.exists():

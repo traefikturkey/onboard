@@ -74,7 +74,10 @@ class Layout:
         logger.debug("Beginning Layout reload...")
         Scheduler.clear_jobs()
         content = self._load_layout_from_file()
-        self.tabs = from_list(Tab.from_dict, content.get("tabs", []))
+        self.tabs = [
+            Tab.from_dict(t, bookmark_manager=self.bar_manager)
+            for t in content.get("tabs", [])
+        ]
         self.headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
 
         self.last_reload = self.mtime

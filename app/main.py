@@ -57,6 +57,11 @@ else:
 cache = Cache(app, config=cache_config)
 page_timeout = int(os.environ.get("ONBOARD_PAGE_TIMEOUT", 600))
 
+# Register API blueprints
+from app.api.bookmarks import bookmarks_api
+
+app.register_blueprint(bookmarks_api)
+
 assets = Environment(app)
 
 css = Bundle("css/*.css", filters="cssmin", output="assets/common.css")
@@ -215,6 +220,11 @@ def refresh(feed_id):
     # layout exposes refresh_feeds (plural); call the correct method
     layout.refresh_feeds(feed_id)
     return redirect("/", code=302)
+
+
+@app.route("/bookmarks/manage")
+def bookmarks_manage():
+    return render_template("bookmarks_manager.html")
 
 
 @app.route("/api/healthcheck")

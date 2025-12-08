@@ -17,11 +17,15 @@ class TestBookmarkFaviconServices(unittest.TestCase):
         self.tmpdir = tempfile.TemporaryDirectory()
         configs = Path(self.tmpdir.name) / "configs"
         configs.mkdir()
-        bb = [
-            {"href": "http://example.com/a"},
-            {"contents": [{"href": "http://example.com/b"}]},
-        ]
-        (configs / "bookmarks_bar.json").write_text(json.dumps(bb))
+        # Use consolidated schema with bar + sections
+        bb = {
+            "bar": [
+                {"href": "http://example.com/a"},
+                {"contents": [{"href": "http://example.com/b"}]},
+            ],
+            "sections": {},
+        }
+        (configs / "bookmarks.json").write_text(json.dumps(bb))
 
         # Patch the pwd used by utils and the services modules so they resolve
         # filesystem paths under the temporary directory created for the test.
@@ -50,7 +54,7 @@ class TestBookmarkFaviconServices(unittest.TestCase):
 
         fs = MagicMock(spec=FS)
         with patch("app.services.bookmark_bar_manager.FaviconStore", return_value=fs):
-            bbm = BookmarkBarManager("configs/bookmarks_bar.json")
+            bbm = BookmarkBarManager("configs/bookmarks.json")
             urls = bbm.bookmarks_list(bbm.bar)
             self.assertIn("http://example.com/a", urls)
             self.assertIn("http://example.com/b", urls)

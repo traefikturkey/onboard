@@ -27,6 +27,7 @@ dependencies = [
     "requests",
     "unidecode",
     "cssmin>=0.2.0",
+    "pydantic>=2.0",
 ]
 
 [tool.deptry.per_rule_ignores]
