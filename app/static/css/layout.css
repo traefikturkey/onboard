@@ -46,5 +46,8 @@ footer {
   width: 100%;
   background-color: #1a1a1c;
   margin-top: auto;
-  text-align: center;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 1rem;
 }
