@@ -46,6 +46,126 @@ class TestFeedArticle(unittest.TestCase):
         self.assertTrue(a.removed)
         self.assertNotIn("stripme", a.description)
 
+    def test_filter_remove_case_insensitive(self):
+        """Remove filter should be case insensitive."""
+        parent = MagicMock()
+        parent.filters = [
+            {"type": "remove", "text": "SPAM", "attribute": "title"},
+        ]
+
+        a = FeedArticle(
+            original_title="Orig",
+            title="this is spam content",
+            link="l",
+            description="desc",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        self.assertTrue(a.removed)
+
+    def test_filter_remove_regex_pattern(self):
+        """Remove filter should support regex patterns."""
+        parent = MagicMock()
+        parent.filters = [
+            {"type": "remove", "text": r"\[AD\]|\[Sponsored\]", "attribute": "title"},
+        ]
+
+        a1 = FeedArticle(
+            original_title="O",
+            title="[AD] Buy this now",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        self.assertTrue(a1.removed)
+
+        a2 = FeedArticle(
+            original_title="O",
+            title="Normal article",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        self.assertFalse(a2.removed)
+
+    def test_filter_strip_removes_pattern(self):
+        """Strip filter removes matching text."""
+        parent = MagicMock()
+        parent.filters = [
+            {"type": "strip", "text": r"\s*-\s*Read more$", "attribute": "description"},
+        ]
+
+        a = FeedArticle(
+            original_title="O",
+            title="T",
+            link="l",
+            description="Article summary - Read more",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        self.assertEqual(a.description, "Article summary")
+
+    def test_filter_unknown_type_ignored(self):
+        """Unknown filter types are silently ignored."""
+        parent = MagicMock()
+        parent.filters = [
+            {"type": "unknown_filter", "text": "test", "attribute": "title"},
+        ]
+
+        a = FeedArticle(
+            original_title="O",
+            title="test title",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        # Should not raise and article should not be modified
+        self.assertFalse(a.removed)
+        self.assertEqual(a.title, "test title")
+
+    def test_filter_nonexistent_attribute_ignored(self):
+        """Filter on nonexistent attribute is silently ignored."""
+        parent = MagicMock()
+        parent.filters = [
+            {"type": "remove", "text": "test", "attribute": "nonexistent_field"},
+        ]
+
+        a = FeedArticle(
+            original_title="O",
+            title="T",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        # Should not raise
+        self.assertFalse(a.removed)
+
+    def test_no_filters_does_not_modify(self):
+        """Article without filters should not be removed."""
+        parent = MagicMock()
+        parent.filters = None
+
+        a = FeedArticle(
+            original_title="O",
+            title="T",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=parent,
+        )
+        self.assertFalse(a.removed)
+
 
 class TestFeed(unittest.TestCase):
     def setUp(self):

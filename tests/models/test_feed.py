@@ -252,9 +252,24 @@ class TestFeed(unittest.TestCase):
         f = Feed(widget)
         f._last_updated = datetime.now()  # just now
 
-        # Mock the force_update check to return False, then test the time-based logic
-        with patch("app.models.feed.os.getenv", return_value=""):
-            self.assertFalse(f.needs_update)
+        # With the fix, empty string is not in ("true", "1", "yes") so force_update is False
+        self.assertFalse(f.needs_update)
+
+    def test_needs_update_force_update_variations(self):
+        """needs_update correctly parses various ONBOARD_FEED_FORCE_UPDATE values."""
+        widget = self.make_widget()
+        f = Feed(widget)
+        f._last_updated = datetime.now()  # recently updated
+
+        # These should all trigger force update
+        for value in ["true", "True", "TRUE", "1", "yes", "YES"]:
+            with patch.dict(os.environ, {"ONBOARD_FEED_FORCE_UPDATE": value}):
+                self.assertTrue(f.needs_update, f"Expected True for '{value}'")
+
+        # These should NOT trigger force update
+        for value in ["false", "False", "0", "no", "", "anything"]:
+            with patch.dict(os.environ, {"ONBOARD_FEED_FORCE_UPDATE": value}):
+                self.assertFalse(f.needs_update, f"Expected False for '{value}'")
 
     def test_processors_returns_noop_when_processor_file_missing(self):
         """processors() returns NoOpFeedProcessor when processor file doesn't exist."""

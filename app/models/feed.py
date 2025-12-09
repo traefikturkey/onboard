@@ -129,7 +129,11 @@ class Feed(Widget):
 
     @property
     def needs_update(self):
-        force_update = bool(os.getenv("ONBOARD_FEED_FORCE_UPDATE", "False"))
+        force_update = os.getenv("ONBOARD_FEED_FORCE_UPDATE", "").lower() in (
+            "true",
+            "1",
+            "yes",
+        )
         # if there is no last_updated time, or if it's more 10 minutes ago, then force an update
         return (
             force_update
