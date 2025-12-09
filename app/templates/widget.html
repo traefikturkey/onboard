@@ -32,7 +32,7 @@
   <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item">
   {% endif %}
           {% set link = article.tracking_link if article.tracking_link else article.link %}
-          <a href="{{ link }}" class="{{ widget.type }}-link" data-hx-boost="false" data-stop-propagation>{{ article.name }}</a>
+          <a href="{{ link }}" data-real-url="{{ article.link }}" class="{{ widget.type }}-link" data-hx-boost="false" data-stop-propagation>{{ article.name }}</a>
           {% if article.summary %}
           <div class="widget-item-toolbar">
             <i class="fas fa-chevron-down" data-toggle-icon-for="{{ article.id }}"></i>

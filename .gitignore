@@ -46,6 +46,9 @@ app/tmp*.json
 # Notebooks data
 notebooks/data/
 
+# Runtime database and data files
+data/
+
 # Specstory chat history checkpoint
 .devplanning/**/specstory_history_checkpoint/*.md
 

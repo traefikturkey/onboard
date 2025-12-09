@@ -282,4 +282,22 @@
 	});
 })();
 </script>
+<script>
+// Show real URL in browser status bar on hover while preserving click tracking.
+// Feed links use /redirect/... URLs for tracking; this swaps to the real URL on hover.
+(function(){
+	document.addEventListener('mouseenter', function(e) {
+		const link = e.target.closest('a[data-real-url]');
+		if (!link) return;
+		link.dataset.trackingUrl = link.href;
+		link.href = link.dataset.realUrl;
+	}, true);
+
+	document.addEventListener('mouseleave', function(e) {
+		const link = e.target.closest('a[data-real-url]');
+		if (!link || !link.dataset.trackingUrl) return;
+		link.href = link.dataset.trackingUrl;
+	}, true);
+})();
+</script>
 </html>
