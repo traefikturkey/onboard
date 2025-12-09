@@ -6,6 +6,7 @@ from pathlib import Path
 import yaml
 
 from app.services.bookmark_bar_manager import BookmarkBarManager
+from app.services.bookmarks_migrator import BookmarksMigrator
 
 from .apscheduler import Scheduler
 from .bookmark import Bookmark
@@ -32,6 +33,12 @@ class Layout:
         except Exception:
             # Don't raise on startup copy failure; let reload surface issues
             logger.exception("Failed to copy default configs")
+
+        # Auto-migrate legacy inline bookmarks to bookmarks_section format
+        try:
+            _auto_migrate_bookmarks()
+        except Exception:
+            logger.exception("Failed to auto-migrate bookmarks")
 
         self.config_path = pwd.joinpath(config_file)
 
@@ -220,3 +227,26 @@ def _copy_default_to_configs():
 
     if files_copied == 0:
         logger.info(f"No files copied from {default_dir} to {config_dir}.")
+
+
+def _auto_migrate_bookmarks():
+    """Auto-migrate legacy inline bookmarks to bookmarks_section format.
+
+    Runs the BookmarksMigrator against the app directory to convert any
+    layout.yml files that still have inline 'bookmarks' arrays to use
+    'bookmarks_section' references instead.
+    """
+    migrator = BookmarksMigrator(app_root=pwd)
+    report = migrator.migrate()
+
+    if report.changed:
+        for directory_report in report.directories:
+            if directory_report.created or directory_report.updated:
+                logger.info(
+                    "Auto-migrated bookmarks in %s: %s -> %s",
+                    directory_report.scope,
+                    directory_report.old_bookmarks,
+                    directory_report.new_bookmarks,
+                )
+    else:
+        logger.debug("No bookmark migration needed.")

@@ -36,6 +36,9 @@ class MigrationReport:
         return any(report.created or report.updated for report in self.directories)
 
 
+CURRENT_SCHEMA_VERSION = 2
+
+
 class BookmarksMigrator:
     """Migrate legacy bookmark configuration into the consolidated schema."""
 
@@ -65,6 +68,19 @@ class BookmarksMigrator:
         old_file = base_dir / self.old_filename
         new_file = base_dir / self.new_filename
         layout_file = base_dir / self.layout_filename
+
+        # Check schema version first - skip if already at current version
+        if self._get_layout_schema_version(layout_file) >= CURRENT_SCHEMA_VERSION:
+            return DirectoryReport(
+                scope=scope,
+                old_bookmarks=old_file,
+                new_bookmarks=new_file,
+                layout=layout_file,
+                created=False,
+                updated=False,
+                skipped=True,
+                reason="already at schema version %d" % CURRENT_SCHEMA_VERSION,
+            )
 
         if not old_file.exists():
             return DirectoryReport(
@@ -163,6 +179,19 @@ class BookmarksMigrator:
                 skipped=True,
                 reason="write failure",
             )
+
+    def _get_layout_schema_version(self, layout_path: Path) -> int:
+        """Get the schema_version from a layout file, defaulting to 1 if not present."""
+        if not layout_path.exists():
+            return 1
+
+        try:
+            with layout_path.open("r", encoding="utf-8") as handle:
+                layout = yaml.safe_load(handle) or {}
+        except yaml.YAMLError:
+            return 1
+
+        return layout.get("schema_version", 1)
 
     def _layout_has_inline_bookmarks(self, layout_path: Path) -> bool:
         """Check if layout.yml still has inline bookmarks that need migration."""
@@ -291,6 +320,9 @@ class BookmarksMigrator:
                     update_widget(item)
 
         update_widget(layout)
+
+        # Set schema_version to mark as migrated
+        layout["schema_version"] = CURRENT_SCHEMA_VERSION
 
         if not self.dry_run:
             with tempfile.NamedTemporaryFile(
