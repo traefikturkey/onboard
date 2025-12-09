@@ -202,10 +202,12 @@ COPY --from=build /usr/local/bin /usr/local/bin
 ENV FLASK_ENV=production
 # Use default Python import paths; rely on ${PROJECT_PATH} as the working dir
 
-# Create necessary directories for static assets
+# Create necessary directories for static assets and cache
 RUN mkdir -p ${PROJECT_PATH}/static/icons && \
     mkdir -p ${PROJECT_PATH}/static/assets && \
-    chown -R ${USER}:${USER} ${PROJECT_PATH}
+    mkdir -p /home/${USER}/.cache/uv && \
+    chown -R ${USER}:${USER} ${PROJECT_PATH} && \
+    chown -R ${USER}:${USER} /home/${USER}/.cache
 
 # Run the app with gunicorn via uv without a shell
 CMD ["uv", "run", "--no-sync", "-m", "gunicorn", "run:app", "--bind", "0.0.0.0:9830", "--access-logfile", "-", "--error-logfile", "-"]
