@@ -406,3 +406,122 @@ class TestUIRoute:
         assert response.status_code == 200
         assert b"Bookmark Manager" in response.data
         assert b"bookmarkManager()" in response.data
+
+
+class TestAdditionalCoverage:
+    """Additional tests for uncovered code paths."""
+
+    def test_get_bar_bookmark_success(self, client, mock_bookmark_manager):
+        """Test getting a specific bar bookmark by index."""
+        mock_bookmark_manager.get_bar_bookmark.return_value = {
+            "name": "Google",
+            "href": "https://google.com",
+        }
+
+        response = client.get("/api/bookmarks/bar/0")
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["success"] is True
+        assert data["data"]["name"] == "Google"
+
+    def test_get_bar_bookmark_not_found(self, client, mock_bookmark_manager):
+        """Test getting a non-existent bar bookmark."""
+        mock_bookmark_manager.get_bar_bookmark.side_effect = InvalidIndexError(
+            "Index out of range"
+        )
+
+        response = client.get("/api/bookmarks/bar/999")
+
+        assert response.status_code == 404
+
+    def test_add_bar_bookmark_empty_body(self, client):
+        """Test adding bookmark with empty request body."""
+        response = client.post(
+            "/api/bookmarks/bar",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+
+        # Empty body should trigger validation error
+        assert response.status_code == 400
+
+    def test_get_section_success(self, client, mock_bookmark_manager):
+        """Test getting a specific section."""
+        mock_bookmark_manager.get_section.return_value = {
+            "displayName": "Work",
+            "bookmarks": [{"name": "Test", "link": "https://test.com"}],
+        }
+
+        response = client.get("/api/bookmarks/sections/work")
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["success"] is True
+        assert data["data"]["displayName"] == "Work"
+
+    def test_get_section_not_found(self, client, mock_bookmark_manager):
+        """Test getting a non-existent section returns null data."""
+        mock_bookmark_manager.get_section.return_value = None
+
+        response = client.get("/api/bookmarks/sections/nonexistent")
+        data = json.loads(response.data)
+
+        # API returns 200 with null data when section not found
+        assert response.status_code == 200
+        assert data["data"] is None
+
+    def test_update_section_missing_body(self, client):
+        """Test updating section with missing request body."""
+        response = client.put(
+            "/api/bookmarks/sections/work",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+
+        # Empty body should trigger validation error or missing data error
+        assert response.status_code in [400, 500]
+
+    def test_add_section_bookmark_missing_body(self, client):
+        """Test adding section bookmark with empty body."""
+        response = client.post(
+            "/api/bookmarks/sections/work/bookmarks",
+            data=json.dumps({}),
+            content_type="application/json",
+        )
+
+        # Empty body should fail validation
+        assert response.status_code == 400
+
+    def test_reorder_bar_bookmarks_invalid_index(self, client, mock_bookmark_manager):
+        """Test reorder with invalid indices."""
+        mock_bookmark_manager.reorder_bar_bookmarks.side_effect = InvalidIndexError(
+            "Invalid index"
+        )
+
+        response = client.post(
+            "/api/bookmarks/bar/reorder",
+            data=json.dumps({"indices": [99, 0, 1]}),
+            content_type="application/json",
+        )
+
+        assert response.status_code == 400
+
+    def test_move_bookmark_section_to_bar(self, client, mock_bookmark_manager):
+        """Test moving bookmark from section to bar."""
+        mock_bookmark_manager.move_bookmark.return_value = None
+
+        response = client.post(
+            "/api/bookmarks/move",
+            data=json.dumps(
+                {
+                    "source": {"type": "section", "section_id": "work", "index": 0},
+                    "destination": {"type": "bar", "index": 0},
+                }
+            ),
+            content_type="application/json",
+        )
+        data = json.loads(response.data)
+
+        assert response.status_code == 200
+        assert data["success"] is True

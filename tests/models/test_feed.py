@@ -228,3 +228,99 @@ class TestFeed(unittest.TestCase):
             f.update()
             mock_download.assert_called_once()
             mock_save.assert_called_once()
+
+    def test_needs_update_returns_true_when_force_update_env_set(self):
+        """needs_update returns True when ONBOARD_FEED_FORCE_UPDATE is set."""
+        widget = self.make_widget()
+        f = Feed(widget)
+        f._last_updated = datetime.now()  # recently updated
+
+        with patch.dict(os.environ, {"ONBOARD_FEED_FORCE_UPDATE": "True"}):
+            self.assertTrue(f.needs_update)
+
+    def test_needs_update_returns_true_when_never_updated(self):
+        """needs_update returns True when last_updated is None."""
+        widget = self.make_widget()
+        f = Feed(widget)
+        f._last_updated = None
+
+        self.assertTrue(f.needs_update)
+
+    def test_needs_update_returns_false_when_recently_updated(self):
+        """needs_update returns False when updated less than 10 minutes ago."""
+        widget = self.make_widget()
+        f = Feed(widget)
+        f._last_updated = datetime.now()  # just now
+
+        # Mock the force_update check to return False, then test the time-based logic
+        with patch("app.models.feed.os.getenv", return_value=""):
+            self.assertFalse(f.needs_update)
+
+    def test_processors_returns_noop_when_processor_file_missing(self):
+        """processors() returns NoOpFeedProcessor when processor file doesn't exist."""
+        widget = self.make_widget()
+        f = Feed(widget)
+
+        # Configure a processor that doesn't exist
+        f.widget = {"process": [{"processor": "nonexistent_processor"}]}
+
+        a = FeedArticle(
+            original_title="o",
+            title="t",
+            link="l",
+            description="d",
+            pub_date=datetime.now(),
+            processed="",
+            parent=f,
+        )
+        # Should not raise, should return articles unchanged (NoOpFeedProcessor)
+        res = f.processors([a])
+        self.assertEqual(len(res), 1)
+        # NoOp doesn't modify processed field
+        self.assertEqual(res[0].processed, "")
+
+    @patch("feedparser.parse")
+    def test_download_handles_entry_without_pubdate(self, mock_parse):
+        """download() handles entries without published or updated dates."""
+        widget = self.make_widget()
+        f = Feed(widget)
+
+        class EntryNoDates:
+            def __init__(self):
+                self.title = "No dates"
+                self.link = "http://example.com"
+
+            def get(self, key, default=None):
+                return getattr(self, key, default)
+
+            def __contains__(self, key):
+                return hasattr(self, key)
+
+        mock_parse.return_value = MagicMock(entries=[EntryNoDates()])
+        articles = f.download("url")
+        # Should have created article with current time as fallback
+        self.assertEqual(len(articles), 1)
+        self.assertEqual(articles[0].title, "No dates")
+        self.assertIsNotNone(articles[0].pub_date)
+
+    @patch("feedparser.parse")
+    def test_download_handles_entry_without_link(self, mock_parse):
+        """download() handles entries missing link field."""
+        widget = self.make_widget()
+        f = Feed(widget)
+
+        class EntryNoLink:
+            def __init__(self):
+                self.title = "No link"
+                self.published = "Wed, 01 Jan 2020 00:00:00 GMT"
+
+            def get(self, key, default=None):
+                return getattr(self, key, default)
+
+            def __contains__(self, key):
+                return hasattr(self, key)
+
+        mock_parse.return_value = MagicMock(entries=[EntryNoLink()])
+        articles = f.download("url")
+        self.assertEqual(len(articles), 1)
+        self.assertEqual(articles[0].link, "")

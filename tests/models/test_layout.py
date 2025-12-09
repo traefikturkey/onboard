@@ -204,5 +204,109 @@ class TestLayout(unittest.TestCase):
         fake_favicon.icon_path.assert_called_once_with("u")
 
 
+class TestLayoutUncoveredPaths(unittest.TestCase):
+    """Tests for previously uncovered paths in layout.py"""
+
+    def setUp(self):
+        self.layout = object.__new__(Layout)
+        self.layout.bar_manager = MagicMock()
+        self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
+        self.mock_clear = self.patcher.start()
+
+    def tearDown(self):
+        self.patcher.stop()
+
+    def write_yaml_config(self, content: str) -> Path:
+        tf = tempfile.NamedTemporaryFile(delete=False, suffix=".yml")
+        tf.write(content.encode("utf-8"))
+        tf.flush()
+        tf.close()
+        return Path(tf.name)
+
+    def test_load_layout_empty_file_returns_empty_dict(self):
+        """Empty YAML file returns empty dict via yaml.safe_load or {}."""
+        path = self.write_yaml_config("")
+        try:
+            self.layout.config_path = path
+            self.layout.reload()
+            # Should have no tabs and no headers
+            self.assertEqual(self.layout.tabs, [])
+            self.assertEqual(self.layout.headers, [])
+        finally:
+            os.unlink(path)
+
+    def test_get_feeds_with_nested_rows(self):
+        """get_feeds recursively finds feeds in nested row/column structures."""
+        inner_feed = MagicMock()
+        inner_feed.type = "feed"
+        inner_feed.id = "nested-feed"
+
+        # Inner column with the feed
+        inner_column = MagicMock()
+        inner_column.rows = []
+        inner_column.widgets = [inner_feed]
+
+        # Inner row containing inner column
+        inner_row = MagicMock()
+        inner_row.columns = [inner_column]
+
+        # Outer column containing inner row
+        outer_column = MagicMock()
+        outer_column.rows = [inner_row]
+        outer_column.widgets = []
+
+        feeds = self.layout.get_feeds(outer_column)
+        self.assertIn(inner_feed, feeds)
+
+    def test_find_link_nested_rows_returns_none_when_not_found(self):
+        """find_link returns None when widget/link not found in nested structure."""
+        self.layout.id = "layout"
+        self.layout.headers = []
+
+        # Create nested structure without matching widget
+        inner_column = MagicMock()
+        inner_column.rows = []
+        inner_column.widgets = []
+
+        inner_row = MagicMock()
+        inner_row.columns = [inner_column]
+
+        outer_column = MagicMock()
+        outer_column.rows = [inner_row]
+        outer_column.widgets = []
+
+        outer_row = MagicMock()
+        outer_row.columns = [outer_column]
+
+        result = self.layout.find_link(outer_row, "nonexistent", "nope")
+        self.assertIsNone(result)
+
+    def test_process_rows_recursively_collects_feeds(self):
+        """process_rows helper recursively finds feed widgets."""
+        feed1 = MagicMock()
+        feed1.type = "feed"
+        feed2 = MagicMock()
+        feed2.type = "feed"
+        not_feed = MagicMock()
+        not_feed.type = "bookmarks"
+
+        # Nested structure: column with row containing column with feeds
+        inner_column = MagicMock()
+        inner_column.rows = None
+        inner_column.widgets = [feed2, not_feed]
+
+        inner_row = MagicMock()
+        inner_row.columns = [inner_column]
+
+        outer_column = MagicMock()
+        outer_column.rows = [inner_row]
+        outer_column.widgets = [feed1]
+
+        feeds = self.layout.process_rows(outer_column)
+        self.assertIn(feed1, feeds)
+        self.assertIn(feed2, feeds)
+        self.assertNotIn(not_feed, feeds)
+
+
 if __name__ == "__main__":
     unittest.main()
