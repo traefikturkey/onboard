@@ -13,9 +13,10 @@ logger.setLevel(logging.DEBUG)
 
 
 class BookmarkBarManager:
-    def __init__(self, bookmark_bar_file: str = "configs/bookmarks.json"):
+    def __init__(self, bookmark_bar_file: str = "configs/bookmarks.json", favicon_store=None):
         self.bookmark_bar_path = Path(pwd.joinpath(bookmark_bar_file))
-        self.favicon_store = FaviconStore()
+        # Allow injection for testing
+        self.favicon_store = favicon_store or FaviconStore()
 
         self.last_reload = 0
         self.reload()

@@ -28,8 +28,8 @@ class Feed(Widget):
 
     hx_get: Optional[str] = None
 
-    def __init__(self, widget) -> None:
-        super().__init__(widget)
+    def __init__(self, widget, feed_cache=None, scheduler=None) -> None:
+        super().__init__(widget, scheduler=scheduler)
 
         self.feed_url = widget["feed_url"]
         self.display_limit = widget.get("display_limit", 10)
@@ -50,8 +50,8 @@ class Feed(Widget):
                             }
                         )
 
-        # Use FeedCache to centralize cache path & IO
-        self.feed_cache = FeedCache(self.id)
+        # Use FeedCache to centralize cache path & IO (inject for testing)
+        self.feed_cache = feed_cache or FeedCache(self.id)
         self.cache_path = self.feed_cache.cache_path
 
         # load cached article dicts then convert to FeedArticle

@@ -35,10 +35,16 @@ class InvalidIndexError(Exception):
 class BookmarkManager:
     """Manages bookmark CRUD operations with atomic saves."""
 
-    def __init__(self, bookmark_file: str = "configs/bookmarks.json"):
+    def __init__(
+        self,
+        bookmark_file: str = "configs/bookmarks.json",
+        file_store=None,
+        bar_manager=None,
+    ):
         self.bookmark_path = Path(pwd.joinpath(bookmark_file))
-        self.file_store = LocalFileStore()
-        self.bar_manager = BookmarkBarManager(bookmark_file)
+        # Allow injection for testing
+        self.file_store = file_store or LocalFileStore()
+        self.bar_manager = bar_manager or BookmarkBarManager(bookmark_file)
         self._data: dict[str, Any] = {}
         self._load()
 

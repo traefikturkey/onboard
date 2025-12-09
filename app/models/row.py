@@ -3,7 +3,8 @@ from .utils import from_list
 
 
 class Row:
-    columns: list["column.Column"] = []
+    def __init__(self):
+        self.columns: list["column.Column"] = []
 
     @staticmethod
     def from_dict(dictionary: dict, bookmark_manager=None) -> "Row":

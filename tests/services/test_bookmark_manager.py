@@ -447,3 +447,56 @@ class TestAdvancedOperations:
 
         with pytest.raises(ValueError, match="list"):
             bookmark_manager.import_bookmarks({"bar": "invalid"}, merge=False)
+
+
+class TestBookmarkManagerDependencyInjection:
+    """Tests for BookmarkManager dependency injection."""
+
+    def test_bookmark_manager_with_injected_file_store(self, temp_bookmark_file):
+        """BookmarkManager uses provided file_store instead of creating its own."""
+        from unittest.mock import MagicMock, patch
+
+        # Create mock file store
+        mock_file_store = MagicMock()
+        mock_file_store.read_json.return_value = {"bar": [], "sections": {}}
+
+        # Mock BookmarkBarManager to avoid file I/O
+        mock_bar_manager = MagicMock()
+
+        manager = BookmarkManager(
+            temp_bookmark_file,
+            file_store=mock_file_store,
+            bar_manager=mock_bar_manager,
+        )
+
+        # Verify our mock was used
+        assert manager.file_store is mock_file_store
+        mock_file_store.read_json.assert_called()
+
+    def test_bookmark_manager_with_injected_bar_manager(self, temp_bookmark_file):
+        """BookmarkManager uses provided bar_manager instead of creating its own."""
+        from unittest.mock import MagicMock
+
+        mock_bar_manager = MagicMock()
+
+        manager = BookmarkManager(
+            temp_bookmark_file, bar_manager=mock_bar_manager
+        )
+
+        assert manager.bar_manager is mock_bar_manager
+
+    def test_bookmark_manager_save_triggers_bar_manager_reload(self, temp_bookmark_file):
+        """When bookmarks are saved, bar_manager.reload() is called."""
+        from unittest.mock import MagicMock
+
+        mock_bar_manager = MagicMock()
+
+        manager = BookmarkManager(
+            temp_bookmark_file, bar_manager=mock_bar_manager
+        )
+
+        # Add a bookmark (triggers save)
+        manager.add_bar_bookmark({"name": "Test", "href": "http://test.com"})
+
+        # Verify reload was called
+        mock_bar_manager.reload.assert_called()

@@ -339,3 +339,64 @@ class TestFeed(unittest.TestCase):
         articles = f.download("url")
         self.assertEqual(len(articles), 1)
         self.assertEqual(articles[0].link, "")
+
+
+class TestFeedDependencyInjection(unittest.TestCase):
+    """Test that Feed accepts injected dependencies."""
+
+    def setUp(self):
+        self.tmpdir = tempfile.TemporaryDirectory()
+        os.environ["WORKING_STORAGE"] = self.tmpdir.name
+
+    def tearDown(self):
+        self.tmpdir.cleanup()
+        os.environ.pop("WORKING_STORAGE", None)
+
+    def make_widget(self):
+        return {"name": "TestFeed", "feed_url": "http://example.com/rss", "widgets": []}
+
+    def test_feed_with_injected_cache(self):
+        """Feed uses provided FeedCache instead of creating its own."""
+        widget = self.make_widget()
+
+        # Create mock FeedCache
+        mock_cache = MagicMock()
+        mock_cache.load_cache.return_value = []
+        mock_cache.cache_path = Path(self.tmpdir.name) / "mock_cache.json"
+
+        # Create Feed with injected cache
+        f = Feed(widget, feed_cache=mock_cache)
+
+        # Verify the injected cache was used
+        self.assertIs(f.feed_cache, mock_cache)
+        mock_cache.load_cache.assert_called()
+
+    def test_feed_with_injected_scheduler(self):
+        """Feed uses provided scheduler instead of Scheduler.getScheduler()."""
+        widget = self.make_widget()
+
+        # Create mock scheduler
+        mock_scheduler = MagicMock()
+        mock_scheduler.running = False  # Prevent job scheduling
+
+        # Create Feed with injected scheduler
+        f = Feed(widget, scheduler=mock_scheduler)
+
+        # Verify scheduler property returns our mock
+        self.assertIs(f.scheduler, mock_scheduler)
+
+    def test_feed_with_both_injected_dependencies(self):
+        """Feed works with both cache and scheduler injected."""
+        widget = self.make_widget()
+
+        mock_cache = MagicMock()
+        mock_cache.load_cache.return_value = []
+        mock_cache.cache_path = Path(self.tmpdir.name) / "mock_cache.json"
+
+        mock_scheduler = MagicMock()
+        mock_scheduler.running = False
+
+        f = Feed(widget, feed_cache=mock_cache, scheduler=mock_scheduler)
+
+        self.assertIs(f.feed_cache, mock_cache)
+        self.assertIs(f.scheduler, mock_scheduler)

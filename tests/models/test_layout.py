@@ -80,6 +80,10 @@ class TestLayout(unittest.TestCase):
     def setUp(self):
         # Create a layout instance without running __init__
         self.layout = object.__new__(Layout)
+        # Set required instance attributes that would be set in __init__
+        self.layout.id = "layout"
+        self.layout.tabs = []
+        self.layout.headers = []
         # Mock bar_manager since reload() needs it
         self.layout.bar_manager = MagicMock()
         # ensure scheduler methods are patched when reload runs
@@ -209,6 +213,10 @@ class TestLayoutUncoveredPaths(unittest.TestCase):
 
     def setUp(self):
         self.layout = object.__new__(Layout)
+        # Set required instance attributes that would be set in __init__
+        self.layout.id = "layout"
+        self.layout.tabs = []
+        self.layout.headers = []
         self.layout.bar_manager = MagicMock()
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
@@ -306,6 +314,51 @@ class TestLayoutUncoveredPaths(unittest.TestCase):
         self.assertIn(feed1, feeds)
         self.assertIn(feed2, feeds)
         self.assertNotIn(not_feed, feeds)
+
+
+class TestInstanceIsolation(unittest.TestCase):
+    """Tests to verify that class instances don't share mutable state."""
+
+    def test_tab_instances_have_isolated_rows(self):
+        """Creating two Tab instances should not share rows list."""
+        from app.models.tab import Tab
+
+        tab1 = Tab()
+        tab2 = Tab()
+
+        # Modify tab1's rows
+        tab1.rows.append("item1")
+
+        # tab2 should be unaffected
+        self.assertEqual(tab1.rows, ["item1"])
+        self.assertEqual(tab2.rows, [])
+
+    def test_row_instances_have_isolated_columns(self):
+        """Creating two Row instances should not share columns list."""
+        from app.models.row import Row
+
+        row1 = Row()
+        row2 = Row()
+
+        row1.columns.append("col1")
+
+        self.assertEqual(row1.columns, ["col1"])
+        self.assertEqual(row2.columns, [])
+
+    def test_column_instances_have_isolated_lists(self):
+        """Creating two Column instances should not share rows or widgets lists."""
+        from app.models.column import Column
+
+        col1 = Column()
+        col2 = Column()
+
+        col1.rows.append("row1")
+        col1.widgets.append("widget1")
+
+        self.assertEqual(col1.rows, ["row1"])
+        self.assertEqual(col1.widgets, ["widget1"])
+        self.assertEqual(col2.rows, [])
+        self.assertEqual(col2.widgets, [])
 
 
 if __name__ == "__main__":

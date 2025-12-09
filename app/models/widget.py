@@ -17,8 +17,9 @@ class Widget:
     template: str = "widget.html"
     id: Optional[str] = None
 
-    def __init__(self, widget):
+    def __init__(self, widget, scheduler=None):
         self.widget = widget
+        self._scheduler = scheduler  # Allow injection for testing
 
         self.display_limit = widget.get("display_limit", None)
 
@@ -43,6 +44,9 @@ class Widget:
 
     @property
     def scheduler(self):
+        # Use injected scheduler if provided, otherwise use global singleton
+        if self._scheduler is not None:
+            return self._scheduler
         return Scheduler.getScheduler()
 
     @property

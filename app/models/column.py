@@ -3,8 +3,9 @@ from .utils import from_list
 
 
 class Column:
-    rows: list["row.Row"] = []
-    widgets: list["widget.Widget"] = []
+    def __init__(self):
+        self.rows: list["row.Row"] = []
+        self.widgets: list["widget.Widget"] = []
 
     @staticmethod
     def from_dict(dictionary: dict, bookmark_manager=None) -> "Column":

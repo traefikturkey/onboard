@@ -3,8 +3,9 @@ from .utils import from_list
 
 
 class Tab:
-    name: str = ""
-    rows: list["Row"] = []
+    def __init__(self):
+        self.name: str = ""
+        self.rows: list["Row"] = []
 
     @staticmethod
     def from_dict(dictionary: dict, bookmark_manager=None) -> "Tab":

@@ -10,9 +10,11 @@ class LinkTracker:
     conn: sqlite3.Connection
     cursor: sqlite3.Cursor
 
-    def __init__(self):
-        file_path = pwd.joinpath("configs", "tracking.db")
-        self.connection = sqlite3.connect(file_path, check_same_thread=False)
+    def __init__(self, db_path=None):
+        # Allow injection of db_path for testing (use ":memory:" for in-memory DB)
+        if db_path is None:
+            db_path = pwd.joinpath("configs", "tracking.db")
+        self.connection = sqlite3.connect(db_path, check_same_thread=False)
         self.cursor = self.connection.cursor()
         self.create_table()
 

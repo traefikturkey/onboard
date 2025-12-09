@@ -21,30 +21,40 @@ logger.setLevel(logging.DEBUG)
 
 
 class Layout:
-    id: str = "layout"
-    tabs: list[Tab] = []
-    headers: list[Bookmark] = []
+    def __init__(
+        self,
+        config_file: str = "configs/layout.yml",
+        bar_manager=None,
+        skip_file_init: bool = False,
+    ):
+        # Instance attributes (not shared across instances)
+        self.id: str = "layout"
+        self.tabs: list[Tab] = []
+        self.headers: list[Bookmark] = []
 
-    def __init__(self, config_file: str = "configs/layout.yml"):
-        # Ensure default config files (including layout.yml) exist before
-        # resolving the config path and loading the layout.
-        try:
-            _copy_default_to_configs()
-        except Exception:
-            # Don't raise on startup copy failure; let reload surface issues
-            logger.exception("Failed to copy default configs")
+        # Allow skipping file operations for testing
+        if not skip_file_init:
+            # Ensure default config files (including layout.yml) exist before
+            # resolving the config path and loading the layout.
+            try:
+                _copy_default_to_configs()
+            except Exception:
+                # Don't raise on startup copy failure; let reload surface issues
+                logger.exception("Failed to copy default configs")
 
-        # Auto-migrate legacy inline bookmarks to bookmarks_section format
-        try:
-            _auto_migrate_bookmarks()
-        except Exception:
-            logger.exception("Failed to auto-migrate bookmarks")
+            # Auto-migrate legacy inline bookmarks to bookmarks_section format
+            try:
+                _auto_migrate_bookmarks()
+            except Exception:
+                logger.exception("Failed to auto-migrate bookmarks")
 
         self.config_path = pwd.joinpath(config_file)
 
-        self.bar_manager = BookmarkBarManager()
+        # Allow injection of bar_manager for testing
+        self.bar_manager = bar_manager or BookmarkBarManager()
 
-        self.reload()
+        if not skip_file_init:
+            self.reload()
 
     @property
     def bookmark_bar(self):
