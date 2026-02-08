@@ -54,3 +54,4 @@ data/
 
 # Local test artifacts (screenshots, recordings)
 .artifacts/
+.buildcache/
