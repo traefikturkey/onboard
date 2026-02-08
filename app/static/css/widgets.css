@@ -159,3 +159,168 @@ body.edit-mode .widget-container { min-height: 50px; }
 
 /* Edit mode header behavior */
 body.edit-mode .drag-handle { cursor: grab; }
+
+/* Add Tab button in tab bar */
+.add-tab-btn {
+  display: inline-block;
+  color: #666;
+  font-size: 1.2em;
+  font-weight: bold;
+  padding: 0 0.5em;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.add-tab-btn:hover {
+  color: #e9e9e9;
+}
+
+/* Add Widget button — hidden by default, visible in edit mode */
+.add-widget-btn-wrapper {
+  display: none;
+  padding: 0.5em;
+}
+body.edit-mode .add-widget-btn-wrapper {
+  display: block;
+}
+.add-widget-btn {
+  width: 100%;
+  padding: 0.5em;
+  border: 2px dashed #555;
+  background: transparent;
+  color: #888;
+  cursor: pointer;
+  font-size: 0.9em;
+  text-align: center;
+  transition: border-color 0.2s, color 0.2s;
+}
+.add-widget-btn:hover {
+  border-color: #888;
+  color: #e9e9e9;
+}
+
+/* Widget move menu — visible in edit mode only */
+.widget-move-menu {
+  display: none;
+  position: relative;
+  float: right;
+  margin-left: 0.3em;
+}
+body.edit-mode .widget-move-menu {
+  display: inline-block;
+}
+.move-btn {
+  cursor: pointer;
+  color: #888;
+  padding: 0 0.3em;
+  transition: color 0.2s;
+}
+.move-btn:hover {
+  color: #e9e9e9;
+}
+.move-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background: #2c2c2c;
+  border: 1px solid #555;
+  border-radius: 4px;
+  min-width: 120px;
+  z-index: 100;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+.move-dropdown a {
+  display: block;
+  padding: 0.4em 0.8em;
+  color: #e9e9e9;
+  text-decoration: none;
+  font-size: 0.85em;
+  white-space: nowrap;
+}
+.move-dropdown a:hover {
+  background: #444;
+}
+
+/* Tab drop hover indicator for drag-to-tab */
+.tab-drop-hover {
+  outline: 2px solid rgba(100, 150, 255, 0.6);
+  outline-offset: -2px;
+}
+
+/* Modal overlay and content */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  z-index: 1000;
+  justify-content: center;
+  align-items: center;
+}
+.modal-overlay.active {
+  display: flex;
+}
+.modal-content {
+  background: #3c3c3c;
+  border: 1px solid #555;
+  border-radius: 8px;
+  padding: 1.5em;
+  min-width: 320px;
+  max-width: 480px;
+  color: #e9e9e9;
+}
+.modal-content h3 {
+  margin: 0 0 1em 0;
+  font-size: 1.1em;
+}
+.modal-content label {
+  display: block;
+  margin-bottom: 0.3em;
+  font-size: 0.9em;
+  color: #bbb;
+}
+.modal-content input[type="text"],
+.modal-content input[type="url"] {
+  width: 100%;
+  padding: 0.5em;
+  margin-bottom: 1em;
+  background: #2c2c2c;
+  border: 1px solid #555;
+  border-radius: 4px;
+  color: #e9e9e9;
+  font-size: 0.95em;
+  box-sizing: border-box;
+}
+.modal-content input:focus {
+  outline: none;
+  border-color: #6a9fff;
+}
+.modal-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5em;
+  margin-top: 0.5em;
+}
+.modal-btn {
+  padding: 0.4em 1em;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9em;
+}
+.modal-btn-primary {
+  background: #4a7aff;
+  color: #fff;
+}
+.modal-btn-primary:hover {
+  background: #5a8aff;
+}
+.modal-btn-cancel {
+  background: #555;
+  color: #e9e9e9;
+}
+.modal-btn-cancel:hover {
+  background: #666;
+}

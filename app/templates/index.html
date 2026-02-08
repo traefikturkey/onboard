@@ -56,6 +56,7 @@
 						   data-index="{{ loop.index }}"
 						   data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
 					{% endfor %}
+					<a href="#" class="add-tab-btn" onclick="showAddTabModal(event)" title="Add tab">+</a>
 				</div>
 			</div>
 			<div class="column">
@@ -85,6 +86,38 @@
 				</a>
 			</div>
 		</footer>
+	</div>
+
+	<!-- Add Tab Modal -->
+	<div id="addTabModal" class="modal-overlay" onclick="if(event.target===this)closeModal('addTabModal')">
+		<div class="modal-content">
+			<h3>Add New Tab</h3>
+			<label for="newTabName">Tab Name</label>
+			<input type="text" id="newTabName" placeholder="Enter tab name" onkeydown="if(event.key==='Enter')submitAddTab()">
+			<div class="modal-buttons">
+				<button class="modal-btn modal-btn-cancel" onclick="closeModal('addTabModal')">Cancel</button>
+				<button class="modal-btn modal-btn-primary" onclick="submitAddTab()">Add Tab</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Add Widget Modal -->
+	<div id="addWidgetModal" class="modal-overlay" onclick="if(event.target===this)closeModal('addWidgetModal')">
+		<div class="modal-content">
+			<h3>Add Feed Widget</h3>
+			<input type="hidden" id="addWidgetTab">
+			<input type="hidden" id="addWidgetColIndex">
+			<label for="addWidgetName">Feed Name</label>
+			<input type="text" id="addWidgetName" placeholder="e.g. Hacker News">
+			<label for="addWidgetFeedUrl">Feed URL</label>
+			<input type="url" id="addWidgetFeedUrl" placeholder="https://example.com/feed.xml">
+			<label for="addWidgetLink">Website URL (optional)</label>
+			<input type="url" id="addWidgetLink" placeholder="https://example.com">
+			<div class="modal-buttons">
+				<button class="modal-btn modal-btn-cancel" onclick="closeModal('addWidgetModal')">Cancel</button>
+				<button class="modal-btn modal-btn-primary" onclick="submitAddWidget()">Add Feed</button>
+			</div>
+		</div>
 	</div>
 </body>
 <script>
@@ -337,7 +370,29 @@
                 ghostClass: 'widget-ghost',
                 chosenClass: 'widget-chosen',
                 animation: 150,
-                onEnd: function() {
+                onEnd: function(evt) {
+                    // Check if drag ended over a tab bar link (drag-to-tab)
+                    var tabBar = document.querySelector('.tab-bar');
+                    if (tabBar && evt.originalEvent) {
+                        var rect = tabBar.getBoundingClientRect();
+                        var x = evt.originalEvent.clientX;
+                        var y = evt.originalEvent.clientY;
+                        if (y >= rect.top && y <= rect.bottom) {
+                            var tabs = tabBar.querySelectorAll('a:not(.add-tab-btn)');
+                            for (var i = 0; i < tabs.length; i++) {
+                                var tabRect = tabs[i].getBoundingClientRect();
+                                if (x >= tabRect.left && x <= tabRect.right) {
+                                    var widgetId = evt.item.getAttribute('data-widget-id');
+                                    var sourceTab = evt.from.getAttribute('data-tab');
+                                    var destTab = tabs[i].textContent.trim();
+                                    if (sourceTab && destTab && sourceTab !== destTab) {
+                                        moveWidget(widgetId, sourceTab, destTab);
+                                        return;
+                                    }
+                                }
+                            }
+                        }
+                    }
                     saveOrder();
                 }
             });
@@ -385,6 +440,139 @@
     document.addEventListener('htmx:afterSwap', function() {
         if (document.body.classList.contains('edit-mode')) {
             initSortables();
+        }
+    });
+})();
+</script>
+<script>
+// Tab and widget management: modals, move menu, drag-to-tab
+(function(){
+    window.showAddTabModal = function(e) {
+        e.preventDefault();
+        document.getElementById('newTabName').value = '';
+        document.getElementById('addTabModal').classList.add('active');
+        document.getElementById('newTabName').focus();
+    };
+
+    window.submitAddTab = function() {
+        var name = document.getElementById('newTabName').value.trim();
+        if (!name) return;
+        fetch('/api/layout/tabs', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name })
+        }).then(function(resp) {
+            if (resp.ok) {
+                window.location.href = '/tab/' + encodeURIComponent(name);
+            } else {
+                resp.json().then(function(data) {
+                    alert(data.details || data.error || 'Failed to add tab');
+                });
+            }
+        }).catch(function(err) {
+            console.error('Failed to add tab:', err);
+        });
+    };
+
+    window.showAddWidgetModal = function(btn) {
+        document.getElementById('addWidgetTab').value = btn.getAttribute('data-tab') || '';
+        document.getElementById('addWidgetColIndex').value = btn.getAttribute('data-col-index') || '0';
+        document.getElementById('addWidgetName').value = '';
+        document.getElementById('addWidgetFeedUrl').value = '';
+        document.getElementById('addWidgetLink').value = '';
+        document.getElementById('addWidgetModal').classList.add('active');
+        document.getElementById('addWidgetName').focus();
+    };
+
+    window.submitAddWidget = function() {
+        var tab = document.getElementById('addWidgetTab').value;
+        var colIndex = parseInt(document.getElementById('addWidgetColIndex').value, 10) || 0;
+        var name = document.getElementById('addWidgetName').value.trim();
+        var feedUrl = document.getElementById('addWidgetFeedUrl').value.trim();
+        var link = document.getElementById('addWidgetLink').value.trim();
+        if (!name || !feedUrl) {
+            alert('Feed name and Feed URL are required');
+            return;
+        }
+        fetch('/api/layout/widgets', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tab: tab, name: name, feed_url: feedUrl, link: link, col_index: colIndex })
+        }).then(function(resp) {
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                resp.json().then(function(data) {
+                    alert(data.details || data.error || 'Failed to add widget');
+                });
+            }
+        }).catch(function(err) {
+            console.error('Failed to add widget:', err);
+        });
+    };
+
+    window.closeModal = function(id) {
+        document.getElementById(id).classList.remove('active');
+    };
+
+    window.toggleMoveMenu = function(e, el) {
+        e.preventDefault();
+        e.stopPropagation();
+        var menu = el.closest('.widget-move-menu');
+        var dropdown = menu.querySelector('.move-dropdown');
+        if (dropdown.style.display !== 'none') {
+            dropdown.style.display = 'none';
+            return;
+        }
+        // Close other open dropdowns
+        document.querySelectorAll('.move-dropdown').forEach(function(d) { d.style.display = 'none'; });
+        // Fetch tab names and populate
+        fetch('/api/layout/tabs').then(function(resp) {
+            return resp.json();
+        }).then(function(result) {
+            var tabs = result.data || [];
+            var currentTab = menu.closest('[data-tab]');
+            var currentTabName = currentTab ? currentTab.getAttribute('data-tab') : '';
+            dropdown.innerHTML = '';
+            tabs.forEach(function(tabName) {
+                if (tabName !== currentTabName) {
+                    var a = document.createElement('a');
+                    a.href = '#';
+                    a.textContent = tabName;
+                    a.onclick = function(ev) {
+                        ev.preventDefault();
+                        var widgetId = menu.getAttribute('data-widget-id');
+                        moveWidget(widgetId, currentTabName, tabName);
+                    };
+                    dropdown.appendChild(a);
+                }
+            });
+            dropdown.style.display = 'block';
+        });
+    };
+
+    window.moveWidget = function(widgetId, sourceTab, destTab) {
+        fetch('/api/layout/move-widget', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ widget_id: widgetId, source_tab: sourceTab, dest_tab: destTab })
+        }).then(function(resp) {
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                resp.json().then(function(data) {
+                    alert(data.details || data.error || 'Failed to move widget');
+                });
+            }
+        }).catch(function(err) {
+            console.error('Failed to move widget:', err);
+        });
+    };
+
+    // Close move dropdowns when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!e.target.closest('.widget-move-menu')) {
+            document.querySelectorAll('.move-dropdown').forEach(function(d) { d.style.display = 'none'; });
         }
     });
 })();

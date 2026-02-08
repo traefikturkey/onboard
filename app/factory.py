@@ -19,6 +19,7 @@ def create_app(
     bookmark_manager=None,
     link_tracker=None,
     widget_order_manager=None,
+    layout_config_manager=None,
     testing=False,
 ):
     """
@@ -30,6 +31,7 @@ def create_app(
         bookmark_manager: Optional BookmarkManager instance (for testing)
         link_tracker: Optional LinkTracker instance (for testing)
         widget_order_manager: Optional WidgetOrderManager instance (for testing)
+        layout_config_manager: Optional LayoutConfigManager instance (for testing)
         testing: If True, skip production initialization
 
     Returns:
@@ -59,6 +61,7 @@ def create_app(
     app.extensions["onboard_bookmark_manager"] = bookmark_manager
     app.extensions["onboard_link_tracker"] = link_tracker
     app.extensions["onboard_widget_order_manager"] = widget_order_manager
+    app.extensions["onboard_layout_config_manager"] = layout_config_manager
 
     # Configure caching
     if os.environ.get("FLASK_DEBUG", "False") == "True" or testing:
@@ -108,6 +111,7 @@ def create_app(
         _ensure_bookmark_manager(app)
         _ensure_link_tracker(app)
         _ensure_widget_order_manager(app)
+        _ensure_layout_config_manager(app)
 
     # Production initialization
     if (
@@ -160,6 +164,23 @@ def _ensure_widget_order_manager(app):
         from app.services.widget_order_manager import WidgetOrderManager
 
         app.extensions["onboard_widget_order_manager"] = WidgetOrderManager()
+
+
+def _ensure_layout_config_manager(app):
+    """Ensure layout config manager is initialized."""
+    if app.extensions.get("onboard_layout_config_manager") is None:
+        from app.services.layout_config_manager import LayoutConfigManager
+
+        app.extensions["onboard_layout_config_manager"] = LayoutConfigManager()
+
+
+def get_layout_config_manager(app=None):
+    """Get layout config manager from app context or current_app."""
+    if app is None:
+        from flask import current_app
+
+        app = current_app
+    return app.extensions.get("onboard_layout_config_manager")
 
 
 def get_layout(app=None):

@@ -70,6 +70,22 @@ class WidgetOrderManager:
 
         self._save()
 
+    def remove_widget(self, tab: str, widget_id: str) -> None:
+        """Remove a widget_id from all columns in a tab's overlay data.
+
+        Args:
+            tab: Tab name
+            widget_id: Widget ID to remove
+        """
+        tab_data = self._data.get("tabs", {}).get(tab, {})
+        changed = False
+        for col_key, widget_ids in tab_data.items():
+            if widget_id in widget_ids:
+                widget_ids.remove(widget_id)
+                changed = True
+        if changed:
+            self._save()
+
     def reconcile(self, tab: str, actual_widgets_by_column: dict[str, list[str]]) -> None:
         """Reconcile overlay with actual layout widgets.
 

@@ -136,3 +136,24 @@ class TestWidgetOrderManagerMtime:
         data = {"tabs": {}}
         manager = make_manager(tmp_config, mock_file_store, initial_data=data)
         assert manager.mtime > 0
+
+
+class TestRemoveWidget:
+    def test_removes_from_column(self, tmp_config, mock_file_store):
+        data = {"tabs": {"Home": {"0.0": ["a", "b", "c"]}}}
+        manager = make_manager(tmp_config, mock_file_store, initial_data=data)
+        manager.remove_widget("Home", "b")
+        assert manager.get_column_order("Home", "0.0") == ["a", "c"]
+
+    def test_removes_from_multiple_columns(self, tmp_config, mock_file_store):
+        data = {"tabs": {"Home": {"0.0": ["a", "b"], "0.1": ["b", "c"]}}}
+        manager = make_manager(tmp_config, mock_file_store, initial_data=data)
+        manager.remove_widget("Home", "b")
+        assert manager.get_column_order("Home", "0.0") == ["a"]
+        assert manager.get_column_order("Home", "0.1") == ["c"]
+
+    def test_noop_when_not_found(self, tmp_config, mock_file_store):
+        data = {"tabs": {"Home": {"0.0": ["a", "b"]}}}
+        manager = make_manager(tmp_config, mock_file_store, initial_data=data)
+        manager.remove_widget("Home", "z")
+        assert manager.get_column_order("Home", "0.0") == ["a", "b"]

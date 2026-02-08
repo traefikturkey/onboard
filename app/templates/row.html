@@ -16,6 +16,12 @@
             {% include widget.template ignore missing with context %}
           </div>
         {% endfor %}
+        <div class="add-widget-btn-wrapper">
+          <button class="add-widget-btn" data-tab="{{ tab_name }}" data-col-index="{{ loop.index0 }}"
+                  onclick="showAddWidgetModal(this)">
+            <i class="fas fa-plus"></i> Add Feed
+          </button>
+        </div>
       {% endif %}
     </div>
   {% endfor %}
