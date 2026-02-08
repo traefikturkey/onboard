@@ -183,7 +183,7 @@ version:
 
 integration-test:
 	@echo "Running integration tests..."
-	uv run pytest tests/integration -q || true
+	uv run pytest tests/integration -q -m integration || true
 
 # -------------------------------
 # Docker build benchmarking and testing
