@@ -6,30 +6,17 @@ import urllib.request
 import pytest
 
 # Configuration
-SELENIUM_IMAGE = "selenium/standalone-chrome"
-SELENIUM_CONTAINER_NAME = "onboard_test_selenium"
-SELENIUM_PORT = "4444"
-
 APP_PORT = "9830"
 APP_CONTAINER_NAME = "onboard_test"
 APP_IMAGE = "onboard:prod"
 
-# Global variables to store URLs
-_SELENIUM_URL = None
 _APP_URL = None
 
 
 def pytest_sessionstart(session):
     """Called after the Session object has been created and configured."""
-    global _SELENIUM_URL, _APP_URL
-
-    # Setup containers here - this runs BEFORE any test names are printed
-    _SELENIUM_URL = _setup_selenium()
+    global _APP_URL
     _APP_URL = _setup_app()
-
-    if _SELENIUM_URL:
-        print(f"[tests] Selenium URL: {_SELENIUM_URL}")
-        os.environ["SELENIUM_URL"] = _SELENIUM_URL
 
     if _APP_URL:
         print(f"[tests] App URL: {_APP_URL}")
@@ -41,82 +28,18 @@ def pytest_sessionfinish(session, exitstatus):
     docker_run(["rm", "-f", APP_CONTAINER_NAME])
 
 
-def _setup_selenium():
-    """Setup selenium container and return URL. Reuse if already running and healthy."""
-    # Check if selenium container is already running
-    result = docker_run(
-        ["ps", "--filter", f"name={SELENIUM_CONTAINER_NAME}", "--format", "{{.Names}}"]
-    )
-
-    if SELENIUM_CONTAINER_NAME in result.stdout:
-        # Container exists and is running, check if it's healthy
-        ip = docker_inspect_ip(SELENIUM_CONTAINER_NAME)
-        if ip:
-            selenium_url = f"http://{ip}:{SELENIUM_PORT}/wd/hub"
-            if wait_for_service(f"{selenium_url}/status", timeout=10):
-                return selenium_url
-            else:
-                print(
-                    f"[tests] Existing selenium container unhealthy, removing and recreating"
-                )
-                docker_run(["rm", "-f", SELENIUM_CONTAINER_NAME])
-        else:
-            print(
-                f"[tests] Cannot get IP for existing selenium container, removing and recreating"
-            )
-            docker_run(["rm", "-f", SELENIUM_CONTAINER_NAME])
-
-    # Start new selenium container
-    print(f"[tests] Starting new selenium container: {SELENIUM_CONTAINER_NAME}")
-    run_cmd = [
-        "run",
-        "-d",
-        "--name",
-        SELENIUM_CONTAINER_NAME,
-        "-p",
-        f"{SELENIUM_PORT}:{SELENIUM_PORT}",
-        "--shm-size",
-        "2g",
-        SELENIUM_IMAGE,
-    ]
-    result = docker_run(run_cmd)
-    if result.returncode != 0:
-        print(f"[tests] Failed to start selenium container: {result.stderr}")
-        return None
-
-    # Get container IP
-    ip = docker_inspect_ip(SELENIUM_CONTAINER_NAME)
-    if not ip:
-        print(
-            f"[tests] Could not get IP for selenium container {SELENIUM_CONTAINER_NAME}"
-        )
-        return None
-
-    selenium_url = f"http://{ip}:{SELENIUM_PORT}/wd/hub"
-
-    # Wait for selenium to be ready
-    if not wait_for_service(f"{selenium_url}/status"):
-        print(f"[tests] Selenium at {selenium_url} did not become ready in time")
-        return None
-
-    return selenium_url
-
-
 def _setup_app():
     """Setup app container and return URL."""
-    # Stop and cleanup any running onboard production containers (exclude devcontainers and selenium)
+    # Stop and cleanup any running onboard production containers (exclude devcontainers)
     result = docker_run(["ps", "-a", "--format", "{{.Names}} {{.Image}}"])
     for line in result.stdout.splitlines():
         parts = line.split()
         if len(parts) >= 2:
             name, image = parts[0], parts[1]
-            # Only clean up production onboard containers, never devcontainers or selenium
-            # Skip if: name starts with vsc-, image starts with vsc-, name ends with _devcontainer, or is selenium
             if (
                 not name.startswith("vsc-")
                 and not image.startswith("vsc-")
                 and not name.endswith("_devcontainer")
-                and name != SELENIUM_CONTAINER_NAME
                 and ("onboard" in name.lower() or "onboard" in image.lower())
             ):
                 print(f"[tests] Stopping and removing container: {name}")
@@ -203,12 +126,12 @@ def wait_for_service(url: str, timeout: int = 60) -> bool:
 
 
 @pytest.fixture(scope="session")
-def selenium_url():
-    """Return the pre-setup selenium URL."""
-    return _SELENIUM_URL
-
-
-@pytest.fixture(scope="session")
 def app_url():
     """Return the pre-setup app URL."""
     return _APP_URL
+
+
+@pytest.fixture(scope="session")
+def base_url(app_url):
+    """Playwright base URL fixture — uses app container URL."""
+    return app_url
