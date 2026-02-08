@@ -6,6 +6,7 @@ import tempfile
 from pathlib import Path
 
 import yaml
+from filelock import FileLock
 
 from app.models.utils import calculate_sha1_hash, pwd
 
@@ -17,11 +18,18 @@ class LayoutConfigManager:
 
     def __init__(self, config_path=None):
         self.config_path = Path(config_path) if config_path else pwd / "configs" / "layout.yml"
+        self._lock = FileLock(str(self.config_path) + ".lock")
 
     def _read(self):
         """Load YAML from disk."""
-        with open(self.config_path, "r", encoding="utf-8") as f:
-            return yaml.safe_load(f)
+        try:
+            with open(self.config_path, "r", encoding="utf-8") as f:
+                data = yaml.safe_load(f)
+                return data if data is not None else {"tabs": []}
+        except FileNotFoundError:
+            raise ValueError("Configuration file not found")
+        except yaml.YAMLError:
+            raise ValueError("Configuration file is corrupted")
 
     def _write(self, data):
         """Atomic write: tempfile + os.replace."""
@@ -41,129 +49,170 @@ class LayoutConfigManager:
 
     def get_tab_names(self):
         """Return list of all tab names."""
-        data = self._read()
-        tabs = data.get("tabs", [])
-        return [t["tab"] for t in tabs if "tab" in t]
+        with self._lock:
+            data = self._read()
+            tabs = data.get("tabs", [])
+            return [t["tab"] for t in tabs if "tab" in t]
 
     def add_tab(self, name):
-        """Add an empty tab with one empty column. Returns the new tab dict.
+        """Add an empty tab with three empty columns. Returns the new tab dict.
 
         Raises ValueError if a tab with the same name (case-insensitive) exists.
         """
-        data = self._read()
-        tabs = data.get("tabs", [])
-        existing_names = {t["tab"].lower() for t in tabs if "tab" in t}
-        if name.strip().lower() in existing_names:
-            raise ValueError(f"Tab '{name}' already exists")
+        with self._lock:
+            data = self._read()
+            tabs = data.get("tabs", [])
+            existing_names = {t["tab"].lower() for t in tabs if "tab" in t}
+            if name.strip().lower() in existing_names:
+                raise ValueError(f"Tab '{name}' already exists")
 
-        new_tab = {
-            "tab": name.strip(),
-            "columns": [{"column": None, "widgets": []}],
-        }
-        tabs.append(new_tab)
-        data["tabs"] = tabs
-        self._write(data)
-        return new_tab
+            new_tab = {
+                "tab": name.strip(),
+                "columns": [
+                    {"column": None, "widgets": []},
+                    {"column": None, "widgets": []},
+                    {"column": None, "widgets": []},
+                ],
+            }
+            tabs.append(new_tab)
+            data["tabs"] = tabs
+            self._write(data)
+            return new_tab
 
     def delete_tab(self, name):
         """Remove a tab by name.
 
         Raises ValueError if tab not found or if it's the last tab.
         """
-        data = self._read()
-        tabs = data.get("tabs", [])
+        with self._lock:
+            data = self._read()
+            tabs = data.get("tabs", [])
 
-        idx = None
-        for i, t in enumerate(tabs):
-            if t.get("tab", "").lower() == name.lower():
-                idx = i
-                break
+            idx = None
+            for i, t in enumerate(tabs):
+                if t.get("tab", "").lower() == name.lower():
+                    idx = i
+                    break
 
-        if idx is None:
-            raise ValueError(f"Tab '{name}' not found")
+            if idx is None:
+                raise ValueError(f"Tab '{name}' not found")
 
-        if len(tabs) <= 1:
-            raise ValueError("Cannot delete the last tab")
+            if len(tabs) <= 1:
+                raise ValueError("Cannot delete the last tab")
 
-        tabs.pop(idx)
-        data["tabs"] = tabs
-        self._write(data)
+            tabs.pop(idx)
+            data["tabs"] = tabs
+            self._write(data)
 
     def add_widget(self, tab, widget_data, col_index=0):
         """Add a feed widget to a tab's column. Returns the generated widget_id.
 
         Raises ValueError if tab not found or col_index out of range.
         """
-        data = self._read()
-        tabs = data.get("tabs", [])
+        with self._lock:
+            data = self._read()
+            tabs = data.get("tabs", [])
 
-        tab_dict = None
-        for t in tabs:
-            if t.get("tab", "").lower() == tab.lower():
-                tab_dict = t
-                break
+            tab_dict = None
+            for t in tabs:
+                if t.get("tab", "").lower() == tab.lower():
+                    tab_dict = t
+                    break
 
-        if tab_dict is None:
-            raise ValueError(f"Tab '{tab}' not found")
+            if tab_dict is None:
+                raise ValueError(f"Tab '{tab}' not found")
 
-        columns = self._get_columns(tab_dict)
-        if col_index >= len(columns):
-            raise ValueError(
-                f"Column index {col_index} out of range (tab has {len(columns)} columns)"
-            )
+            columns = self._get_columns(tab_dict)
+            if col_index >= len(columns):
+                raise ValueError(
+                    f"Column index {col_index} out of range (tab has {len(columns)} columns)"
+                )
 
-        col = columns[col_index]
-        widgets_list = col.get("widgets", [])
-        widgets_list.append(widget_data)
-        col["widgets"] = widgets_list
+            col = columns[col_index]
+            widgets_list = col.get("widgets", [])
+            widgets_list.append(widget_data)
+            col["widgets"] = widgets_list
 
-        self._write(data)
+            self._write(data)
 
-        # Compute widget ID same way as Widget.__init__
-        id_source = widget_data.get("link", widget_data.get("name", ""))
-        return calculate_sha1_hash(id_source)
+            # Compute widget ID same way as Widget.__init__
+            id_source = widget_data.get("link", widget_data.get("name", ""))
+            return calculate_sha1_hash(id_source)
 
     def move_widget(self, widget_id, source_tab, dest_tab, dest_col_index=0):
         """Move a widget from source_tab to dest_tab.
 
         Raises ValueError if widget not found, tabs not found, or same tab.
         """
-        if source_tab.lower() == dest_tab.lower():
-            raise ValueError("Source and destination tabs are the same")
+        with self._lock:
+            if source_tab.lower() == dest_tab.lower():
+                raise ValueError("Source and destination tabs are the same")
 
-        data = self._read()
-        tabs = data.get("tabs", [])
+            data = self._read()
+            tabs = data.get("tabs", [])
 
-        source_dict = None
-        dest_dict = None
-        for t in tabs:
-            name = t.get("tab", "")
-            if name.lower() == source_tab.lower():
-                source_dict = t
-            if name.lower() == dest_tab.lower():
-                dest_dict = t
+            source_dict = None
+            dest_dict = None
+            for t in tabs:
+                name = t.get("tab", "")
+                if name.lower() == source_tab.lower():
+                    source_dict = t
+                if name.lower() == dest_tab.lower():
+                    dest_dict = t
 
-        if source_dict is None:
-            raise ValueError(f"Source tab '{source_tab}' not found")
-        if dest_dict is None:
-            raise ValueError(f"Destination tab '{dest_tab}' not found")
+            if source_dict is None:
+                raise ValueError(f"Source tab '{source_tab}' not found")
+            if dest_dict is None:
+                raise ValueError(f"Destination tab '{dest_tab}' not found")
 
-        # Find and remove widget from source
-        widget_data = self._find_and_remove_widget(source_dict, widget_id)
-        if widget_data is None:
-            raise ValueError(f"Widget '{widget_id}' not found in tab '{source_tab}'")
+            # Find and remove widget from source
+            widget_data = self._find_and_remove_widget(source_dict, widget_id)
+            if widget_data is None:
+                raise ValueError(f"Widget '{widget_id}' not found in tab '{source_tab}'")
 
-        # Add to destination
-        dest_columns = self._get_columns(dest_dict)
-        if dest_col_index >= len(dest_columns):
-            dest_col_index = 0
+            # Add to destination
+            dest_columns = self._get_columns(dest_dict)
+            if dest_col_index >= len(dest_columns):
+                dest_col_index = 0
 
-        col = dest_columns[dest_col_index]
-        widgets_list = col.get("widgets", [])
-        widgets_list.append(widget_data)
-        col["widgets"] = widgets_list
+            col = dest_columns[dest_col_index]
+            widgets_list = col.get("widgets", [])
+            widgets_list.append(widget_data)
+            col["widgets"] = widgets_list
 
-        self._write(data)
+            self._write(data)
+
+    def add_row(self, tab_name, num_columns=3):
+        """Add a new row to a tab.
+
+        If the tab uses flat columns structure, converts to rows first.
+        Raises ValueError if tab not found.
+        """
+        with self._lock:
+            data = self._read()
+            tabs = data.get("tabs", [])
+
+            tab_dict = None
+            for t in tabs:
+                if t.get("tab", "").lower() == tab_name.lower():
+                    tab_dict = t
+                    break
+
+            if tab_dict is None:
+                raise ValueError(f"Tab '{tab_name}' not found")
+
+            new_row = {
+                "columns": [{"column": None, "widgets": []} for _ in range(num_columns)]
+            }
+
+            if "rows" in tab_dict:
+                tab_dict["rows"].append(new_row)
+            else:
+                # Convert flat columns to rows structure
+                existing_row = {"columns": tab_dict.pop("columns", [])}
+                tab_dict["rows"] = [existing_row, new_row]
+
+            self._write(data)
 
     def _get_columns(self, tab_dict):
         """Get the flat list of leaf columns from a tab dict."""
