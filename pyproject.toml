@@ -15,6 +15,7 @@ dependencies = [
     "flask-caching",
     "flask-minify",
     "flask-minify[go]",
+    "filelock",
     "gunicorn",
     "hypercorn==0.15.0",
     "langchain",
