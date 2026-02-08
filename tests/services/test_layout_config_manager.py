@@ -73,7 +73,11 @@ class TestAddTab:
 
         # Check return value
         assert result["tab"] == "News"
-        assert result["columns"] == [{"column": None, "widgets": []}]
+        assert result["columns"] == [
+            {"column": None, "widgets": []},
+            {"column": None, "widgets": []},
+            {"column": None, "widgets": []},
+        ]
 
         # Verify persisted to disk
         tab_names = manager.get_tab_names()
@@ -265,3 +269,145 @@ class TestMoveWidget:
 
         with pytest.raises(ValueError, match="Destination tab 'Missing' not found"):
             manager.move_widget(widget_id, "Home", "Missing")
+
+
+class TestAddRow:
+    """Tests for add_row method."""
+
+    def test_flat_columns_converts_to_rows(self, tmp_path, sample_layout):
+        """Should convert flat columns to rows structure and add new row."""
+        manager = make_manager(tmp_path, sample_layout)
+        manager.add_row("Home")
+
+        config_file = tmp_path / "layout.yml"
+        with open(config_file, "r") as f:
+            data = yaml.safe_load(f)
+
+        home_tab = next(t for t in data["tabs"] if t["tab"] == "Home")
+        assert "rows" in home_tab
+        assert "columns" not in home_tab
+        assert len(home_tab["rows"]) == 2
+        # First row should have original columns
+        assert len(home_tab["rows"][0]["columns"]) == 2
+        # New row should have 3 columns (default)
+        assert len(home_tab["rows"][1]["columns"]) == 3
+
+    def test_appends_to_existing_rows(self, tmp_path):
+        """Should append new row when tab already has rows structure."""
+        layout = {
+            "tabs": [
+                {
+                    "tab": "Multi",
+                    "rows": [
+                        {"columns": [{"column": None, "widgets": []}]},
+                    ],
+                }
+            ]
+        }
+        manager = make_manager(tmp_path, layout)
+        manager.add_row("Multi")
+
+        config_file = tmp_path / "layout.yml"
+        with open(config_file, "r") as f:
+            data = yaml.safe_load(f)
+
+        tab = data["tabs"][0]
+        assert len(tab["rows"]) == 2
+
+    def test_nonexistent_tab_raises_valueerror(self, tmp_path, sample_layout):
+        """Should raise ValueError if tab not found."""
+        manager = make_manager(tmp_path, sample_layout)
+
+        with pytest.raises(ValueError, match="Tab 'Missing' not found"):
+            manager.add_row("Missing")
+
+    def test_custom_num_columns(self, tmp_path, sample_layout):
+        """Should create row with specified number of columns."""
+        manager = make_manager(tmp_path, sample_layout)
+        manager.add_row("Home", num_columns=5)
+
+        config_file = tmp_path / "layout.yml"
+        with open(config_file, "r") as f:
+            data = yaml.safe_load(f)
+
+        home_tab = next(t for t in data["tabs"] if t["tab"] == "Home")
+        new_row = home_tab["rows"][1]
+        assert len(new_row["columns"]) == 5
+
+    def test_case_insensitive_tab_name(self, tmp_path, sample_layout):
+        """Should find tab case-insensitively."""
+        manager = make_manager(tmp_path, sample_layout)
+        manager.add_row("home")
+
+        config_file = tmp_path / "layout.yml"
+        with open(config_file, "r") as f:
+            data = yaml.safe_load(f)
+
+        home_tab = next(t for t in data["tabs"] if t["tab"] == "Home")
+        assert "rows" in home_tab
+
+
+class TestErrorHandling:
+    """Tests for _read error handling."""
+
+    def test_file_not_found_raises_valueerror(self, tmp_path):
+        """Should raise ValueError when config file doesn't exist."""
+        from app.services.layout_config_manager import LayoutConfigManager
+
+        manager = LayoutConfigManager(config_path=str(tmp_path / "nonexistent.yml"))
+
+        with pytest.raises(ValueError, match="Configuration file not found"):
+            manager.get_tab_names()
+
+    def test_corrupt_yaml_raises_valueerror(self, tmp_path):
+        """Should raise ValueError when YAML is corrupted."""
+        config_file = tmp_path / "layout.yml"
+        config_file.write_text("{{invalid yaml: [")
+
+        from app.services.layout_config_manager import LayoutConfigManager
+
+        manager = LayoutConfigManager(config_path=str(config_file))
+
+        with pytest.raises(ValueError, match="Configuration file is corrupted"):
+            manager.get_tab_names()
+
+    def test_empty_yaml_returns_empty_tabs(self, tmp_path):
+        """Should handle empty YAML file gracefully."""
+        config_file = tmp_path / "layout.yml"
+        config_file.write_text("")
+
+        from app.services.layout_config_manager import LayoutConfigManager
+
+        manager = LayoutConfigManager(config_path=str(config_file))
+
+        names = manager.get_tab_names()
+        assert names == []
+
+
+class TestConcurrency:
+    """Tests for concurrent access with file locking."""
+
+    def test_concurrent_add_tabs(self, tmp_path):
+        """Should handle concurrent tab additions safely."""
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+
+        layout = {"schema_version": 2, "tabs": [{"tab": "Base", "columns": [{"column": None, "widgets": []}]}]}
+        manager = make_manager(tmp_path, layout)
+
+        def add_tab(name):
+            manager.add_tab(name)
+            return name
+
+        tab_names = [f"Tab{i}" for i in range(10)]
+        with ThreadPoolExecutor(max_workers=5) as executor:
+            futures = {executor.submit(add_tab, name): name for name in tab_names}
+            results = []
+            for future in as_completed(futures):
+                results.append(future.result())
+
+        # Verify all tabs exist
+        all_names = manager.get_tab_names()
+        assert "Base" in all_names
+        for name in tab_names:
+            assert name in all_names
+        assert len(all_names) == 11  # Base + 10 new tabs

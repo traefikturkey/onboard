@@ -8,6 +8,9 @@ import pytest
 from app.api.layout import create_layout_blueprint
 from app.factory import create_app
 
+# All POST/DELETE/PUT/PATCH requests need Origin header for CSRF check
+ORIGIN_HEADER = {"Origin": "http://localhost"}
+
 
 @pytest.fixture
 def mock_widget_order_manager():
@@ -63,6 +66,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 200
         data = response.get_json()
@@ -82,6 +86,7 @@ class TestReorderEndpoint:
             "/api/layout/reorder",
             data=json.dumps(None),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -96,6 +101,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -109,6 +115,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -123,6 +130,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -132,6 +140,7 @@ class TestReorderEndpoint:
             "/api/layout/reorder",
             data=json.dumps({"tab": "Home"}),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -146,6 +155,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -161,6 +171,7 @@ class TestReorderEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 500
         data = response.get_json()
@@ -192,6 +203,7 @@ class TestBlueprintInjection:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 200
         mock_mgr.update_columns.assert_called_once()
@@ -215,6 +227,7 @@ class TestAddTabEndpoint:
             "/api/layout/tabs",
             data=json.dumps({"name": "New Tab"}),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 201
         data = response.get_json()
@@ -228,6 +241,7 @@ class TestAddTabEndpoint:
             "/api/layout/tabs",
             data=json.dumps({"name": ""}),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -238,6 +252,7 @@ class TestAddTabEndpoint:
             "/api/layout/tabs",
             data=json.dumps({"name": "Home"}),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 409
 
@@ -245,7 +260,7 @@ class TestAddTabEndpoint:
 class TestDeleteTabEndpoint:
     def test_valid_returns_200(self, client, mock_layout_config_manager):
         """Valid tab deletion returns 200."""
-        response = client.delete("/api/layout/tabs/Home")
+        response = client.delete("/api/layout/tabs/Home", headers=ORIGIN_HEADER)
         assert response.status_code == 200
         data = response.get_json()
         assert data["success"] is True
@@ -254,7 +269,7 @@ class TestDeleteTabEndpoint:
     def test_not_found_returns_404(self, client, mock_layout_config_manager):
         """Tab not found returns 404."""
         mock_layout_config_manager.delete_tab.side_effect = ValueError("Tab not found")
-        response = client.delete("/api/layout/tabs/NonExistent")
+        response = client.delete("/api/layout/tabs/NonExistent", headers=ORIGIN_HEADER)
         assert response.status_code == 404
 
     def test_last_tab_returns_400(self, client, mock_layout_config_manager):
@@ -262,7 +277,7 @@ class TestDeleteTabEndpoint:
         mock_layout_config_manager.delete_tab.side_effect = ValueError(
             "Cannot delete the last tab"
         )
-        response = client.delete("/api/layout/tabs/Home")
+        response = client.delete("/api/layout/tabs/Home", headers=ORIGIN_HEADER)
         assert response.status_code == 400
 
 
@@ -281,6 +296,7 @@ class TestAddWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 201
         data = response.get_json()
@@ -308,6 +324,7 @@ class TestAddWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -323,6 +340,7 @@ class TestAddWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -339,6 +357,7 @@ class TestAddWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 404
 
@@ -357,6 +376,7 @@ class TestMoveWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 200
         data = response.get_json()
@@ -375,6 +395,7 @@ class TestMoveWidgetEndpoint:
             "/api/layout/move-widget",
             data=json.dumps({}),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 400
 
@@ -391,5 +412,260 @@ class TestMoveWidgetEndpoint:
                 }
             ),
             content_type="application/json",
+            headers=ORIGIN_HEADER,
         )
         assert response.status_code == 404
+
+
+class TestAddRowEndpoint:
+    """Tests for POST /api/layout/rows endpoint."""
+
+    def test_valid_returns_201(self, client, mock_layout_config_manager):
+        """Valid row addition returns 201."""
+        mock_layout_config_manager.add_row.return_value = None
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({"tab": "Home"}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 201
+        data = response.get_json()
+        assert data["success"] is True
+        assert data["message"] == "Row added"
+        mock_layout_config_manager.add_row.assert_called_once_with("Home", 3)
+
+    def test_missing_tab_returns_400(self, client):
+        """Missing tab returns 400."""
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_nonexistent_tab_returns_404(self, client, mock_layout_config_manager):
+        """Nonexistent tab returns 404."""
+        mock_layout_config_manager.add_row.side_effect = ValueError("Tab 'Missing' not found")
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({"tab": "Missing"}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 404
+
+    def test_custom_num_columns(self, client, mock_layout_config_manager):
+        """Custom num_columns is passed through."""
+        mock_layout_config_manager.add_row.return_value = None
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({"tab": "Home", "num_columns": 5}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 201
+        mock_layout_config_manager.add_row.assert_called_once_with("Home", 5)
+
+    def test_invalid_num_columns_returns_400(self, client):
+        """num_columns out of range returns 400."""
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({"tab": "Home", "num_columns": 0}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+        response = client.post(
+            "/api/layout/rows",
+            data=json.dumps({"tab": "Home", "num_columns": 13}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+
+class TestSSRFProtection:
+    """Tests for SSRF protection in feed URL validation."""
+
+    def test_localhost_rejected(self, client):
+        """Feed URL pointing to localhost should be rejected."""
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test",
+                "feed_url": "http://localhost/feed",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_loopback_ip_rejected(self, client):
+        """Feed URL pointing to 127.0.0.1 should be rejected."""
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test",
+                "feed_url": "http://127.0.0.1/feed",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_private_ip_rejected(self, client):
+        """Feed URL pointing to private IP should be rejected."""
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test",
+                "feed_url": "http://10.0.0.1/feed",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_metadata_endpoint_rejected(self, client):
+        """Feed URL pointing to cloud metadata endpoint should be rejected."""
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test",
+                "feed_url": "http://169.254.169.254/latest/meta-data/",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_valid_external_url_accepted(self, client, mock_layout_config_manager):
+        """Valid external feed URL should be accepted."""
+        mock_layout_config_manager.add_widget.return_value = "widget123"
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test",
+                "feed_url": "https://example.com/feed.xml",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 201
+
+
+class TestYAMLInjection:
+    """Tests for YAML injection protection in name validation."""
+
+    def test_newline_in_tab_name_rejected(self, client):
+        """Tab name with newline should be rejected."""
+        response = client.post(
+            "/api/layout/tabs",
+            data=json.dumps({"name": "Test\nInjection"}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_null_byte_in_tab_name_rejected(self, client):
+        """Tab name with null byte should be rejected."""
+        response = client.post(
+            "/api/layout/tabs",
+            data=json.dumps({"name": "Test\x00Injection"}),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+    def test_yaml_metachar_in_tab_name_rejected(self, client):
+        """Tab name starting with YAML metacharacter should be rejected."""
+        for char in ["{", "[", "&", "*", "!", "|", ">", "%", "@", "`"]:
+            response = client.post(
+                "/api/layout/tabs",
+                data=json.dumps({"name": f"{char}injection"}),
+                content_type="application/json",
+                headers=ORIGIN_HEADER,
+            )
+            assert response.status_code == 400, f"Expected 400 for name starting with '{char}'"
+
+    def test_newline_in_widget_name_rejected(self, client):
+        """Widget name with newline should be rejected."""
+        response = client.post(
+            "/api/layout/widgets",
+            data=json.dumps({
+                "tab": "Home",
+                "name": "Test\nInjection",
+                "feed_url": "https://example.com/feed",
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 400
+
+
+class TestErrorSanitization:
+    """Tests for 500 error response sanitization."""
+
+    def test_500_does_not_expose_internals(self, client, mock_widget_order_manager):
+        """500 errors should not expose internal error details."""
+        mock_widget_order_manager.update_columns.side_effect = RuntimeError(
+            "SQLALCHEMY_DATABASE_URI=postgresql://secret:pass@db/mydb"
+        )
+        response = client.post(
+            "/api/layout/reorder",
+            data=json.dumps({
+                "tab": "Home",
+                "columns": [{"col_key": "0.0", "widget_ids": ["a"]}],
+            }),
+            content_type="application/json",
+            headers=ORIGIN_HEADER,
+        )
+        assert response.status_code == 500
+        data = response.get_json()
+        assert "secret" not in str(data)
+        assert "postgresql" not in str(data)
+        assert data["details"] == "An internal error occurred"
+        assert data["error"] == "InternalError"
+
+
+class TestCSRFProtection:
+    """Tests for CSRF protection."""
+
+    def test_post_without_origin_returns_403(self, client):
+        """POST without Origin header should be rejected."""
+        response = client.post(
+            "/api/layout/tabs",
+            data=json.dumps({"name": "Test"}),
+            content_type="application/json",
+        )
+        assert response.status_code == 403
+        data = response.get_json()
+        assert data["error"] == "Forbidden"
+
+    def test_delete_without_origin_returns_403(self, client):
+        """DELETE without Origin header should be rejected."""
+        response = client.delete("/api/layout/tabs/Home")
+        assert response.status_code == 403
+
+    def test_get_without_origin_allowed(self, client, mock_layout_config_manager):
+        """GET requests should not require Origin header."""
+        response = client.get("/api/layout/tabs")
+        assert response.status_code == 200
+
+    def test_cross_origin_rejected(self, client):
+        """Cross-origin POST should be rejected."""
+        response = client.post(
+            "/api/layout/tabs",
+            data=json.dumps({"name": "Test"}),
+            content_type="application/json",
+            headers={"Origin": "http://evil.com"},
+        )
+        assert response.status_code == 403
