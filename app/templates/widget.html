@@ -10,7 +10,7 @@
       <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
         <i class="fas fa-grip-vertical drag-handle"></i>
         <div class="widget-move-menu" data-widget-id="{{ widget.id }}">
-          <i class="fas fa-arrows-alt move-btn" onclick="toggleMoveMenu(event, this)"></i>
+          <i class="fas fa-arrows-alt move-btn" tabindex="0" role="button" aria-label="Move widget" onclick="toggleMoveMenu(event, this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMoveMenu(event,this)}"></i>
           <div class="move-dropdown" style="display:none"></div>
         </div>
         <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a>
@@ -28,7 +28,7 @@
     <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
       <i class="fas fa-grip-vertical drag-handle"></i>
       <div class="widget-move-menu" data-widget-id="{{ widget.id }}">
-        <i class="fas fa-arrows-alt move-btn" onclick="toggleMoveMenu(event, this)"></i>
+        <i class="fas fa-arrows-alt move-btn" tabindex="0" role="button" aria-label="Move widget" onclick="toggleMoveMenu(event, this)" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();toggleMoveMenu(event,this)}"></i>
         <div class="move-dropdown" style="display:none"></div>
       </div>
       <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>

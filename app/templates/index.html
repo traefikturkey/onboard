@@ -56,7 +56,7 @@
 						   data-index="{{ loop.index }}"
 						   data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
 					{% endfor %}
-					<a href="#" class="add-tab-btn" onclick="showAddTabModal(event)" title="Add tab">+</a>
+					<a href="#" class="add-tab-btn" onclick="showAddTabModal(event)" title="Add tab" aria-label="Add new tab">+</a>
 				</div>
 			</div>
 			<div class="column">
@@ -69,6 +69,11 @@
 					{% include "row.html" %}
 				{% endwith %}
 			{% endfor %}
+			<div class="add-row-btn-wrapper">
+				<button class="add-row-btn" data-tab="{{ tab_name }}" onclick="submitAddRow(this)">
+					<i class="fas fa-plus"></i> Add Row
+				</button>
+			</div>
 		</div>
 		<footer>
 			<div>
@@ -436,6 +441,25 @@
         });
     }
 
+    // Tab drop hover feedback during drag
+    document.addEventListener('dragover', function(e) {
+        var tabLink = e.target.closest('.tab-bar a:not(.add-tab-btn)');
+        if (tabLink && document.body.classList.contains('edit-mode')) {
+            tabLink.classList.add('tab-drop-hover');
+        }
+    });
+    document.addEventListener('dragleave', function(e) {
+        var tabLink = e.target.closest('.tab-bar a:not(.add-tab-btn)');
+        if (tabLink) {
+            tabLink.classList.remove('tab-drop-hover');
+        }
+    });
+    document.addEventListener('drop', function() {
+        document.querySelectorAll('.tab-drop-hover').forEach(function(el) {
+            el.classList.remove('tab-drop-hover');
+        });
+    });
+
     // Re-initialize sortables after HTMX tab swaps
     document.addEventListener('htmx:afterSwap', function() {
         if (document.body.classList.contains('edit-mode')) {
@@ -447,6 +471,18 @@
 <script>
 // Tab and widget management: modals, move menu, drag-to-tab
 (function(){
+    // Loading state helper: disable button and show spinner during async operation
+    function withLoading(btn, promise) {
+        if (!btn) return promise;
+        btn.disabled = true;
+        var origHTML = btn.innerHTML;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> ' + btn.textContent.trim();
+        return promise.finally(function() {
+            btn.disabled = false;
+            btn.innerHTML = origHTML;
+        });
+    }
+
     window.showAddTabModal = function(e) {
         e.preventDefault();
         document.getElementById('newTabName').value = '';
@@ -457,7 +493,8 @@
     window.submitAddTab = function() {
         var name = document.getElementById('newTabName').value.trim();
         if (!name) return;
-        fetch('/api/layout/tabs', {
+        var btn = document.querySelector('#addTabModal .modal-btn-primary');
+        withLoading(btn, fetch('/api/layout/tabs', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name: name })
@@ -471,7 +508,7 @@
             }
         }).catch(function(err) {
             console.error('Failed to add tab:', err);
-        });
+        }));
     };
 
     window.showAddWidgetModal = function(btn) {
@@ -494,7 +531,8 @@
             alert('Feed name and Feed URL are required');
             return;
         }
-        fetch('/api/layout/widgets', {
+        var btn = document.querySelector('#addWidgetModal .modal-btn-primary');
+        withLoading(btn, fetch('/api/layout/widgets', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ tab: tab, name: name, feed_url: feedUrl, link: link, col_index: colIndex })
@@ -508,7 +546,7 @@
             }
         }).catch(function(err) {
             console.error('Failed to add widget:', err);
-        });
+        }));
     };
 
     window.closeModal = function(id) {
@@ -569,10 +607,42 @@
         });
     };
 
+    window.submitAddRow = function(btn) {
+        var tab = btn.getAttribute('data-tab');
+        if (!tab) return;
+        withLoading(btn, fetch('/api/layout/rows', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tab: tab })
+        }).then(function(resp) {
+            if (resp.ok) {
+                window.location.reload();
+            } else {
+                resp.json().then(function(data) {
+                    alert(data.details || data.error || 'Failed to add row');
+                });
+            }
+        }).catch(function(err) {
+            console.error('Failed to add row:', err);
+        }));
+    };
+
     // Close move dropdowns when clicking outside
     document.addEventListener('click', function(e) {
         if (!e.target.closest('.widget-move-menu')) {
             document.querySelectorAll('.move-dropdown').forEach(function(d) { d.style.display = 'none'; });
+        }
+    });
+
+    // Close modals and dropdowns on Escape key
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.modal-overlay.active').forEach(function(m) {
+                m.classList.remove('active');
+            });
+            document.querySelectorAll('.move-dropdown').forEach(function(d) {
+                d.style.display = 'none';
+            });
         }
     });
 })();

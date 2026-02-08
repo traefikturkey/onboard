@@ -16,6 +16,9 @@
             {% include widget.template ignore missing with context %}
           </div>
         {% endfor %}
+        {% if not column.widgets %}
+        <div class="empty-column-hint">Use Edit Layout to add feeds.</div>
+        {% endif %}
         <div class="add-widget-btn-wrapper">
           <button class="add-widget-btn" data-tab="{{ tab_name }}" data-col-index="{{ loop.index0 }}"
                   onclick="showAddWidgetModal(this)">
