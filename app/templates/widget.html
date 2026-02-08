@@ -8,6 +8,7 @@
        data-loading-class-remove="widget-loading">
     <div class="box {{ widget.type }}-box">
       <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
+        <i class="fas fa-grip-vertical drag-handle"></i>
         <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a>
       </div>
     <div class="box-content {{ widget.type }}-content">
@@ -21,6 +22,7 @@
 {% else %}
   <div class="box {{ widget.type }}-box">
     <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
+      <i class="fas fa-grip-vertical drag-handle"></i>
       <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
     <div class="box-content {{ widget.type }}-content">
   <ul data-widget="feed" data-open-id="">

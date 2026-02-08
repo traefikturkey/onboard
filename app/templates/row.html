@@ -1,15 +1,20 @@
-<div class="row content">
+<div class="row content" data-row-path="{{ row_path|default('0') }}">
   {% for column in row.columns %}
-    <div class="column">
+    <div class="column {% if not column.rows %}widget-container{% endif %}"
+         data-col-index="{{ loop.index0 }}"
+         data-row-path="{{ row_path|default('0') }}"
+         data-tab="{{ tab_name }}">
       {% if column.rows %}
         {% for row in column.rows %}
-          {% with row=row %}
+          {% with row=row, row_path=(row_path|default('0') ~ '.' ~ loop.index0) %}
             {% include "row.html" %}
           {% endwith %}
         {% endfor %}
       {% else %}
         {% for widget in column.widgets %}
-          {% include widget.template ignore missing with context %}
+          <div class="widget-wrapper" data-widget-id="{{ widget.id }}">
+            {% include widget.template ignore missing with context %}
+          </div>
         {% endfor %}
       {% endif %}
     </div>

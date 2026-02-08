@@ -86,6 +86,7 @@ class TestLayout(unittest.TestCase):
         self.layout.headers = []
         # Mock bar_manager since reload() needs it
         self.layout.bar_manager = MagicMock()
+        self.layout.widget_order_manager = None
         # ensure scheduler methods are patched when reload runs
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
@@ -218,6 +219,7 @@ class TestLayoutUncoveredPaths(unittest.TestCase):
         self.layout.tabs = []
         self.layout.headers = []
         self.layout.bar_manager = MagicMock()
+        self.layout.widget_order_manager = None
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
 
@@ -359,6 +361,145 @@ class TestInstanceIsolation(unittest.TestCase):
         self.assertEqual(col1.widgets, ["widget1"])
         self.assertEqual(col2.rows, [])
         self.assertEqual(col2.widgets, [])
+
+
+class TestWidgetOrdering(unittest.TestCase):
+    """Tests for widget order overlay integration."""
+
+    def setUp(self):
+        self.layout = object.__new__(Layout)
+        self.layout.id = "layout"
+        self.layout.tabs = []
+        self.layout.headers = []
+        self.layout.bar_manager = MagicMock()
+        self.layout.widget_order_manager = MagicMock()
+
+    def test_apply_widget_order_reorders_widgets(self):
+        """_apply_widget_order reorders column widgets based on overlay."""
+        w1 = MagicMock()
+        w1.id = "aaa"
+        w2 = MagicMock()
+        w2.id = "bbb"
+        w3 = MagicMock()
+        w3.id = "ccc"
+
+        column = MagicMock()
+        column.rows = []
+        column.widgets = [w1, w2, w3]
+
+        row = MagicMock()
+        row.columns = [column]
+
+        tab = MagicMock()
+        tab.name = "Home"
+        tab.rows = [row]
+
+        self.layout.tabs = [tab]
+        # Overlay says: reverse order
+        self.layout.widget_order_manager.get_column_order.return_value = [
+            "ccc",
+            "bbb",
+            "aaa",
+        ]
+
+        self.layout._apply_widget_order()
+
+        self.assertEqual(column.widgets, [w3, w2, w1])
+
+    def test_apply_widget_order_no_manager(self):
+        """_apply_widget_order does nothing without manager."""
+        self.layout.widget_order_manager = None
+        # Should not raise
+        self.layout._apply_widget_order()
+
+    def test_apply_widget_order_empty_overlay(self):
+        """_apply_widget_order preserves order when overlay is empty."""
+        w1 = MagicMock()
+        w1.id = "aaa"
+        w2 = MagicMock()
+        w2.id = "bbb"
+
+        column = MagicMock()
+        column.rows = []
+        column.widgets = [w1, w2]
+
+        row = MagicMock()
+        row.columns = [column]
+
+        tab = MagicMock()
+        tab.name = "Home"
+        tab.rows = [row]
+
+        self.layout.tabs = [tab]
+        self.layout.widget_order_manager.get_column_order.return_value = []
+
+        self.layout._apply_widget_order()
+
+        # Order should be unchanged
+        self.assertEqual(column.widgets, [w1, w2])
+
+    def test_apply_widget_order_partial_overlay(self):
+        """Widgets not in overlay are appended after ordered ones."""
+        w1 = MagicMock()
+        w1.id = "aaa"
+        w2 = MagicMock()
+        w2.id = "bbb"
+        w3 = MagicMock()
+        w3.id = "ccc"
+
+        column = MagicMock()
+        column.rows = []
+        column.widgets = [w1, w2, w3]
+
+        row = MagicMock()
+        row.columns = [column]
+
+        tab = MagicMock()
+        tab.name = "Home"
+        tab.rows = [row]
+
+        self.layout.tabs = [tab]
+        # Only ccc is in overlay
+        self.layout.widget_order_manager.get_column_order.return_value = ["ccc"]
+
+        self.layout._apply_widget_order()
+
+        # ccc first, then the rest in original order
+        self.assertEqual(column.widgets, [w3, w1, w2])
+
+    def test_is_modified_checks_overlay(self):
+        """is_modified returns True when overlay is newer than last_reload."""
+        self.layout.config_path = MagicMock()
+        self.layout.last_reload = 100
+
+        # Layout file is older
+        with patch("os.path.getmtime", return_value=50):
+            # Overlay is newer
+            self.layout.widget_order_manager.mtime = 200
+            self.assertTrue(self.layout.is_modified())
+
+    def test_is_modified_false_when_both_old(self):
+        """is_modified returns False when both files are older."""
+        self.layout.config_path = MagicMock()
+        self.layout.last_reload = 100
+
+        with patch("os.path.getmtime", return_value=50):
+            self.layout.widget_order_manager.mtime = 50
+            self.assertFalse(self.layout.is_modified())
+
+    def test_save_widget_order_delegates(self):
+        """save_widget_order delegates to widget_order_manager."""
+        columns_data = [{"col_key": "0.0", "widget_ids": ["a"]}]
+        self.layout.save_widget_order("Home", columns_data)
+        self.layout.widget_order_manager.update_columns.assert_called_once_with(
+            "Home", columns_data
+        )
+
+    def test_save_widget_order_no_manager(self):
+        """save_widget_order does nothing without manager."""
+        self.layout.widget_order_manager = None
+        # Should not raise
+        self.layout.save_widget_order("Home", [])
 
 
 if __name__ == "__main__":

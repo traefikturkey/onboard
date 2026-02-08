@@ -26,6 +26,7 @@ class Layout:
         config_file: str = "configs/layout.yml",
         bar_manager=None,
         skip_file_init: bool = False,
+        widget_order_manager=None,
     ):
         # Instance attributes (not shared across instances)
         self.id: str = "layout"
@@ -53,6 +54,13 @@ class Layout:
         # Allow injection of bar_manager for testing
         self.bar_manager = bar_manager or BookmarkBarManager()
 
+        # Widget order overlay manager (optional)
+        self.widget_order_manager = widget_order_manager
+        if not widget_order_manager and not skip_file_init:
+            from app.services.widget_order_manager import WidgetOrderManager
+
+            self.widget_order_manager = WidgetOrderManager()
+
         if not skip_file_init:
             self.reload()
 
@@ -72,6 +80,8 @@ class Layout:
 
     def is_modified(self):
         modified = self.mtime > self.last_reload
+        if not modified and self.widget_order_manager:
+            modified = self.widget_order_manager.mtime > self.last_reload
         logger.info(f"Layout modified?: {modified}")
         return modified
 
@@ -97,10 +107,50 @@ class Layout:
         ]
         self.headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
 
+        self._apply_widget_order()
+
         self.last_reload = self.mtime
         self.feed_hash = {}
 
         logger.debug("Completed Layout reload!")
+
+    def _apply_widget_order(self):
+        """Reorder widgets in columns based on the overlay file."""
+        if not self.widget_order_manager:
+            return
+        for tab in self.tabs:
+            self._apply_tab_order(tab, tab.name)
+
+    def _apply_tab_order(self, tab, tab_name, row_path="0"):
+        """Recursively apply widget ordering to all columns in a tab."""
+        for row in tab.rows:
+            for col_idx, column in enumerate(row.columns):
+                if column.rows:
+                    for nested_idx, nested_row in enumerate(column.rows):
+                        nested_path = f"{row_path}.{col_idx}"
+                        nested_tab = type("_NS", (), {"rows": [nested_row]})()
+                        self._apply_tab_order(nested_tab, tab_name, nested_path)
+                else:
+                    col_key = f"{row_path}.{col_idx}"
+                    ordered_ids = self.widget_order_manager.get_column_order(
+                        tab_name, col_key
+                    )
+                    if ordered_ids:
+                        self._reorder_widgets(column, ordered_ids)
+
+    @staticmethod
+    def _reorder_widgets(column, ordered_ids):
+        """Reorder a column's widgets to match the given ID order."""
+        widget_map = {w.id: w for w in column.widgets}
+        ordered = [widget_map[wid] for wid in ordered_ids if wid in widget_map]
+        ordered_set = {wid for wid in ordered_ids}
+        remaining = [w for w in column.widgets if w.id not in ordered_set]
+        column.widgets = ordered + remaining
+
+    def save_widget_order(self, tab, columns_data):
+        """Save widget ordering overlay for a tab."""
+        if self.widget_order_manager:
+            self.widget_order_manager.update_columns(tab, columns_data)
 
     def _load_layout_from_file(self) -> dict:
         """Helper to load YAML layout content from the configured path.

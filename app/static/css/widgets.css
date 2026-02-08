@@ -138,3 +138,24 @@ li::after {
   display: table;
   clear: both;
 }
+
+/* Drag handle — hidden by default, visible in edit mode */
+.drag-handle {
+  display: none;
+  cursor: grab;
+  padding: 0 0.4em;
+  color: #888;
+}
+body.edit-mode .drag-handle {
+  display: inline-block;
+}
+
+/* Visual feedback during drag */
+.widget-ghost { opacity: 0.4; }
+.widget-chosen { box-shadow: 0 0 10px rgba(100, 150, 255, 0.5); }
+
+/* Ensure empty columns remain drop targets */
+body.edit-mode .widget-container { min-height: 50px; }
+
+/* Edit mode header behavior */
+body.edit-mode .drag-handle { cursor: grab; }

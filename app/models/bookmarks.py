@@ -1,7 +1,7 @@
 import logging
 
 from .bookmark import Bookmark
-from .utils import from_list
+from .utils import calculate_sha1_hash, from_list
 from .widget import Widget
 
 logger = logging.getLogger(__name__)
@@ -22,6 +22,8 @@ class Bookmarks(Widget):
             raise ValueError(
                 "bookmark_manager is required to load bookmarks from sections."
             )
+
+        self.id = calculate_sha1_hash(widget["bookmarks_section"])
 
         section_key = widget["bookmarks_section"]
         section = bookmark_manager.get_section(section_key)

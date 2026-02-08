@@ -20,6 +20,7 @@
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-preload@2.0.2/dist/preload.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-head-support@2.0.2/dist/head-support.js"></script>
 	<script defer src="https://cdn.jsdelivr.net/npm/htmx-ext-loading-states@2.0.2/dist/loading-states.js"></script>
+	<script defer src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.6/Sortable.min.js"></script>
 	<!-- Dev: Alpine.js was removed from runtime; re-add intentionally if needed for development -->
 
 		<!-- Use Font Awesome CSS only (no JS injection) to keep icons as <i> elements which CSS can rotate -->
@@ -63,7 +64,7 @@
 		</div>
 		<div id="main-content">
 			{% for row in layout.tab(tab_name).rows:  %}
-				{% with row=row %}
+				{% with row=row, tab_name=tab_name, row_path='0' %}
 					{% include "row.html" %}
 				{% endwith %}
 			{% endfor %}
@@ -77,6 +78,11 @@
 			</div>
 			<div>
 				<a href="/bookmarks/manage"><i class="fas fa-bookmark"></i> Manage Bookmarks</a>
+			</div>
+			<div>
+				<a href="#" id="edit-mode-toggle" onclick="toggleEditMode(event)">
+					<i class="fas fa-pencil-alt"></i> Edit Layout
+				</a>
 			</div>
 		</footer>
 	</div>
@@ -298,6 +304,89 @@
 		if (!link || !link.dataset.trackingUrl) return;
 		link.href = link.dataset.trackingUrl;
 	}, true);
+})();
+</script>
+<script>
+// Edit mode toggle and SortableJS widget drag-and-drop
+(function(){
+    var sortableInstances = [];
+
+    window.toggleEditMode = function(e) {
+        e.preventDefault();
+        var active = document.body.classList.toggle('edit-mode');
+        var toggle = document.getElementById('edit-mode-toggle');
+        if (toggle) {
+            toggle.innerHTML = active
+                ? '<i class="fas fa-check"></i> Done Editing'
+                : '<i class="fas fa-pencil-alt"></i> Edit Layout';
+        }
+        if (active) {
+            initSortables();
+        } else {
+            destroySortables();
+        }
+    };
+
+    function initSortables() {
+        destroySortables();
+        var containers = document.querySelectorAll('.widget-container');
+        containers.forEach(function(el) {
+            var s = Sortable.create(el, {
+                group: 'widgets',
+                handle: '.drag-handle',
+                ghostClass: 'widget-ghost',
+                chosenClass: 'widget-chosen',
+                animation: 150,
+                onEnd: function() {
+                    saveOrder();
+                }
+            });
+            sortableInstances.push(s);
+        });
+    }
+
+    function destroySortables() {
+        sortableInstances.forEach(function(s) { s.destroy(); });
+        sortableInstances = [];
+    }
+
+    function saveOrder() {
+        var containers = document.querySelectorAll('.widget-container');
+        var tab = '';
+        var columns = [];
+        containers.forEach(function(el) {
+            var rowPath = el.getAttribute('data-row-path') || '0';
+            var colIndex = el.getAttribute('data-col-index') || '0';
+            if (!tab) tab = el.getAttribute('data-tab') || '';
+            var wrappers = el.querySelectorAll(':scope > .widget-wrapper');
+            var widgetIds = [];
+            wrappers.forEach(function(w) {
+                var id = w.getAttribute('data-widget-id');
+                if (id) widgetIds.push(id);
+            });
+            columns.push({
+                col_key: rowPath + '.' + colIndex,
+                widget_ids: widgetIds
+            });
+        });
+
+        if (!tab) return;
+
+        fetch('/api/layout/reorder', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ tab: tab, columns: columns })
+        }).catch(function(err) {
+            console.error('Failed to save widget order:', err);
+        });
+    }
+
+    // Re-initialize sortables after HTMX tab swaps
+    document.addEventListener('htmx:afterSwap', function() {
+        if (document.body.classList.contains('edit-mode')) {
+            initSortables();
+        }
+    });
 })();
 </script>
 </html>

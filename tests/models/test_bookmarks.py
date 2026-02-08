@@ -87,3 +87,11 @@ class TestBookmarksInit:
         bookmarks = Bookmarks(base_widget_data, bookmark_manager=manager)
         # Existing setting should be preserved
         assert bookmarks.get("openInNewTab") is False
+
+    def test_unique_ids_for_different_sections(self, mock_bookmark_manager):
+        """Two widgets with same name but different sections get different IDs."""
+        w1_data = {"name": "SharedName", "type": "bookmarks", "link": "http://example.com", "bookmarks_section": "section_a"}
+        w2_data = {"name": "SharedName", "type": "bookmarks", "link": "http://example.com", "bookmarks_section": "section_b"}
+        w1 = Bookmarks(w1_data, bookmark_manager=mock_bookmark_manager)
+        w2 = Bookmarks(w2_data, bookmark_manager=mock_bookmark_manager)
+        assert w1.id != w2.id

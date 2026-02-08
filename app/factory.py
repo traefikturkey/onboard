@@ -18,6 +18,7 @@ def create_app(
     layout=None,
     bookmark_manager=None,
     link_tracker=None,
+    widget_order_manager=None,
     testing=False,
 ):
     """
@@ -28,6 +29,7 @@ def create_app(
         layout: Optional Layout instance (for testing)
         bookmark_manager: Optional BookmarkManager instance (for testing)
         link_tracker: Optional LinkTracker instance (for testing)
+        widget_order_manager: Optional WidgetOrderManager instance (for testing)
         testing: If True, skip production initialization
 
     Returns:
@@ -56,6 +58,7 @@ def create_app(
     app.extensions["onboard_layout"] = layout
     app.extensions["onboard_bookmark_manager"] = bookmark_manager
     app.extensions["onboard_link_tracker"] = link_tracker
+    app.extensions["onboard_widget_order_manager"] = widget_order_manager
 
     # Configure caching
     if os.environ.get("FLASK_DEBUG", "False") == "True" or testing:
@@ -90,8 +93,10 @@ def create_app(
 
     # Register blueprints
     from app.api.bookmarks import create_bookmarks_blueprint
+    from app.api.layout import create_layout_blueprint
 
     app.register_blueprint(create_bookmarks_blueprint())
+    app.register_blueprint(create_layout_blueprint())
 
     # Register main routes
     _register_routes(app, cache)
@@ -102,6 +107,7 @@ def create_app(
         _ensure_layout(app)
         _ensure_bookmark_manager(app)
         _ensure_link_tracker(app)
+        _ensure_widget_order_manager(app)
 
     # Production initialization
     if (
@@ -148,6 +154,14 @@ def _ensure_link_tracker(app):
         app.extensions["onboard_link_tracker"] = LinkTracker()
 
 
+def _ensure_widget_order_manager(app):
+    """Ensure widget order manager is initialized."""
+    if app.extensions.get("onboard_widget_order_manager") is None:
+        from app.services.widget_order_manager import WidgetOrderManager
+
+        app.extensions["onboard_widget_order_manager"] = WidgetOrderManager()
+
+
 def get_layout(app=None):
     """Get layout from app context or current_app."""
     if app is None:
@@ -173,6 +187,15 @@ def get_link_tracker(app=None):
 
         app = current_app
     return app.extensions.get("onboard_link_tracker")
+
+
+def get_widget_order_manager(app=None):
+    """Get widget order manager from app context or current_app."""
+    if app is None:
+        from flask import current_app
+
+        app = current_app
+    return app.extensions.get("onboard_widget_order_manager")
 
 
 def _register_routes(app, cache):
