@@ -8,6 +8,7 @@ from pydantic import ValidationError
 
 from app.models.bookmark_api import ErrorResponse, SuccessResponse
 from app.models.layout_api import (
+    AddRowRequest,
     AddTabRequest,
     AddWidgetRequest,
     MoveWidgetRequest,
@@ -61,8 +62,29 @@ def create_layout_blueprint(widget_order_manager=None):
     ) -> tuple[dict[str, Any], int]:
         """Handle exceptions and return error response."""
         logger.error(f"API error: {e}")
-        error_response = ErrorResponse(error=type(e).__name__, details=str(e))
+        if status_code >= 500:
+            error_response = ErrorResponse(error="InternalError", details="An internal error occurred")
+        else:
+            error_response = ErrorResponse(error=type(e).__name__, details=str(e))
         return error_response.model_dump(), status_code
+
+    @layout_bp.before_request
+    def csrf_check():
+        """Reject cross-origin state-changing requests."""
+        if request.method in ("POST", "DELETE", "PUT", "PATCH"):
+            origin = request.headers.get("Origin") or request.headers.get("Referer")
+            if not origin:
+                return ErrorResponse(
+                    error="Forbidden", details="Origin header required"
+                ).model_dump(), 403
+            from urllib.parse import urlparse
+            parsed = urlparse(origin)
+            request_host = request.host.split(":")[0]
+            origin_host = parsed.hostname or ""
+            if origin_host != request_host:
+                return ErrorResponse(
+                    error="Forbidden", details="Cross-origin request rejected"
+                ).model_dump(), 403
 
     @layout_bp.route("/reorder", methods=["POST"])
     def reorder_widgets():
@@ -215,6 +237,34 @@ def create_layout_blueprint(widget_order_manager=None):
             return jsonify(
                 SuccessResponse(message="Widget moved").model_dump()
             )
+        except Exception as e:
+            return handle_error(e, 500)
+
+    @layout_bp.route("/rows", methods=["POST"])
+    def add_row():
+        """Add a new row to a tab."""
+        try:
+            data = request.get_json()
+            if not data:
+                return handle_error(ValueError("Request body is required"), 400)
+
+            try:
+                validated = AddRowRequest(**data)
+            except ValidationError as ve:
+                return handle_error(ve, 400)
+
+            try:
+                get_config_manager().add_row(validated.tab, validated.num_columns)
+            except ValueError as ve:
+                msg = str(ve)
+                if "not found" in msg.lower():
+                    return handle_error(ve, 404)
+                return handle_error(ve, 400)
+
+            reload_layout()
+            return jsonify(
+                SuccessResponse(message="Row added").model_dump()
+            ), 201
         except Exception as e:
             return handle_error(e, 500)
 
