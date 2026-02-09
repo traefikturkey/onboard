@@ -1,5 +1,6 @@
 import logging
 import re
+import shutil
 
 from app.models.apscheduler import Scheduler
 from app.models.utils import pwd
@@ -15,15 +16,26 @@ logger.setLevel(logging.DEBUG)
 
 
 class FaviconStore:
-    def __init__(self, icon_dir="static/assets/icons"):
+    def __init__(self, icon_dir="static/assets/icons", defaults_dir="defaults/icons"):
         self.relative_icon_dir = icon_dir
         self.icon_dir = pwd.joinpath(icon_dir).resolve()
         self.icon_dir.mkdir(parents=True, exist_ok=True)
+        self._seed_from_defaults(pwd.joinpath(defaults_dir))
 
         self.ip_pattern = re.compile(
             r"^(?:(?:https?://)?(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}"
             r"(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(?::\d{1,5})?(?:\/)?$"
         )
+
+    def _seed_from_defaults(self, defaults_dir):
+        """Copy curated favicons from defaults/icons/ into the icon directory."""
+        if not defaults_dir.is_dir():
+            return
+        for src in defaults_dir.iterdir():
+            dest = self.icon_dir / src.name
+            if not dest.exists():
+                shutil.copy2(src, dest)
+                logger.debug(f"Seeded favicon {src.name} from defaults")
 
     @property
     def scheduler(self):
