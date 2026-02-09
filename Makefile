@@ -128,11 +128,26 @@ start: buildx
 up: buildx
 	$(CONTAINER_RUNTIME) run --rm --name onboard_prod_run -p 9830:9830 onboard:prod
 
+dev: buildx
+	$(CONTAINER_RUNTIME) run --rm --name onboard_dev_run -p 9830:9830 \
+		-v $(CURDIR)/app:/srv/app \
+		-v $(CURDIR)/run.py:/srv/run.py:ro \
+		-e FLASK_DEBUG=1 \
+		onboard:prod python run.py
+
+dev-bg: buildx
+	$(CONTAINER_RUNTIME) run --rm -d --name onboard_dev_run -p 9830:9830 \
+		-v $(CURDIR)/app:/srv/app \
+		-v $(CURDIR)/run.py:/srv/run.py:ro \
+		-e FLASK_DEBUG=1 \
+		onboard:prod python run.py
+
 down:
-	$(CONTAINER_RUNTIME) stop onboard_prod_run
+	-$(CONTAINER_RUNTIME) stop onboard_prod_run 2>/dev/null
+	-$(CONTAINER_RUNTIME) stop onboard_dev_run 2>/dev/null
 
 logs:
-	$(CONTAINER_RUNTIME) logs onboard_prod_run -f
+	$(CONTAINER_RUNTIME) logs -f $$($(CONTAINER_RUNTIME) ps -q --filter "name=onboard_" | head -1)
 
 
 restart: buildx down start
