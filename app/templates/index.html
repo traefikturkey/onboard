@@ -59,8 +59,11 @@
 					<a href="#" class="add-tab-btn" onclick="showAddTabModal(event)" title="Add tab" aria-label="Add new tab">+</a>
 				</div>
 			</div>
-			<div class="column">
-				<div class="logo"><!-- Placeholder for the logo --></div>
+			<div class="column header-right">
+				<a href="/bookmarks/manage"><i class="fas fa-bookmark"></i> Manage Bookmarks</a>
+				<a href="#" id="edit-mode-toggle" onclick="toggleEditMode(event)">
+					<i class="fas fa-pencil-alt"></i> Edit Layout
+				</a>
 			</div>
 		</div>
 		<div id="main-content">
@@ -76,20 +79,10 @@
 			</div>
 		</div>
 		<footer>
-			<div>
-				<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
-				is a
-				<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a>
-				&copy; {{ today_date.year }}
-			</div>
-			<div>
-				<a href="/bookmarks/manage"><i class="fas fa-bookmark"></i> Manage Bookmarks</a>
-			</div>
-			<div>
-				<a href="#" id="edit-mode-toggle" onclick="toggleEditMode(event)">
-					<i class="fas fa-pencil-alt"></i> Edit Layout
-				</a>
-			</div>
+			<a href="https://github.com/traefikturkey/onboard" target="_blank">OnBoard</a>
+			is a
+			<a href="https://github.com/traefikturkey" target="_blank">TraefikTurkey Project</a>
+			&copy; {{ today_date.year }}
 		</footer>
 	</div>
 

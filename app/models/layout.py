@@ -276,8 +276,10 @@ def _copy_default_to_configs():
 
     files_copied = 0
     for file in os.listdir(default_dir):
+        src = os.path.join(default_dir, file)
+        if os.path.isdir(src):
+            continue
         if file not in os.listdir(config_dir):
-            src = os.path.join(default_dir, file)
             dst = os.path.join(config_dir, file)
             shutil.copy2(src, dst)
             files_copied += 1
