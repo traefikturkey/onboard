@@ -1,5 +1,5 @@
 # syntax=docker/dockerfile:1.7-labs
-ARG PYTHON_VERSION=3.12-slim-bookworm
+ARG PYTHON_VERSION=3.15.0-slim-bookworm
 
 FROM python:${PYTHON_VERSION} as base
 LABEL maintainer="Mike Glenn <mglenn@ilude.com>"
@@ -133,6 +133,10 @@ ENV ONBOARD_PORT=${ONBOARD_PORT:-9830}
 # ----------------------------------------------------------------------
 FROM base as build-base
 
+# flask-minify[go] needs Go when no wheel is available for the target Python.
+COPY --from=golang:1.26-bookworm /usr/local/go /usr/local/go
+ENV PATH="/usr/local/go/bin:${PATH}"
+
 # Install build dependencies needed for compiling Python packages
 RUN --mount=type=cache,id=apt-cache,target=/var/cache/apt,sharing=locked \
     --mount=type=cache,id=apt-lists,target=/var/lib/apt/lists,sharing=locked \
@@ -196,7 +200,7 @@ COPY --chown=${USER}:${USER} app ${PROJECT_PATH}/app
 COPY --chown=${USER}:${USER} run.py ${PROJECT_PATH}/run.py
 
 # Bring in dependencies installed into the system prefix from the build stage
-COPY --from=build /usr/local/lib/python3.12/site-packages /usr/local/lib/python3.12/site-packages
+COPY --from=build /usr/local/lib/python3.15/site-packages /usr/local/lib/python3.15/site-packages
 COPY --from=build /usr/local/bin /usr/local/bin
 
 ENV FLASK_ENV=production

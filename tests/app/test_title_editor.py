@@ -52,6 +52,18 @@ class TestTitleEditor(unittest.TestCase):
         self.assertTrue(hasattr(editor, "mistral_chain"))
         self.assertEqual(editor.script_hash, "hash")
 
+    def test_cached_processed_title_is_used_as_display_name(self):
+        article = FeedArticle(
+            original_title="Original Title",
+            title="Edited Title",
+            link="https://example.com",
+            description="Description",
+            pub_date=None,
+            processed="saved-script-hash",
+            parent=self.mock_parent,
+        )
+        self.assertEqual(article.name, "Edited Title")
+
     @patch.dict(os.environ, {}, clear=True)
     def test_init_without_ollama_url(self):
         editor = TitleEditor()
@@ -99,6 +111,7 @@ class TestTitleEditor(unittest.TestCase):
         articles = [article1]
         result = editor.process(articles)
         self.assertEqual(result[0].title, "Edited Title")
+        self.assertEqual(result[0].name, "Edited Title")
         self.assertEqual(result[0].processed, "hash")
 
     @patch.dict(os.environ, {"OLLAMA_URL": "localhost"})

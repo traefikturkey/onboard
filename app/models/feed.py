@@ -11,12 +11,13 @@ from pathlib import Path
 import dateutil
 import feedparser
 
+from app.processors.strip_long_urls import StripLongUrls
+
 from .feed_article import FeedArticle
 from .feed_cache import FeedCache
 from .noop_feed_processor import NoOpFeedProcessor
 from .utils import calculate_sha1_hash, pwd
 from .widget import Widget
-from app.processors.strip_long_urls import StripLongUrls
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.DEBUG)
@@ -295,10 +296,10 @@ class Feed(Widget):
             for processor in self.widget["process"]:
                 processor_name = processor["processor"]
                 # Check both app/processors and root processors directories
-                app_processor_path = pwd.joinpath(
-                    "app", "processors", processor_name + ".py"
+                app_processor_path = pwd.joinpath("processors", processor_name + ".py")
+                root_processor_path = pwd.parent.joinpath(
+                    "processors", processor_name + ".py"
                 )
-                root_processor_path = pwd.joinpath("processors", processor_name + ".py")
 
                 processor_instance = None
                 if app_processor_path.exists():
@@ -311,7 +312,7 @@ class Feed(Widget):
                             "".join(word.title() for word in processor_name.split("_")),
                         )
                         processor_instance = processor_class()
-                    except (ImportError, AttributeError):
+                    except ImportError, AttributeError:
                         processor_instance = NoOpFeedProcessor()
                 elif root_processor_path.exists():
                     try:
@@ -321,7 +322,7 @@ class Feed(Widget):
                             "".join(word.title() for word in processor_name.split("_")),
                         )
                         processor_instance = processor_class()
-                    except (ImportError, AttributeError):
+                    except ImportError, AttributeError:
                         processor_instance = NoOpFeedProcessor()
                 else:
                     processor_instance = NoOpFeedProcessor()

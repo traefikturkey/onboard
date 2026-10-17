@@ -130,6 +130,7 @@ def feed(feed_id):
         # Use a small HTML parser to remove any hx-trigger or data-hx-trigger
         # attributes that reference the `load` event. This is more robust than
         # a regex-based removal and avoids accidentally breaking other attributes.
+        from html import escape
         from html.parser import HTMLParser
 
         class HXStripper(HTMLParser):
@@ -153,7 +154,7 @@ def feed(feed_id):
             def handle_starttag(self, tag, attrs):
                 attrs_filtered = self._filter_attrs(attrs)
                 attr_str = "".join(
-                    f' {n}="{v}"' if v is not None else f' {n}'
+                    f' {n}="{escape(v, quote=True)}"' if v is not None else f' {n}'
                     for n, v in attrs_filtered
                 )
                 self.parts.append(f"<{tag}{attr_str}>")
@@ -161,7 +162,7 @@ def feed(feed_id):
             def handle_startendtag(self, tag, attrs):
                 attrs_filtered = self._filter_attrs(attrs)
                 attr_str = "".join(
-                    f' {n}="{v}"' if v is not None else f' {n}'
+                    f' {n}="{escape(v, quote=True)}"' if v is not None else f' {n}'
                     for n, v in attrs_filtered
                 )
                 self.parts.append(f"<{tag}{attr_str}/>")
@@ -170,7 +171,7 @@ def feed(feed_id):
                 self.parts.append(f"</{tag}>")
 
             def handle_data(self, data):
-                self.parts.append(data)
+                self.parts.append(escape(data))
 
             def handle_comment(self, data):
                 self.parts.append(f"<!--{data}-->")

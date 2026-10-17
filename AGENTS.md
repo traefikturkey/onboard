@@ -2,7 +2,7 @@
 
 ## Overview
 
-- Onboard is a Python 3.12–3.13 Flask application for a configurable dashboard of feeds and bookmarks.
+- Onboard is a Python 3.15 Flask application for a configurable dashboard of feeds and bookmarks.
 - Use `uv` for Python environments and commands; dependencies are declared in the root `pyproject.toml` and locked in `uv.lock`.
 - Keep changes focused. Preserve existing public behavior and add or update tests for changed behavior.
 

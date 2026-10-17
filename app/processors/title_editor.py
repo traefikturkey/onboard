@@ -4,14 +4,14 @@ import os
 import socket
 import sys
 
-from langchain.output_parsers import ResponseSchema, StructuredOutputParser
-from langchain.prompts import (
+from langchain_classic.output_parsers import ResponseSchema, StructuredOutputParser
+from langchain_community.llms import Ollama
+from langchain_core.messages import SystemMessage
+from langchain_core.prompts import (
     ChatPromptTemplate,
     HumanMessagePromptTemplate,
     PromptTemplate,
 )
-from langchain_community.llms import Ollama
-from langchain_core.messages import SystemMessage
 
 app_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if app_dir not in sys.path:
@@ -65,9 +65,7 @@ class TitleEditor:
             )
 
             # format chat prompt
-            system_prompt = SystemMessage(
-                content=(
-                    """
+            system_prompt = SystemMessage(content=("""
     You are an expert news article title editor.
     Use the provided title and summary to write a concise and accurate title that is informative and avoids sounding like clickbait.
     Do not include links or urls in the title.
@@ -76,9 +74,7 @@ class TitleEditor:
     title MUST have an absolute minimum of punctuation.
     title MUST NOT use words that are all capitalized. NO SHOUTING!
     Only return the title in the requested format!
-    """
-                )
-            )
+    """))
             user_prompt = HumanMessagePromptTemplate(prompt=prompt)
 
             chat_prompt = ChatPromptTemplate.from_messages([system_prompt, user_prompt])
@@ -127,6 +123,7 @@ class TitleEditor:
                             }
                         )
                         article.title = result["title"]
+                        article.name = result["title"]
                         article.processed = self.script_hash
                         break
                     except Exception as ex:

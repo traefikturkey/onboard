@@ -298,64 +298,50 @@ class BookmarkManager:
         Returns:
             The moved bookmark data
         """
-        # Get the bookmark from source
-        if source["type"] == "bar":
-            bookmark = self.get_bar_bookmark(source["index"])
-            # Convert href to link for sections
+        # Validate and prepare the entire move before changing persisted state.
+        data = deepcopy(self._data)
+        source_type = source["type"]
+        if source_type == "bar":
+            source_items = data["bar"]
+        elif source_type == "section":
+            source_section = source["section_id"]
+            if source_section not in data["sections"]:
+                raise SectionNotFoundError(f"Section '{source_section}' not found")
+            source_items = data["sections"][source_section]["bookmarks"]
+        else:
+            raise ValueError(f"Invalid source type: {source_type}")
+
+        source_index = source["index"]
+        if source_index < 0 or source_index >= len(source_items):
+            raise InvalidIndexError(f"Index {source_index} out of bounds")
+        bookmark = source_items[source_index]
+
+        destination_type = destination["type"]
+        if destination_type == "bar":
+            destination_items = data["bar"]
+        elif destination_type == "section":
+            destination_section = destination["section_id"]
+            if destination_section not in data["sections"]:
+                raise SectionNotFoundError(f"Section '{destination_section}' not found")
+            destination_items = data["sections"][destination_section]["bookmarks"]
+        else:
+            raise ValueError(f"Invalid destination type: {destination_type}")
+
+        del source_items[source_index]
+        if source_type == "bar" and destination_type == "section":
             if "href" in bookmark:
-                bookmark["link"] = bookmark["href"]
-        elif source["type"] == "section":
-            bookmark = self.get_section_bookmarks(source["section_id"])[source["index"]]
-            # Convert link to href for bar
+                bookmark["link"] = bookmark.pop("href")
+        elif source_type == "section" and destination_type == "bar":
             if "link" in bookmark:
-                bookmark["href"] = bookmark["link"]
-        else:
-            raise ValueError(f"Invalid source type: {source['type']}")
+                bookmark["href"] = bookmark.pop("link")
 
-        # Delete from source
-        if source["type"] == "bar":
-            self.delete_bar_bookmark(source["index"])
-        else:
-            self.delete_section_bookmark(source["section_id"], source["index"])
+        # Resolve destination after removal, preserving same-list move behavior.
+        dest_index = destination.get("index", len(destination_items))
+        destination_items.insert(dest_index, bookmark)
 
-        # Insert at destination
-        try:
-            if destination["type"] == "bar":
-                # Ensure href is present
-                if "link" in bookmark and "href" not in bookmark:
-                    bookmark["href"] = bookmark.pop("link")
-
-                # Insert at specific index
-                dest_index = destination.get("index", len(self._data["bar"]))
-                self._data["bar"].insert(dest_index, bookmark)
-            elif destination["type"] == "section":
-                # Ensure link is present
-                if "href" in bookmark and "link" not in bookmark:
-                    bookmark["link"] = bookmark.pop("href")
-
-                if destination["section_id"] not in self._data.get("sections", {}):
-                    raise SectionNotFoundError(
-                        f"Section '{destination['section_id']}' not found"
-                    )
-
-                # Insert at specific index
-                dest_index = destination.get(
-                    "index",
-                    len(self._data["sections"][destination["section_id"]]["bookmarks"]),
-                )
-                self._data["sections"][destination["section_id"]]["bookmarks"].insert(
-                    dest_index, bookmark
-                )
-            else:
-                raise ValueError(f"Invalid destination type: {destination['type']}")
-
-            self._save()
-            return deepcopy(bookmark)
-        except Exception as e:
-            # Rollback: reload from file
-            logger.error(f"Failed to move bookmark, reloading: {e}")
-            self._load()
-            raise
+        self._data = data
+        self._save()
+        return deepcopy(bookmark)
 
     def export_bookmarks(self) -> dict[str, Any]:
         """Export all bookmarks as a dict."""

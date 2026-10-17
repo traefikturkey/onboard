@@ -23,7 +23,9 @@ class Bookmarks(Widget):
                 "bookmark_manager is required to load bookmarks from sections."
             )
 
-        section_key = widget["bookmarks_section"]
+        self.bookmark_manager = bookmark_manager
+        self.section_key = widget["bookmarks_section"]
+        section_key = self.section_key
         section = bookmark_manager.get_section(section_key)
         if section and isinstance(section, dict):
             bookmarks_data = section.get("bookmarks", [])
@@ -42,6 +44,13 @@ class Bookmarks(Widget):
             bookmarks_data = []
 
         self.items = from_list(Bookmark.from_dict, bookmarks_data, self)
+
+    @Widget.items.getter
+    def items(self):
+        """Read section bookmarks from the manager so edits appear without layout reload."""
+        section = self.bookmark_manager.get_section(self.section_key)
+        bookmarks_data = section.get("bookmarks", []) if section else []
+        return from_list(Bookmark.from_dict, bookmarks_data, self)
 
     @staticmethod
     def from_dict(widget: dict) -> "Bookmarks":

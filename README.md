@@ -46,7 +46,7 @@ On first startup, files from `app/defaults/` are copied into the empty runtime c
 
 ### Requirements
 
-- Python 3.12 or 3.13
+- Python 3.15 (the repository pins 3.15.0)
 - [uv](https://docs.astral.sh/uv/)
 - GNU Make for the repository Make targets
 - Docker for container builds and integration tests

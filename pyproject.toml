@@ -1,7 +1,7 @@
 [project]
 name = "onboard"
 version = "0.1.0"
-requires-python = ">=3.12, <=3.13"
+requires-python = ">=3.15, <3.16"
 description = "Onboard Flask application"
 authors = [{ name = "Mike Glenn", email = "mglenn@ilude.com" }]
 dependencies = [
@@ -16,8 +16,9 @@ dependencies = [
     "flask-minify",
     "flask-minify[go]",
     "gunicorn",
-    "hypercorn==0.15.0",
+    "hypercorn",
     "langchain",
+    "langchain-classic",
     "langchain-community",
     "langchain_core",
     "pandas",
@@ -36,7 +37,7 @@ DEP002 = ["gunicorn", "python-dotenv"]
 [tool.black]
 line-length = 88
 skip-string-normalization = true
-target-version = ['py312']
+target-version = ['py315']
 
 [dependency-groups]
 dev = [

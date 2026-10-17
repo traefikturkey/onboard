@@ -430,7 +430,7 @@
 									<i class="fas fa-folder"></i> Folder (<span x-text="bookmark.contents?.length || 0"></span>)
 								</span>
 							</div>
-							<div class="bookmark-url" x-text="bookmark.href || 'Click to expand folder'"></div>
+							<div class="bookmark-url" x-text="bookmark.href || bookmark.link || 'Click to expand folder'"></div>
 						</div>
 						<div class="bookmark-actions">
 							<button class="btn btn-primary" @click="openEditBookmarkModal(index)">
@@ -650,7 +650,7 @@
 				openEditBookmarkModal(index) {
 					this.editingIndex = index;
 					const bookmark = this.currentBookmarks[index];
-					this.bookmarkForm = { ...bookmark };
+					this.bookmarkForm = { ...bookmark, href: bookmark.href || bookmark.link || '' };
 					this.isFolder = !!bookmark.contents;
 					this.showBookmarkModal = true;
 				},
@@ -664,13 +664,17 @@
 					try {
 						const bookmarkData = {
 							name: this.bookmarkForm.name,
-							href: this.bookmarkForm.href || undefined,
+							[this.currentContext === 'bar' ? 'href' : 'link']: this.bookmarkForm.href || undefined,
 							favicon: this.bookmarkForm.favicon || undefined
 						};
 
 						if (this.isFolder) {
 							bookmarkData.contents = this.bookmarkForm.contents || [];
-							bookmarkData.multiColumn = this.bookmarkForm.multiColumn || false;
+							if (this.bookmarkForm.multiColumn) {
+								bookmarkData.multiColumn = Number.isInteger(this.bookmarkForm.multiColumn)
+									? this.bookmarkForm.multiColumn
+									: 1;
+							}
 							bookmarkData.openInNewTab = this.bookmarkForm.openInNewTab || false;
 						}
 
@@ -747,7 +751,10 @@
 						const response = await fetch('/api/bookmarks/sections', {
 							method: 'POST',
 							headers: { 'Content-Type': 'application/json' },
-							body: JSON.stringify(this.sectionForm)
+							body: JSON.stringify({
+							section_id: this.sectionForm.id,
+							displayName: this.sectionForm.displayName
+						})
 						});
 
 						if (!response.ok) {
@@ -755,10 +762,11 @@
 							throw new Error(error.error || 'Failed to create section');
 						}
 
+						const sectionId = this.sectionForm.id;
 						await this.loadData();
 						this.closeSectionModal();
 						this.showNotification('success', 'Section created');
-						this.switchContext(this.sectionForm.id);
+						this.switchContext(sectionId);
 					} catch (error) {
 						this.showNotification('error', error.message);
 						console.error('Create section error:', error);

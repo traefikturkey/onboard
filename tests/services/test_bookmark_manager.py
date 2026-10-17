@@ -362,6 +362,21 @@ class TestAdvancedOperations:
         assert len(bar) == 3
         assert bar[1]["name"] == "Amazon"
 
+    def test_failed_move_preserves_source_in_memory_and_on_disk(self, bookmark_manager):
+        original = bookmark_manager.export_bookmarks()
+        original_file = bookmark_manager.bookmark_path.read_text(encoding="utf-8")
+
+        with pytest.raises(SectionNotFoundError):
+            bookmark_manager.move_bookmark(
+                {"type": "bar", "index": 0},
+                {"type": "section", "section_id": "missing"},
+            )
+
+        assert bookmark_manager.export_bookmarks() == original
+        assert (
+            bookmark_manager.bookmark_path.read_text(encoding="utf-8") == original_file
+        )
+
     def test_move_bookmark_section_to_section(self, bookmark_manager):
         """Test moving a bookmark between sections."""
         source = {"type": "section", "section_id": "shopping", "index": 0}
@@ -479,21 +494,19 @@ class TestBookmarkManagerDependencyInjection:
 
         mock_bar_manager = MagicMock()
 
-        manager = BookmarkManager(
-            temp_bookmark_file, bar_manager=mock_bar_manager
-        )
+        manager = BookmarkManager(temp_bookmark_file, bar_manager=mock_bar_manager)
 
         assert manager.bar_manager is mock_bar_manager
 
-    def test_bookmark_manager_save_triggers_bar_manager_reload(self, temp_bookmark_file):
+    def test_bookmark_manager_save_triggers_bar_manager_reload(
+        self, temp_bookmark_file
+    ):
         """When bookmarks are saved, bar_manager.reload() is called."""
         from unittest.mock import MagicMock
 
         mock_bar_manager = MagicMock()
 
-        manager = BookmarkManager(
-            temp_bookmark_file, bar_manager=mock_bar_manager
-        )
+        manager = BookmarkManager(temp_bookmark_file, bar_manager=mock_bar_manager)
 
         # Add a bookmark (triggers save)
         manager.add_bar_bookmark({"name": "Test", "href": "http://test.com"})

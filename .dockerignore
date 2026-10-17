@@ -55,8 +55,8 @@ htmlcov/
 app/config/
 app/archive/
 app/.working/
-app/configs/*.db
-app/configs/*.sqlite3
+app/configs/*
+!app/configs/.keep
 app/static/.*-cache
 app/static/assets/
 app/feed_cache/

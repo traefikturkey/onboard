@@ -45,6 +45,8 @@ class FeedArticle(WidgetItem):
         self.description = normalize_text(description)
         self.pub_date = pub_date
         self.processed = processed
+        if processed:
+            self.name = self.title
 
         summary = normalize_text(self.description)
         summary = BeautifulSoup(html.unescape(summary), "html.parser").text

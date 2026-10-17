@@ -44,6 +44,35 @@ def test_reload_loads_valid_json(tmp_path, monkeypatch):
     assert mgr.get_section("test-section") is not None
 
 
+def test_get_section_reloads_when_bookmarks_file_changes(tmp_path, monkeypatch):
+    file_path = tmp_path / "bookmarks.json"
+    write_file(
+        file_path, json.dumps({"bar": [], "sections": {"section": {"bookmarks": []}}})
+    )
+
+    class Pwd:
+        def joinpath(self, _):
+            return str(file_path)
+
+    monkeypatch.setattr("app.services.bookmark_bar_manager.pwd", Pwd())
+    monkeypatch.setattr(
+        "app.services.bookmark_bar_manager.FaviconStore", lambda: DummyFaviconStore()
+    )
+    manager = BookmarkBarManager("bookmarks.json")
+    write_file(
+        file_path,
+        json.dumps(
+            {
+                "bar": [],
+                "sections": {"section": {"displayName": "Updated", "bookmarks": []}},
+            }
+        ),
+    )
+    os.utime(file_path, (manager.last_reload + 2, manager.last_reload + 2))
+
+    assert manager.get_section("section")["displayName"] == "Updated"
+
+
 def test_reload_handles_corrupt_json_and_keeps_previous(tmp_path, monkeypatch):
     file_path = tmp_path / "bookmarks.json"
     # Use consolidated schema

@@ -119,7 +119,9 @@ def create_app(
 
             apscheduler_module.Scheduler.getScheduler()
         except Exception:
-            logger.exception("Failed to eagerly reload layout during production startup")
+            logger.exception(
+                "Failed to eagerly reload layout during production startup"
+            )
 
     return app
 
@@ -194,9 +196,7 @@ def _register_routes(app, cache):
 
     @app.route("/")
     @app.route("/tab/<tab_name>")
-    @cache.cached(
-        timeout=page_timeout, unless=lambda: get_layout(app).is_modified()
-    )
+    @cache.cached(timeout=page_timeout, unless=lambda: get_layout(app).is_modified())
     def index(tab_name=None):
         layout = get_layout(app)
         if layout.is_modified():
@@ -215,6 +215,7 @@ def _register_routes(app, cache):
         feed = layout.get_feed(feed_id)
         html = render_template(feed.template, widget=feed, skip_htmx=True)
         try:
+            from html import escape
             from html.parser import HTMLParser
 
             class HXStripper(HTMLParser):
@@ -234,7 +235,7 @@ def _register_routes(app, cache):
                 def handle_starttag(self, tag, attrs):
                     attrs_filtered = self._filter_attrs(attrs)
                     attr_str = "".join(
-                        f' {n}="{v}"' if v is not None else f" {n}"
+                        f' {n}="{escape(v, quote=True)}"' if v is not None else f" {n}"
                         for n, v in attrs_filtered
                     )
                     self.parts.append(f"<{tag}{attr_str}>")
@@ -242,7 +243,7 @@ def _register_routes(app, cache):
                 def handle_startendtag(self, tag, attrs):
                     attrs_filtered = self._filter_attrs(attrs)
                     attr_str = "".join(
-                        f' {n}="{v}"' if v is not None else f" {n}"
+                        f' {n}="{escape(v, quote=True)}"' if v is not None else f" {n}"
                         for n, v in attrs_filtered
                     )
                     self.parts.append(f"<{tag}{attr_str}/>")
@@ -251,7 +252,7 @@ def _register_routes(app, cache):
                     self.parts.append(f"</{tag}>")
 
                 def handle_data(self, data):
-                    self.parts.append(data)
+                    self.parts.append(escape(data))
 
                 def handle_comment(self, data):
                     self.parts.append(f"<!--{data}-->")

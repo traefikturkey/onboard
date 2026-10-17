@@ -13,7 +13,9 @@ logger.setLevel(logging.DEBUG)
 
 
 class BookmarkBarManager:
-    def __init__(self, bookmark_bar_file: str = "configs/bookmarks.json", favicon_store=None):
+    def __init__(
+        self, bookmark_bar_file: str = "configs/bookmarks.json", favicon_store=None
+    ):
         self.bookmark_bar_path = Path(pwd.joinpath(bookmark_bar_file))
         # Allow injection for testing
         self.favicon_store = favicon_store or FaviconStore()
@@ -29,6 +31,8 @@ class BookmarkBarManager:
 
     def get_section(self, section_key: str) -> dict[str, Any] | None:
         """Retrieve a bookmark section by its key from the consolidated schema."""
+        if self.is_modified():
+            self.reload()
         if not hasattr(self, "_sections"):
             return None
         return self._sections.get(section_key)

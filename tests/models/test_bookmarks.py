@@ -56,6 +56,19 @@ class TestBookmarksInit:
         bookmarks = Bookmarks(base_widget_data, bookmark_manager=manager)
         assert list(bookmarks.items) == []
 
+    def test_existing_widget_reflects_section_changes(self, base_widget_data):
+        manager = MagicMock()
+        manager.get_section.return_value = {
+            "bookmarks": [{"name": "First", "link": "http://first"}]
+        }
+        bookmarks = Bookmarks(base_widget_data, bookmark_manager=manager)
+
+        assert list(bookmarks.items)[0].name == "First"
+        manager.get_section.return_value = {
+            "bookmarks": [{"name": "Second", "link": "http://second"}]
+        }
+        assert list(bookmarks.items)[0].name == "Second"
+
     def test_section_loads_bookmarks(self, base_widget_data, mock_bookmark_manager):
         """Bookmarks are loaded from the section."""
         bookmarks = Bookmarks(base_widget_data, bookmark_manager=mock_bookmark_manager)
