@@ -1,5 +1,7 @@
 import types
 
+import pytest
+
 import app.main as app_module
 
 
@@ -74,7 +76,8 @@ def test_click_events(monkeypatch):
     assert b"<table" in r.data
 
 
-def test_track_redirect(monkeypatch):
+@pytest.mark.parametrize("method", ["GET", "POST"])
+def test_track_redirect(monkeypatch, method):
     called = {}
 
     def fake_track(feed_id, link_id, link):
@@ -86,10 +89,42 @@ def test_track_redirect(monkeypatch):
     app_module.layout = FakeLayout()
     client = app_module.app.test_client()
 
-    r = client.get("/redirect/f1/l1")
-    assert r.status_code == 302
-    assert r.headers["Location"] == "http://example.com"
+    r = client.open("/redirect/f1/l1", method=method)
+    if method == "POST":
+        assert r.status_code == 204
+        assert r.data == b""
+        assert "Location" not in r.headers
+    else:
+        assert r.status_code == 302
+        assert r.headers["Location"] == "http://example.com"
     assert called["args"] == ("f1", "l1", "http://example.com")
+
+
+@pytest.mark.parametrize("tracking_url", ["/redirect/f1/l1", None])
+def test_widget_link_keeps_destination_in_href(tracking_url):
+    from bs4 import BeautifulSoup
+    from flask import render_template
+
+    article = types.SimpleNamespace(
+        id="l1",
+        name="Example",
+        link="https://example.com/article",
+        tracking_link=tracking_url,
+        summary=None,
+    )
+    widget = types.SimpleNamespace(
+        type="feed",
+        link="https://example.com",
+        name="Feed",
+        display_header=True,
+        display_items=[article],
+    )
+    with app_module.app.test_request_context():
+        html = render_template("widget.html", widget=widget, skip_htmx=True)
+    link = BeautifulSoup(html, "html.parser").select_one("a.feed-link")
+    assert link["href"] == article.link
+    assert link.get("data-tracking-url") == tracking_url
+    assert "data-real-url" not in link.attrs
 
 
 def test_refresh():

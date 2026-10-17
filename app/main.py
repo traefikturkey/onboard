@@ -199,10 +199,16 @@ def click_events():
     return response
 
 
-@app.route("/redirect/<feed_id>/<link_id>")
+@app.route("/redirect/<feed_id>/<link_id>", methods=["GET", "POST"])
 def track(feed_id, link_id):
     link = layout.get_link(feed_id, link_id)
     # defensive: ensure link is a string and handle missing links gracefully
+    if request.method == "POST":
+        if not link:
+            return "", 404
+        link_tracker.track_click_event(feed_id, link_id, link)
+        return "", 204
+
     link_tracker.track_click_event(feed_id, link_id, link)
 
     if not link:

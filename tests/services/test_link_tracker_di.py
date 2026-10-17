@@ -63,4 +63,4 @@ class TestLinkTrackerDependencyInjection(unittest.TestCase):
 
         expected_default = pwd.joinpath("configs", "tracking.db")
         # Just verify the default path computation is correct
-        self.assertTrue(str(expected_default).endswith("configs/tracking.db"))
+        self.assertEqual(expected_default.parts[-2:], ("configs", "tracking.db"))

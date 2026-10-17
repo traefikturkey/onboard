@@ -226,6 +226,28 @@ class TestRoutes:
         assert response.status_code == 302
         assert response.headers["Location"] == "/"
 
+    def test_tracking_post(self, route_client, mock_layout, mock_link_tracker):
+        mock_layout.get_link.return_value = "https://example.com"
+
+        response = route_client.post("/redirect/feed1/link1")
+
+        assert response.status_code == 204
+        assert response.data == b""
+        assert "Location" not in response.headers
+        mock_link_tracker.track_click_event.assert_called_once_with(
+            "feed1", "link1", "https://example.com"
+        )
+
+    def test_tracking_post_missing_link(
+        self, route_client, mock_layout, mock_link_tracker
+    ):
+        mock_layout.get_link.return_value = None
+
+        response = route_client.post("/redirect/feed1/link1")
+
+        assert response.status_code == 404
+        mock_link_tracker.track_click_event.assert_not_called()
+
     def test_refresh_route(self, route_client, mock_layout):
         """Test /feed/<feed_id>/refresh route."""
         response = route_client.get("/feed/test_feed/refresh")

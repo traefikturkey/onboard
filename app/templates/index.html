@@ -283,21 +283,21 @@
 })();
 </script>
 <script>
-// Show real URL in browser status bar on hover while preserving click tracking.
-// Feed links use /redirect/... URLs for tracking; this swaps to the real URL on hover.
+// Keep real destinations in href; record activations without delaying navigation.
 (function(){
-	document.addEventListener('mouseenter', function(e) {
-		const link = e.target.closest('a[data-real-url]');
-		if (!link) return;
-		link.dataset.trackingUrl = link.href;
-		link.href = link.dataset.realUrl;
-	}, true);
-
-	document.addEventListener('mouseleave', function(e) {
-		const link = e.target.closest('a[data-real-url]');
-		if (!link || !link.dataset.trackingUrl) return;
-		link.href = link.dataset.trackingUrl;
-	}, true);
+  function trackLink(e) {
+    if (e.type === 'click' ? e.button !== 0 : e.button !== 1) return;
+    const link = e.target.closest('a[data-tracking-url]');
+    if (!link) return;
+    const url = link.dataset.trackingUrl;
+    if (navigator.sendBeacon && navigator.sendBeacon(url)) return;
+    fetch(url, { method: 'POST', keepalive: true }).catch(function(error) {
+      console.warn('Unable to record link click:', error);
+    });
+  }
+  // Capture before item controls stop propagation; delegation covers HTMX updates.
+  document.addEventListener('click', trackLink, true);
+  document.addEventListener('auxclick', trackLink, true);
 })();
 </script>
 </html>
