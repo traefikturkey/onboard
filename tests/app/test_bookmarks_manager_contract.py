@@ -26,7 +26,7 @@ def test_folder_payload_omits_disabled_multicolumn_and_sends_integer_when_enable
 
     assert "if (this.bookmarkForm.multiColumn)" in template
     assert "Number.isInteger(this.bookmarkForm.multiColumn)" in template
-    assert ": 1;" in template
+    assert ": 2;" in template
     assert (
         "bookmarkData.multiColumn = this.bookmarkForm.multiColumn || false"
         not in template
