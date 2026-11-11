@@ -39,8 +39,15 @@
 		<div class="row header">
 			<div class="column">
 				<div class="row">
+          {% set header_icons = {
+            'Gmail': 'gmail.ico',
+            'Amazon': 'amazon.ico',
+            'eBay': 'ebay.ico',
+            'Youtube': 'youtube.ico'
+          } %}
 					{% for header in layout.headers %}
-					<a href="{{header.link}}" target="_blank">{% if header.name == 'Gmail' %}<img class="header-link-icon" src="{{ url_for('static', filename='img/gmail.ico') }}" width="16" height="16" alt="">{% endif %}{{header.name}}</a>
+          {% set header_icon = header_icons.get(header.name) %}
+					<a href="{{header.link}}" target="_blank">{% if header_icon %}<img class="header-link-icon" src="{{ url_for('static', filename='img/' ~ header_icon) }}" width="16" height="16" alt="">{% endif %}{{header.name}}</a>
 					{% endfor %}
 				</div>
 				<div class="row tab-bar">
