@@ -49,11 +49,7 @@ class TestFaviconUtilsAndLinkTracker(unittest.TestCase):
             self.assertTrue(failed.exists())
 
     def test_link_tracker_insert_and_query(self):
-        # patch pwd so db goes to temp configs
-        with patch("app.models.utils.pwd", self.base):
-            lt = LinkTracker()
-            lt.cursor.execute("DELETE FROM CLICK_EVENTS")
-            lt.connection.commit()
-            lt.track_click_event("w", "l", "http://a")
-            df = lt.get_click_events()
-            self.assertEqual(len(df), 1)
+        lt = LinkTracker(db_path=self.base / "tracking.db")
+        lt.track_click_event("w", "l", "http://a")
+        df = lt.get_click_events()
+        self.assertEqual(len(df), 1)

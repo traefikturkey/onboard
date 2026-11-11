@@ -9,15 +9,6 @@ from .local_file_store import LocalFileStore
 from .utils import pwd
 
 
-def _is_testing_mode() -> bool:
-    # Consider testing mode if FLASK_ENV=="testing" or scheduler/archive explicitly disabled
-    if os.environ.get("FLASK_ENV", "").lower() == "testing":
-        return True
-    if os.environ.get("ONBOARD_DISABLE_SCHEDULER", "False").lower() == "true":
-        return True
-    return False
-
-
 class FeedCache:
     """Small utility to manage per-feed JSON cache files.
 
@@ -56,13 +47,9 @@ class FeedCache:
         # backwards compatibility.
         self.file_store: CacheStore = file_store or LocalFileStore()
 
-        # Run best-effort startup logic (archive existing large cache files)
-        # by default we avoid running this in testing or when the scheduler is disabled.
-        if not _is_testing_mode():
-            # archive_large_jsons is implemented to never raise; call directly
-            self.archive_large_jsons()
+        self.metadata: dict = {}
 
-    def load_cache(self, archive_on_load: bool = True) -> List[dict]:
+    def load_cache(self, archive_on_load: bool = False) -> List[dict]:
         """Return list of article dicts stored in the cache file.
 
         If archive_on_load is True, run archive_large_jsons first. On error, return []
@@ -80,21 +67,33 @@ class FeedCache:
                 return []
 
             payload = self.file_store.read_json(self.cache_path)
-            return payload.get("articles", []) if isinstance(payload, dict) else []
+            if not isinstance(payload, dict):
+                return []
+            metadata = payload.get("metadata", {})
+            self.metadata = metadata if isinstance(metadata, dict) else {}
+            return payload.get("articles", [])
         except Exception:
             # Keep behaviour simple: on any parse/read error return empty list
             return []
 
-    def save_articles(self, articles: List[dict]) -> List[dict]:
+    def save_articles(
+        self, articles: List[dict], metadata: dict | None = None
+    ) -> List[dict]:
         """Atomically write the provided list of article dicts into the feed cache file.
 
         Returns the list written.
         """
-        data = {"name": None, "link": None, "articles": articles}
+        data = {
+            "name": None,
+            "link": None,
+            "articles": articles,
+            "metadata": self.metadata if metadata is None else metadata,
+        }
 
         # Delegate atomic write to the file store implementation. Implementations
         # should ensure parent directories exist when writing.
         self.file_store.write_json_atomic(self.cache_path, data)
+        self.metadata = data["metadata"]
         return articles
 
     def archive_large_jsons(self, min_size_bytes: int = 300 * 1024) -> List[Path]:

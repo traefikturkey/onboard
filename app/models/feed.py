@@ -10,6 +10,7 @@ from pathlib import Path
 
 import dateutil
 import feedparser
+import requests
 
 from app.processors.strip_long_urls import StripLongUrls
 
@@ -92,14 +93,37 @@ class Feed(Widget):
         logger.debug(
             f"Feed.__init__: appended {appended} articles into self.items for feed id={self.id}"
         )
-        if self.items:
+        metadata = self.feed_cache.metadata
+        self._http_metadata = dict(metadata) if isinstance(metadata, dict) else {}
+        self._pending_http_metadata = dict(self._http_metadata)
+        self._last_updated = None
+        checked_at = self._http_metadata.get("last_checked")
+        if checked_at:
+            try:
+                self._last_updated = self._utc(dateutil.parser.parse(checked_at))
+            except ValueError, TypeError, OverflowError:
+                pass
+        if self._last_updated is None and self.cache_path.exists():
             self._last_updated = datetime.fromtimestamp(
-                os.path.getmtime(self.cache_path)
+                os.path.getmtime(self.cache_path), tz=timezone.utc
             )
-        else:
-            self._last_updated = None
 
-        if self.scheduler.running:
+        self.start_scheduling()
+
+    @staticmethod
+    def _utc(value: datetime) -> datetime:
+        if value.tzinfo is None:
+            value = value.replace(tzinfo=timezone.utc)
+        return value.astimezone(timezone.utc)
+
+    @Widget.items.setter
+    def items(self, items):
+        self._items = items
+        self._last_updated = datetime.now(timezone.utc)
+
+    def start_scheduling(self):
+        """Register feed work once, after its owning layout is ready."""
+        if self.scheduler.running and not getattr(self, "job", None):
             self.job = self.scheduler.add_job(
                 self.update,
                 "cron",
@@ -122,7 +146,7 @@ class Feed(Widget):
         if hasattr(self, "job") and self.job:
             logging.debug(f"Feed: {self.name} scheduled for immediate update now!")
             try:
-                self.job.modify(next_run_time=datetime.now())
+                self.job.modify(next_run_time=datetime.now(timezone.utc))
             except Exception:
                 logger.exception(f"Failed to modify job for feed {self.name}")
         else:
@@ -139,7 +163,8 @@ class Feed(Widget):
         return (
             force_update
             or self.last_updated is None
-            or self.last_updated < datetime.now() - timedelta(minutes=10)
+            or self._utc(self.last_updated)
+            < datetime.now(timezone.utc) - timedelta(minutes=10)
         )
 
     @property
@@ -156,8 +181,23 @@ class Feed(Widget):
         self.id = calculate_sha1_hash(url)
 
     def update(self):
-        articles = self.download(self.feed_url)
-        self.items = self.save_articles(articles)
+        try:
+            articles = self.download(self.feed_url)
+            metadata = dict(self._pending_http_metadata)
+            metadata["last_checked"] = datetime.now(timezone.utc).isoformat()
+            if articles is None:  # HTTP 304: retain articles without reprocessing.
+                self.feed_cache.save_articles(
+                    self._serialize_articles(self.items), metadata=metadata
+                )
+            else:
+                articles = self.save_articles(articles, metadata=metadata)
+                self._items = articles
+            self._http_metadata = metadata
+            self._last_updated = self._utc(
+                dateutil.parser.parse(metadata["last_checked"])
+            )
+        except requests.RequestException, ValueError, OSError:
+            logger.exception("Failed to update feed %s", self.feed_url)
 
     def load_cache(self, cache_path: Path | None = None) -> list[FeedArticle]:
         """Load cached articles as FeedArticle objects.
@@ -202,7 +242,7 @@ class Feed(Widget):
                     f"Failed to load cached articles for {self.name} : {str(ex)}"
                 )
         else:
-            # prefer FeedCache which handles archive-on-load and file-store injection
+            # Prefer FeedCache for file-store injection without moving active caches.
             try:
                 dicts = self.feed_cache.load_cache(archive_on_load=False)
                 articles = _to_feed_articles(dicts)
@@ -214,9 +254,29 @@ class Feed(Widget):
 
         return articles
 
-    def download(self, feed_url: str) -> list[FeedArticle]:
+    def download(self, feed_url: str) -> list[FeedArticle] | None:
+        headers = {}
+        if self._http_metadata.get("etag"):
+            headers["If-None-Match"] = self._http_metadata["etag"]
+        if self._http_metadata.get("last_modified"):
+            headers["If-Modified-Since"] = self._http_metadata["last_modified"]
+        # Bound both connection establishment and waits for response data.
+        with requests.get(feed_url, headers=headers, timeout=(5, 30)) as response:
+            response.raise_for_status()
+            metadata = dict(self._http_metadata) if response.status_code == 304 else {}
+            for header, key in (("ETag", "etag"), ("Last-Modified", "last_modified")):
+                if response.headers.get(header):
+                    metadata[key] = response.headers[header]
+            if response.status_code == 304:
+                self._pending_http_metadata = metadata
+                return None
+            parser_headers = {
+                key.lower(): value for key, value in response.headers.items()
+            }
+            parser_headers.setdefault("content-location", response.url or feed_url)
+            feed = feedparser.parse(response.content, response_headers=parser_headers)
+
         articles = []
-        feed = feedparser.parse(feed_url)
 
         # Log parse problems but continue processing entries when possible
         if getattr(feed, "bozo", False):
@@ -225,6 +285,11 @@ class Feed(Widget):
                 feed_url,
                 getattr(feed, "bozo_exception", "unknown"),
             )
+
+        if not getattr(feed, "entries", []) and (
+            getattr(feed, "bozo", False) or not getattr(feed, "version", None)
+        ):
+            raise ValueError(f"Response from {feed_url} is not a valid feed")
 
         for entry in getattr(feed, "entries", []) or []:
             # Prefer structured times when available to avoid dateutil parse errors
@@ -272,6 +337,7 @@ class Feed(Widget):
                 # Skip malformed entries defensively
                 continue
 
+        self._pending_http_metadata = metadata
         return articles
 
     def process(self):
@@ -348,7 +414,7 @@ class Feed(Widget):
             for articles_list in article_dict.values()
         ]
 
-    def save_articles(self, articles: list[FeedArticle]):
+    def save_articles(self, articles: list[FeedArticle], metadata: dict | None = None):
         # load all existing articles from the json file, and add the new ones
         # then apply the filters
         # Get existing articles as FeedArticle objects
@@ -363,8 +429,17 @@ class Feed(Widget):
         # sort articles in place by pub_date newest to oldest
         all_articles.sort(key=lambda a: a.pub_date, reverse=True)
 
-        # Persist using FeedCache (save serializable dicts)
-        serializable = [
+        self.feed_cache.save_articles(
+            self._serialize_articles(all_articles), metadata=metadata
+        )
+        logger.info(
+            f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}"
+        )
+        return all_articles
+
+    @staticmethod
+    def _serialize_articles(articles: list[FeedArticle]) -> list[dict]:
+        return [
             {
                 "original_title": article.original_title,
                 "title": article.title,
@@ -374,11 +449,5 @@ class Feed(Widget):
                 "id": article.id,
                 "processed": article.processed,
             }
-            for article in all_articles
+            for article in articles
         ]
-
-        self.feed_cache.save_articles(serializable)
-        logger.info(
-            f"Saved {len(all_articles)} articles for {self.name} to cache file {self.cache_path}"
-        )
-        return all_articles

@@ -38,14 +38,16 @@ class BookmarkBarManager:
         return self._sections.get(section_key)
 
     def is_modified(self):
-        logger.info(f"Bookmark Bar modified?: {self.mtime > self.last_reload}")
-        return self.mtime > self.last_reload
+        logger.info(f"Bookmark Bar modified?: {self.mtime != self.last_reload}")
+        return self.mtime != self.last_reload
 
     @property
     def mtime(self):
         return os.path.getmtime(self.bookmark_bar_path)
 
-    def bookmarks_list(self, bookmarks, urls=[]):
+    def bookmarks_list(self, bookmarks, urls=None):
+        if urls is None:
+            urls = []
         for bookmark in bookmarks:
             if "contents" in bookmark:
                 self.bookmarks_list(bookmark["contents"], urls)

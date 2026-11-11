@@ -7,6 +7,9 @@ from copy import deepcopy
 from pathlib import Path
 from typing import Any
 
+from pydantic import TypeAdapter
+
+from app.models.bookmark_api import BarItem, BookmarkData, SectionBookmarkItem
 from app.models.local_file_store import LocalFileStore
 from app.models.utils import pwd
 from app.services.bookmark_bar_manager import BookmarkBarManager
@@ -48,8 +51,22 @@ class BookmarkManager:
         self._data: dict[str, Any] = {}
         self._load()
 
+    def _file_signature(self) -> tuple[int, int, int] | None:
+        """Identify ordinary edits and atomic replacements of the bookmark file."""
+        try:
+            stat = self.bookmark_path.stat()
+            return stat.st_mtime_ns, stat.st_size, stat.st_ino
+        except FileNotFoundError:
+            return None
+
+    def _ensure_fresh(self) -> None:
+        """Reload external file changes before reading or changing bookmarks."""
+        if self._file_signature() != self._loaded_signature:
+            self._load()
+
     def _load(self) -> None:
         """Load bookmarks from file."""
+        self._loaded_signature = self._file_signature()
         try:
             self._data = self.file_store.read_json(self.bookmark_path)
             # Ensure structure
@@ -68,6 +85,7 @@ class BookmarkManager:
         """Atomically save bookmarks to file."""
         try:
             self.file_store.write_json_atomic(self.bookmark_path, self._data)
+            self._loaded_signature = self._file_signature()
             # Trigger reload in BookmarkBarManager
             self.bar_manager.reload()
             logger.info("Bookmarks saved successfully")
@@ -83,10 +101,12 @@ class BookmarkManager:
 
     def get_bar_bookmarks(self) -> list[dict[str, Any]]:
         """Get all bar bookmarks."""
+        self._ensure_fresh()
         return deepcopy(self._data.get("bar", []))
 
     def get_bar_bookmark(self, index: int) -> dict[str, Any]:
         """Get a specific bar bookmark by index."""
+        self._ensure_fresh()
         bar = self._data.get("bar", [])
         if index < 0 or index >= len(bar):
             raise InvalidIndexError(
@@ -96,6 +116,7 @@ class BookmarkManager:
 
     def add_bar_bookmark(self, bookmark_data: dict[str, Any]) -> dict[str, Any]:
         """Add a bookmark to the bar."""
+        self._ensure_fresh()
         # Add timestamp if not present
         if "add_date" not in bookmark_data:
             bookmark_data["add_date"] = str(int(time.time()))
@@ -108,6 +129,7 @@ class BookmarkManager:
         self, index: int, bookmark_data: dict[str, Any]
     ) -> dict[str, Any]:
         """Update a bar bookmark at a specific index."""
+        self._ensure_fresh()
         bar = self._data.get("bar", [])
         if index < 0 or index >= len(bar):
             raise InvalidIndexError(
@@ -124,6 +146,7 @@ class BookmarkManager:
 
     def delete_bar_bookmark(self, index: int) -> None:
         """Delete a bar bookmark at a specific index."""
+        self._ensure_fresh()
         bar = self._data.get("bar", [])
         if index < 0 or index >= len(bar):
             raise InvalidIndexError(
@@ -135,6 +158,7 @@ class BookmarkManager:
 
     def reorder_bar_bookmarks(self, indices: list[int]) -> list[dict[str, Any]]:
         """Reorder bar bookmarks according to the provided index list."""
+        self._ensure_fresh()
         bar = self._data.get("bar", [])
 
         # Validate indices
@@ -156,10 +180,12 @@ class BookmarkManager:
 
     def get_all_sections(self) -> dict[str, dict[str, Any]]:
         """Get all sections."""
+        self._ensure_fresh()
         return deepcopy(self._data.get("sections", {}))
 
     def get_section(self, section_id: str) -> dict[str, Any]:
         """Get a specific section by ID."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -167,6 +193,7 @@ class BookmarkManager:
 
     def create_section(self, section_id: str, display_name: str) -> dict[str, Any]:
         """Create a new section."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id in sections:
             raise ValueError(f"Section '{section_id}' already exists")
@@ -178,6 +205,7 @@ class BookmarkManager:
 
     def update_section(self, section_id: str, data: dict[str, Any]) -> dict[str, Any]:
         """Update a section's metadata (displayName)."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -191,6 +219,7 @@ class BookmarkManager:
 
     def delete_section(self, section_id: str) -> None:
         """Delete a section."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -209,6 +238,7 @@ class BookmarkManager:
         self, section_id: str, bookmark_data: dict[str, Any]
     ) -> dict[str, Any]:
         """Add a bookmark to a section."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -225,6 +255,7 @@ class BookmarkManager:
         self, section_id: str, index: int, bookmark_data: dict[str, Any]
     ) -> dict[str, Any]:
         """Update a bookmark in a section at a specific index."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -245,6 +276,7 @@ class BookmarkManager:
 
     def delete_section_bookmark(self, section_id: str, index: int) -> None:
         """Delete a bookmark from a section at a specific index."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -262,6 +294,7 @@ class BookmarkManager:
         self, section_id: str, indices: list[int]
     ) -> list[dict[str, Any]]:
         """Reorder bookmarks in a section according to the provided index list."""
+        self._ensure_fresh()
         sections = self._data.get("sections", {})
         if section_id not in sections:
             raise SectionNotFoundError(f"Section '{section_id}' not found")
@@ -298,6 +331,7 @@ class BookmarkManager:
         Returns:
             The moved bookmark data
         """
+        self._ensure_fresh()
         # Validate and prepare the entire move before changing persisted state.
         data = deepcopy(self._data)
         source_type = source["type"]
@@ -335,6 +369,11 @@ class BookmarkManager:
             if "link" in bookmark:
                 bookmark["href"] = bookmark.pop("link")
 
+        if destination_type == "section":
+            SectionBookmarkItem.model_validate(bookmark)
+        else:
+            TypeAdapter(BarItem).validate_python(bookmark)
+
         # Resolve destination after removal, preserving same-list move behavior.
         dest_index = destination.get("index", len(destination_items))
         destination_items.insert(dest_index, bookmark)
@@ -345,6 +384,7 @@ class BookmarkManager:
 
     def export_bookmarks(self) -> dict[str, Any]:
         """Export all bookmarks as a dict."""
+        self._ensure_fresh()
         return deepcopy(self._data)
 
     def import_bookmarks(self, data: dict[str, Any], merge: bool = False) -> None:
@@ -355,6 +395,7 @@ class BookmarkManager:
             data: Bookmark data with 'bar' and 'sections'
             merge: If True, merge with existing data; if False, replace
         """
+        self._ensure_fresh()
         # Validate structure
         if not isinstance(data, dict):
             raise ValueError("Import data must be a dictionary")
@@ -367,6 +408,8 @@ class BookmarkManager:
 
         if "sections" in data and not isinstance(data["sections"], dict):
             raise ValueError("'sections' must be a dictionary")
+
+        data = BookmarkData.model_validate(data).model_dump(exclude_none=True)
 
         if merge:
             # Merge sections

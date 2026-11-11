@@ -107,7 +107,7 @@ def test_from_dict_dispatch(widget_data):
     ) as mock_feed:
         result = Widget.from_dict(widget_data)
         assert result == "feed_instance"
-        mock_feed.assert_called_once_with(widget_data)
+        mock_feed.assert_called_once_with(widget_data, scheduler=None)
 
     # Bookmarks type
     widget_data["type"] = "bookmarks"

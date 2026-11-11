@@ -74,8 +74,11 @@ def create_app(
             except ImportError:
                 pass
 
-    cache = Cache(app, config=cache_config)
-    app.extensions["cache"] = cache
+    # Explicit caller configuration also allows exercising real caching in tests.
+    for key, value in cache_config.items():
+        app.config.setdefault(key, value)
+    cache = Cache(app)
+    app.extensions["onboard_cache"] = cache
 
     # Set up assets
     assets = Environment(app)
@@ -114,7 +117,6 @@ def create_app(
                 "Production startup: eagerly reloading layout and initializing scheduler"
             )
             _ensure_layout(app)
-            app.extensions["onboard_layout"].reload()
             from app.models import apscheduler as apscheduler_module
 
             apscheduler_module.Scheduler.getScheduler()
@@ -139,7 +141,10 @@ def _ensure_bookmark_manager(app):
     if app.extensions.get("onboard_bookmark_manager") is None:
         from app.services.bookmark_manager import BookmarkManager
 
-        app.extensions["onboard_bookmark_manager"] = BookmarkManager()
+        layout = get_layout(app)
+        app.extensions["onboard_bookmark_manager"] = BookmarkManager(
+            bar_manager=layout.bar_manager if layout else None
+        )
 
 
 def _ensure_link_tracker(app):
@@ -194,16 +199,55 @@ def _register_routes(app, cache):
             "favicon_path": layout.favicon_path if layout else lambda x: None,
         }
 
+    def is_tab_fragment():
+        return (
+            request.headers.get("HX-Request") == "true"
+            and request.headers.get("HX-Target") == "main-content"
+            and request.headers.get("HX-History-Restore-Request") != "true"
+        )
+
+    def file_version(path):
+        if not isinstance(path, (str, os.PathLike)):
+            return None
+        try:
+            stat = os.stat(path)
+            return stat.st_mtime_ns, stat.st_size, stat.st_ino
+        except FileNotFoundError:
+            return None
+
+    def page_cache_key(*args, **kwargs):
+        layout = get_layout(app)
+        # A new file version invalidates all tabs, including inactive cached tabs.
+        return repr(
+            (
+                request.path,
+                is_tab_fragment(),
+                file_version(getattr(layout, "config_path", None)),
+                file_version(
+                    getattr(
+                        getattr(layout, "bar_manager", None), "bookmark_bar_path", None
+                    )
+                ),
+            )
+        )
+
     @app.route("/")
     @app.route("/tab/<tab_name>")
-    @cache.cached(timeout=page_timeout, unless=lambda: get_layout(app).is_modified())
+    @cache.cached(
+        timeout=page_timeout,
+        unless=lambda: get_layout(app).is_modified(),
+        make_cache_key=page_cache_key,
+    )
     def index(tab_name=None):
         layout = get_layout(app)
         if layout.is_modified():
             layout.reload()
 
-        if request.headers.get("HX-Request"):
-            return render_template("tab_content.html", layout=layout, tab_name=tab_name)
+        if is_tab_fragment():
+            selected_tab = layout.tab(tab_name)
+            return render_template(
+                "tab_content.html", layout=layout, tab_name=selected_tab.name
+            )
         else:
             return render_template(
                 "index.html", layout=layout, tab_name=tab_name, skip_htmx=False

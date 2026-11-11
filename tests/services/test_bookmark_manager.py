@@ -464,6 +464,85 @@ class TestAdvancedOperations:
             bookmark_manager.import_bookmarks({"bar": "invalid"}, merge=False)
 
 
+@pytest.mark.parametrize("merge", [False, True])
+@pytest.mark.parametrize(
+    "entry",
+    [
+        {"name": "Folder", "contents": [], "link": "https://example.com"},
+        {"name": "Missing link"},
+        {"name": "Bad URL", "link": "javascript:alert(1)"},
+    ],
+)
+def test_invalid_import_is_atomic(bookmark_manager, merge, entry):
+    original = bookmark_manager.export_bookmarks()
+    original_file = bookmark_manager.bookmark_path.read_bytes()
+    with pytest.raises(ValueError):
+        bookmark_manager.import_bookmarks(
+            {
+                "bar": [{"name": "Valid", "href": "https://example.com"}],
+                "sections": {
+                    "shopping": {"displayName": "Shopping", "bookmarks": [entry]}
+                },
+            },
+            merge=merge,
+        )
+    assert bookmark_manager.export_bookmarks() == original
+    assert bookmark_manager.bookmark_path.read_bytes() == original_file
+
+
+@pytest.mark.parametrize(
+    "entry",
+    [
+        {"name": "Folder", "contents": [], "href": "https://example.com"},
+        {"name": "Linkless"},
+        {"name": "Bad URL", "href": "javascript:alert(1)"},
+    ],
+)
+def test_invalid_move_to_section_is_atomic(bookmark_manager, entry):
+    bookmark_manager.add_bar_bookmark(entry)
+    original = bookmark_manager.export_bookmarks()
+    original_file = bookmark_manager.bookmark_path.read_bytes()
+    with pytest.raises(ValueError):
+        bookmark_manager.move_bookmark(
+            {"type": "bar", "index": 2},
+            {"type": "section", "section_id": "shopping", "index": 0},
+        )
+    assert bookmark_manager.export_bookmarks() == original
+    assert bookmark_manager.bookmark_path.read_bytes() == original_file
+
+
+def test_external_file_edit_reloaded_before_reads(bookmark_manager):
+    data = bookmark_manager.export_bookmarks()
+    data["bar"][0]["name"] = "Hand edited bookmark"
+    data["sections"]["shopping"]["displayName"] = "Hand edited section"
+    bookmark_manager.bookmark_path.write_text(json.dumps(data), encoding="utf-8")
+    assert bookmark_manager.get_bar_bookmark(0)["name"] == "Hand edited bookmark"
+    assert (
+        bookmark_manager.get_section("shopping")["displayName"] == "Hand edited section"
+    )
+    assert bookmark_manager.export_bookmarks() == data
+
+
+@pytest.mark.parametrize("operation", ["bar", "section", "import", "move"])
+def test_external_file_edit_preserved_by_next_mutation(bookmark_manager, operation):
+    data = bookmark_manager.export_bookmarks()
+    data["bar"][0]["name"] = "Externally edited bookmark"
+    bookmark_manager.bookmark_path.write_text(json.dumps(data), encoding="utf-8")
+    if operation == "bar":
+        bookmark_manager.add_bar_bookmark({"name": "New", "href": "/new"})
+    elif operation == "section":
+        bookmark_manager.create_section("new", "New")
+    elif operation == "import":
+        bookmark_manager.import_bookmarks({"bar": []}, merge=True)
+    else:
+        bookmark_manager.move_bookmark(
+            {"type": "bar", "index": 1},
+            {"type": "section", "section_id": "shopping", "index": 0},
+        )
+    saved = json.loads(bookmark_manager.bookmark_path.read_text(encoding="utf-8"))
+    assert saved["bar"][0]["name"] == "Externally edited bookmark"
+
+
 class TestBookmarkManagerDependencyInjection:
     """Tests for BookmarkManager dependency injection."""
 

@@ -20,6 +20,26 @@ class TestTitleEditor(unittest.TestCase):
         with patch("socket.gethostbyname", return_value="127.0.0.1"):
             self.assertEqual(editor.hostname_resolves("localhost"), 1)
 
+    def test_hostname_resolves_url_with_port(self):
+        editor = TitleEditor()
+        with patch("socket.gethostbyname", return_value="127.0.0.1") as resolve:
+            self.assertEqual(editor.hostname_resolves("http://ollama:11434"), 1)
+            resolve.assert_called_once_with("ollama")
+
+    @patch.dict(os.environ, {"OLLAMA_URL": "http://ollama:11434"})
+    def test_valid_url_initializes_and_processes_using_original_base_url(self):
+        with (
+            patch("socket.gethostbyname", return_value="127.0.0.1") as resolve,
+            patch("app.processors.title_editor.Ollama") as ollama,
+        ):
+            editor = TitleEditor()
+            self.assertTrue(hasattr(editor, "llama3_chain"))
+            self.assertEqual(ollama.call_args.kwargs["base_url"], "http://ollama:11434")
+            self.assertEqual(editor.process([]), [])
+            self.assertTrue(
+                all(call.args == ("ollama",) for call in resolve.call_args_list)
+            )
+
     def test_hostname_resolves_failure(self):
         editor = TitleEditor()
         with patch("socket.gethostbyname", side_effect=OSError):

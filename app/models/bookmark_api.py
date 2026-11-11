@@ -1,8 +1,15 @@
 """Pydantic models for bookmark API request/response validation."""
 
-from typing import Any, Literal, Optional
+from typing import Annotated, Any, Literal, Optional
 
-from pydantic import BaseModel, Field, HttpUrl, field_validator
+from pydantic import (
+    BaseModel,
+    Discriminator,
+    Field,
+    Tag,
+    field_validator,
+    model_validator,
+)
 
 
 class BookmarkItem(BaseModel):
@@ -40,7 +47,7 @@ class BookmarkItem(BaseModel):
 class FolderItem(BookmarkItem):
     """Model for a bookmark folder with nested contents."""
 
-    contents: list[dict[str, Any]] = Field(
+    contents: list['BarItem'] = Field(
         default_factory=list, description="Nested bookmarks"
     )
     multiColumn: Optional[int] = Field(
@@ -49,11 +56,33 @@ class FolderItem(BookmarkItem):
     openInNewTab: Optional[bool] = Field(None, description="Open links in new tab")
 
 
-class SectionBookmarkItem(BaseModel):
-    """Model for a bookmark within a section."""
+def _bar_item_type(value: Any) -> str:
+    """Distinguish folders by contents, without changing the stored JSON shape."""
+    if isinstance(value, FolderItem) or (
+        isinstance(value, dict) and "contents" in value
+    ):
+        return "folder"
+    return "bookmark"
 
-    name: str = Field(..., min_length=1, max_length=500, description="Bookmark name")
+
+BarItem = Annotated[
+    Annotated[FolderItem, Tag("folder")] | Annotated[BookmarkItem, Tag("bookmark")],
+    Discriminator(_bar_item_type),
+]
+FolderItem.model_rebuild()
+
+
+class SectionBookmarkItem(BookmarkItem):
+    """Model for a flat bookmark within a section, retaining bookmark metadata."""
+
     link: str = Field(..., description="Bookmark URL")
+
+    @model_validator(mode="before")
+    @classmethod
+    def reject_folder(cls, value: Any) -> Any:
+        if isinstance(value, dict) and "contents" in value:
+            raise ValueError("Sections cannot contain folders")
+        return value
 
     @field_validator("link")
     @classmethod
@@ -77,6 +106,7 @@ class SectionBookmarkItem(BaseModel):
 class SectionData(BaseModel):
     """Model for a bookmark section."""
 
+    openInNewTab: Optional[bool] = None
     displayName: str = Field(
         ..., min_length=1, max_length=200, description="Display name for the section"
     )
@@ -190,10 +220,17 @@ class ReorderRequest(BaseModel):
         return v
 
 
+class BookmarkData(BaseModel):
+    """Typed persisted bookmark tree with recursive bar and flat sections."""
+
+    bar: list[BarItem]
+    sections: dict[str, SectionData] = Field(default_factory=dict)
+
+
 class ImportBookmarksRequest(BaseModel):
     """Request model for importing bookmarks."""
 
-    data: dict[str, Any] = Field(..., description="Bookmark data to import")
+    data: BookmarkData = Field(..., description="Bookmark data to import")
     merge: bool = Field(
         False, description="Whether to merge with existing data or replace"
     )

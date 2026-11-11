@@ -1,7 +1,18 @@
 import types
 from datetime import datetime
+from unittest.mock import MagicMock
+
+import pytest
 
 import app.main as app_module
+
+
+@pytest.fixture(autouse=True)
+def isolate_dependencies(monkeypatch):
+    for key in ("onboard_layout", "onboard_bookmark_manager", "onboard_link_tracker"):
+        monkeypatch.setitem(app_module.app.extensions, key, MagicMock())
+    with app_module.app.app_context():
+        app_module.app.extensions["onboard_cache"].clear()
 
 
 class FakeLayoutModified:
@@ -27,9 +38,12 @@ class FakeLayoutModified:
 def test_inject_current_date_uses_env_and_layout(monkeypatch):
     # ensure env var is used for site title and layout favicon is returned
     monkeypatch.setenv("ONBOARD_SITE_TITLE", "MySite")
-    app_module.layout = types.SimpleNamespace(favicon_path="/fav.ico")
-
-    ctx = app_module.inject_current_date()
+    app_module.app.extensions["onboard_layout"] = types.SimpleNamespace(
+        favicon_path="/fav.ico"
+    )
+    with app_module.app.test_request_context():
+        ctx = {}
+        app_module.app.update_template_context(ctx)
     assert "today_date" in ctx
     assert isinstance(ctx["today_date"], datetime)
     assert ctx["site_title"] == "MySite"
@@ -38,7 +52,7 @@ def test_inject_current_date_uses_env_and_layout(monkeypatch):
 
 def test_index_calls_reload_when_layout_modified():
     fake = FakeLayoutModified()
-    app_module.layout = fake
+    app_module.app.extensions["onboard_layout"] = fake
     client = app_module.app.test_client()
 
     r = client.get("/")
@@ -53,11 +67,13 @@ def test_track_redirect_with_missing_link(monkeypatch):
     def fake_track(feed_id, link_id, link):
         called["args"] = (feed_id, link_id, link)
 
-    monkeypatch.setattr(
-        app_module, "link_tracker", types.SimpleNamespace(track_click_event=fake_track)
+    monkeypatch.setitem(
+        app_module.app.extensions,
+        "onboard_link_tracker",
+        types.SimpleNamespace(track_click_event=fake_track),
     )
     # layout returns None for get_link
-    app_module.layout = FakeLayoutModified()
+    app_module.app.extensions["onboard_layout"] = FakeLayoutModified()
     client = app_module.app.test_client()
 
     r = client.get("/redirect/f1/l1")
@@ -73,15 +89,17 @@ def test_track_redirect_with_empty_string_link(monkeypatch):
     def fake_track(feed_id, link_id, link):
         called["args"] = (feed_id, link_id, link)
 
-    monkeypatch.setattr(
-        app_module, "link_tracker", types.SimpleNamespace(track_click_event=fake_track)
+    monkeypatch.setitem(
+        app_module.app.extensions,
+        "onboard_link_tracker",
+        types.SimpleNamespace(track_click_event=fake_track),
     )
 
     class FakeLayoutEmpty:
         def get_link(self, feed_id, link_id):
             return ""
 
-    app_module.layout = FakeLayoutEmpty()
+    app_module.app.extensions["onboard_layout"] = FakeLayoutEmpty()
     client = app_module.app.test_client()
 
     r = client.get("/redirect/f2/l2")

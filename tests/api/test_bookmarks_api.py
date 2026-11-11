@@ -11,6 +11,48 @@ from app.services.bookmark_manager import (
 )
 
 
+@pytest.mark.parametrize(
+    "method,path", [("post", "/api/bookmarks/bar"), ("put", "/api/bookmarks/bar/0")]
+)
+def test_nested_invalid_url_rejected_before_mutation(
+    test_client, mock_bookmark_manager, method, path
+):
+    response = getattr(test_client, method)(
+        path,
+        json={
+            "name": "Folder",
+            "contents": [
+                {
+                    "name": "Nested",
+                    "contents": [{"name": "Unsafe", "href": "javascript:alert(1)"}],
+                }
+            ],
+        },
+    )
+    assert response.status_code == 400
+    mock_bookmark_manager.add_bar_bookmark.assert_not_called()
+    mock_bookmark_manager.update_bar_bookmark.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "entry", [{"name": "Folder", "contents": []}, {"name": "Linkless"}]
+)
+def test_invalid_section_import_rejected_before_mutation(
+    test_client, mock_bookmark_manager, entry
+):
+    response = test_client.post(
+        "/api/bookmarks/import",
+        json={
+            "data": {
+                "bar": [],
+                "sections": {"links": {"displayName": "Links", "bookmarks": [entry]}},
+            }
+        },
+    )
+    assert response.status_code == 400
+    mock_bookmark_manager.import_bookmarks.assert_not_called()
+
+
 class TestBarBookmarkRoutes:
     """Test bar bookmark API endpoints."""
 
@@ -96,7 +138,9 @@ class TestBarBookmarkRoutes:
         assert data["success"] is True
         assert data["data"]["name"] == "Updated"
 
-    def test_update_bar_bookmark_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_update_bar_bookmark_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test updating with invalid index."""
         mock_bookmark_manager.update_bar_bookmark.side_effect = InvalidIndexError(
             "Invalid index"
@@ -476,7 +520,9 @@ class TestAdditionalCoverage:
         # Empty body should fail validation
         assert response.status_code == 400
 
-    def test_reorder_bar_bookmarks_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_reorder_bar_bookmarks_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reorder with invalid indices."""
         mock_bookmark_manager.reorder_bar_bookmarks.side_effect = InvalidIndexError(
             "Invalid index"
@@ -513,7 +559,9 @@ class TestAdditionalCoverage:
 class TestBookmarksAPIErrorPaths:
     """Test error handling paths in bookmarks API."""
 
-    def test_update_bar_bookmark_validation_error(self, test_client, mock_bookmark_manager):
+    def test_update_bar_bookmark_validation_error(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test update bar bookmark with invalid data type."""
         response = test_client.put(
             "/api/bookmarks/bar/0",
@@ -522,7 +570,9 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 400
 
-    def test_update_bar_bookmark_folder_validation(self, test_client, mock_bookmark_manager):
+    def test_update_bar_bookmark_folder_validation(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test update bar bookmark with folder data."""
         folder = {
             "name": "Folder",
@@ -542,7 +592,9 @@ class TestBookmarksAPIErrorPaths:
         assert response.status_code == 200
         assert "contents" in data["data"]
 
-    def test_delete_bar_bookmark_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_delete_bar_bookmark_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test delete bar bookmark with InvalidIndexError."""
         mock_bookmark_manager.delete_bar_bookmark.side_effect = InvalidIndexError(
             "Invalid index"
@@ -551,7 +603,9 @@ class TestBookmarksAPIErrorPaths:
         response = test_client.delete("/api/bookmarks/bar/999")
         assert response.status_code == 404
 
-    def test_get_section_bookmarks_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_get_section_bookmarks_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test getting bookmarks from non-existent section."""
         mock_bookmark_manager.get_section_bookmarks.side_effect = SectionNotFoundError(
             "Section not found"
@@ -560,7 +614,9 @@ class TestBookmarksAPIErrorPaths:
         response = test_client.get("/api/bookmarks/sections/nonexistent/bookmarks")
         assert response.status_code == 404
 
-    def test_add_section_bookmark_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_add_section_bookmark_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test adding bookmark to non-existent section."""
         mock_bookmark_manager.add_section_bookmark.side_effect = SectionNotFoundError(
             "Section not found"
@@ -573,10 +629,12 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 404
 
-    def test_update_section_bookmark_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_update_section_bookmark_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test updating bookmark in non-existent section."""
-        mock_bookmark_manager.update_section_bookmark.side_effect = SectionNotFoundError(
-            "Section not found"
+        mock_bookmark_manager.update_section_bookmark.side_effect = (
+            SectionNotFoundError("Section not found")
         )
 
         response = test_client.put(
@@ -586,7 +644,9 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 404
 
-    def test_update_section_bookmark_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_update_section_bookmark_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test updating bookmark with invalid index."""
         mock_bookmark_manager.update_section_bookmark.side_effect = InvalidIndexError(
             "Invalid index"
@@ -599,16 +659,20 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 404
 
-    def test_delete_section_bookmark_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_delete_section_bookmark_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test deleting bookmark from non-existent section."""
-        mock_bookmark_manager.delete_section_bookmark.side_effect = SectionNotFoundError(
-            "Section not found"
+        mock_bookmark_manager.delete_section_bookmark.side_effect = (
+            SectionNotFoundError("Section not found")
         )
 
         response = test_client.delete("/api/bookmarks/sections/nonexistent/bookmarks/0")
         assert response.status_code == 404
 
-    def test_delete_section_bookmark_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_delete_section_bookmark_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test deleting bookmark with invalid index."""
         mock_bookmark_manager.delete_section_bookmark.side_effect = InvalidIndexError(
             "Invalid index"
@@ -617,7 +681,9 @@ class TestBookmarksAPIErrorPaths:
         response = test_client.delete("/api/bookmarks/sections/work/bookmarks/999")
         assert response.status_code == 404
 
-    def test_reorder_section_bookmarks_success(self, test_client, mock_bookmark_manager):
+    def test_reorder_section_bookmarks_success(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reordering section bookmarks."""
         mock_bookmark_manager.reorder_section_bookmarks.return_value = None
 
@@ -631,10 +697,12 @@ class TestBookmarksAPIErrorPaths:
         assert response.status_code == 200
         assert data["success"] is True
 
-    def test_reorder_section_bookmarks_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_reorder_section_bookmarks_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reordering bookmarks in non-existent section."""
-        mock_bookmark_manager.reorder_section_bookmarks.side_effect = SectionNotFoundError(
-            "Section not found"
+        mock_bookmark_manager.reorder_section_bookmarks.side_effect = (
+            SectionNotFoundError("Section not found")
         )
 
         response = test_client.post(
@@ -644,7 +712,9 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 404
 
-    def test_reorder_section_bookmarks_invalid_index(self, test_client, mock_bookmark_manager):
+    def test_reorder_section_bookmarks_invalid_index(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reordering with invalid indices."""
         mock_bookmark_manager.reorder_section_bookmarks.side_effect = InvalidIndexError(
             "Invalid index"
@@ -688,7 +758,9 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 404
 
-    def test_get_section_raises_section_not_found(self, test_client, mock_bookmark_manager):
+    def test_get_section_raises_section_not_found(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test getting section that raises SectionNotFoundError."""
         mock_bookmark_manager.get_section.side_effect = SectionNotFoundError(
             "Section not found"
@@ -705,10 +777,16 @@ class TestBookmarksAPIErrorPaths:
 
         response = test_client.post(
             "/api/bookmarks/move",
-            data=json.dumps({
-                "source": {"type": "section", "section_id": "nonexistent", "index": 0},
-                "destination": {"type": "bar", "index": 0},
-            }),
+            data=json.dumps(
+                {
+                    "source": {
+                        "type": "section",
+                        "section_id": "nonexistent",
+                        "index": 0,
+                    },
+                    "destination": {"type": "bar", "index": 0},
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 404
@@ -721,10 +799,16 @@ class TestBookmarksAPIErrorPaths:
 
         response = test_client.post(
             "/api/bookmarks/move",
-            data=json.dumps({
-                "source": {"type": "bar", "index": 999},
-                "destination": {"type": "section", "section_id": "work", "index": 0},
-            }),
+            data=json.dumps(
+                {
+                    "source": {"type": "bar", "index": 999},
+                    "destination": {
+                        "type": "section",
+                        "section_id": "work",
+                        "index": 0,
+                    },
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 404
@@ -737,10 +821,12 @@ class TestBookmarksAPIErrorPaths:
 
         response = test_client.post(
             "/api/bookmarks/move",
-            data=json.dumps({
-                "source": {"type": "bar", "index": 0},
-                "destination": {"type": "bar", "index": 0},
-            }),
+            data=json.dumps(
+                {
+                    "source": {"type": "bar", "index": 0},
+                    "destination": {"type": "bar", "index": 0},
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -753,10 +839,12 @@ class TestBookmarksAPIErrorPaths:
 
         response = test_client.post(
             "/api/bookmarks/import",
-            data=json.dumps({
-                "data": {"bar": [], "sections": {}},
-                "merge": False,
-            }),
+            data=json.dumps(
+                {
+                    "data": {"bar": [], "sections": {}},
+                    "merge": False,
+                }
+            ),
             content_type="application/json",
         )
         assert response.status_code == 400
@@ -775,7 +863,9 @@ class TestBookmarksAPIErrorPaths:
         # The API returns 409 for ValueError in create_section
         assert response.status_code == 409
 
-    def test_reorder_bar_bookmarks_value_error(self, test_client, mock_bookmark_manager):
+    def test_reorder_bar_bookmarks_value_error(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reorder bar bookmarks with ValueError."""
         mock_bookmark_manager.reorder_bar_bookmarks.side_effect = ValueError(
             "Invalid indices"
@@ -788,7 +878,9 @@ class TestBookmarksAPIErrorPaths:
         )
         assert response.status_code == 400
 
-    def test_reorder_section_bookmarks_value_error(self, test_client, mock_bookmark_manager):
+    def test_reorder_section_bookmarks_value_error(
+        self, test_client, mock_bookmark_manager
+    ):
         """Test reorder section bookmarks with ValueError."""
         mock_bookmark_manager.reorder_section_bookmarks.side_effect = ValueError(
             "Invalid indices"

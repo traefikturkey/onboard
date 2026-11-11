@@ -5,6 +5,8 @@ from pathlib import Path
 from types import SimpleNamespace
 from unittest.mock import MagicMock, patch
 
+import pytest
+
 from app.models.layout import Layout
 
 
@@ -231,15 +233,12 @@ class TestLayoutUncoveredPaths(unittest.TestCase):
         tf.close()
         return Path(tf.name)
 
-    def test_load_layout_empty_file_returns_empty_dict(self):
-        """Empty YAML file returns empty dict via yaml.safe_load or {}."""
+    def test_empty_layout_is_rejected_on_initial_load(self):
         path = self.write_yaml_config("")
         try:
             self.layout.config_path = path
-            self.layout.reload()
-            # Should have no tabs and no headers
-            self.assertEqual(self.layout.tabs, [])
-            self.assertEqual(self.layout.headers, [])
+            with pytest.raises(ValueError, match="at least one tab"):
+                self.layout.reload()
         finally:
             os.unlink(path)
 
@@ -359,6 +358,90 @@ class TestInstanceIsolation(unittest.TestCase):
         self.assertEqual(col1.widgets, ["widget1"])
         self.assertEqual(col2.rows, [])
         self.assertEqual(col2.widgets, [])
+
+
+@pytest.mark.parametrize(
+    "replacement",
+    ["tabs: [", "", "tabs: []", "tabs:\n  - columns: []", "tabs: not-a-list"],
+)
+def test_invalid_reload_preserves_tabs_and_jobs(tmp_path, monkeypatch, replacement):
+    scheduler = MagicMock(running=True)
+    monkeypatch.setattr("app.models.layout.Scheduler.getScheduler", lambda: scheduler)
+    monkeypatch.setenv("WORKING_STORAGE", str(tmp_path))
+    config = tmp_path / "layout.yml"
+    valid = (
+        "tabs:\n  - tab: Original\n    columns:\n      - widgets:\n"
+        "          - name: News\n            type: feed\n"
+        "            feed_url: https://example.com/feed\n"
+    )
+    config.write_text(valid, encoding="utf-8")
+    layout = Layout(str(config), bar_manager=MagicMock(), skip_file_init=True)
+    assert layout.reload()
+    original_tabs = layout.tabs
+    original_reload = layout.last_reload
+    job = scheduler.add_job.return_value
+    scheduler.add_job.reset_mock()
+    config.write_text(replacement, encoding="utf-8")
+    assert layout.reload() is False
+    assert layout.tabs is original_tabs
+    assert layout.last_reload == original_reload
+    assert layout.reload_error
+    scheduler.add_job.assert_not_called()
+    job.remove.assert_not_called()
+
+
+def test_candidate_feed_is_not_scheduled_if_later_widget_is_invalid(
+    tmp_path, monkeypatch
+):
+    scheduler = MagicMock(running=True)
+    monkeypatch.setattr("app.models.layout.Scheduler.getScheduler", lambda: scheduler)
+    monkeypatch.setenv("WORKING_STORAGE", str(tmp_path))
+    config = tmp_path / "layout.yml"
+    config.write_text("tabs:\n  - tab: Original\n    columns: []\n", encoding="utf-8")
+    layout = Layout(str(config), bar_manager=MagicMock(), skip_file_init=True)
+    layout.reload()
+    config.write_text(
+        "tabs:\n  - tab: Invalid\n    columns:\n      - widgets:\n"
+        "          - name: Candidate\n            type: feed\n"
+        "            feed_url: https://example.com/feed\n"
+        "          - name: Broken\n            type: iframe\n",
+        encoding="utf-8",
+    )
+    assert layout.reload() is False
+    assert layout.tabs[0].name == "Original"
+    scheduler.add_job.assert_not_called()
+
+
+def test_valid_reload_replaces_only_old_feed_jobs(tmp_path, monkeypatch):
+    scheduler = MagicMock(running=True)
+    monkeypatch.setattr("app.models.layout.Scheduler.getScheduler", lambda: scheduler)
+    monkeypatch.setenv("WORKING_STORAGE", str(tmp_path))
+    config = tmp_path / "layout.yml"
+    config.write_text(
+        "tabs:\n  - tab: Original\n    columns:\n      - widgets:\n"
+        "          - name: News\n            type: feed\n"
+        "            feed_url: https://example.com/feed\n",
+        encoding="utf-8",
+    )
+    layout = Layout(str(config), bar_manager=MagicMock(), skip_file_init=True)
+    layout.reload()
+    old_job = scheduler.add_job.return_value
+    config.write_text("tabs:\n  - tab: Updated\n    columns: []\n", encoding="utf-8")
+    assert layout.reload()
+    assert layout.tabs[0].name == "Updated"
+    old_job.remove.assert_called_once()
+    scheduler.remove_all_jobs.assert_not_called()
+
+
+def test_layout_bookmark_collector_has_no_shared_default():
+    first = object.__new__(Layout)
+    second = object.__new__(Layout)
+    assert first.bookmarks_list([{"href": "https://one.example"}]) == [
+        "https://one.example"
+    ]
+    assert second.bookmarks_list([{"href": "https://two.example"}]) == [
+        "https://two.example"
+    ]
 
 
 if __name__ == "__main__":

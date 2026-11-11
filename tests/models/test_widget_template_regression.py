@@ -4,6 +4,7 @@ Regression tests for Widget template rendering with empty feeds.
 Tests that widget templates correctly render "No articles yet" message
 instead of "Loading..." when feeds have no articles.
 """
+
 import os
 import tempfile
 import unittest
@@ -105,7 +106,13 @@ class TestWidgetTemplateRegression(unittest.TestCase):
         with patch(
             "app.models.widget.Scheduler.getScheduler", return_value=mock_scheduler
         ):
-            with patch("app.models.feed.feedparser.parse", return_value=mock_feed_data):
+            with (
+                patch("app.models.feed.feedparser.parse", return_value=mock_feed_data),
+                patch("app.models.feed.requests.get") as request,
+            ):
+                response = request.return_value.__enter__.return_value
+                response.status_code = 200
+                response.headers = {}
                 feed = Feed(self.widget_config)
                 # Manually populate feed with articles (simulating after update)
                 feed.update()

@@ -28,7 +28,7 @@ class FeedArticle(WidgetItem):
         title: str,
         link: str,
         description: str,
-        pub_date: datetime.datetime,
+        pub_date: datetime.datetime | None,
         processed: str,
         parent: Any,
     ):
@@ -43,7 +43,12 @@ class FeedArticle(WidgetItem):
             self.title = self.original_title
 
         self.description = normalize_text(description)
-        self.pub_date = pub_date
+        # Treat missing dates and legacy dates without an offset as UTC.
+        if pub_date is None:
+            pub_date = datetime.datetime.now(datetime.timezone.utc)
+        if pub_date.tzinfo is None:
+            pub_date = pub_date.replace(tzinfo=datetime.timezone.utc)
+        self.pub_date = pub_date.astimezone(datetime.timezone.utc)
         self.processed = processed
         if processed:
             self.name = self.title

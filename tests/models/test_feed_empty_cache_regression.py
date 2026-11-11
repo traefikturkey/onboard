@@ -4,6 +4,7 @@ Regression tests for Feed initialization with empty cache.
 Tests the scenario where a Feed is initialized in a production environment
 with no cached files, ensuring automatic updates are triggered correctly.
 """
+
 import os
 import tempfile
 import unittest
@@ -19,6 +20,14 @@ class TestFeedEmptyCache(unittest.TestCase):
         """Set up test fixtures with clean temporary directory."""
         self.tmpdir = tempfile.TemporaryDirectory()
         os.environ["WORKING_STORAGE"] = self.tmpdir.name
+        request_patch = patch("app.models.feed.requests.get")
+        request = request_patch.start()
+        self.addCleanup(request_patch.stop)
+        response = request.return_value.__enter__.return_value
+        response.status_code = 200
+        response.headers = {}
+        response.content = b"<rss version='2.0'><channel /></rss>"
+        response.url = "https://example.com/feed"
 
         # Basic widget configuration
         self.widget_config = {

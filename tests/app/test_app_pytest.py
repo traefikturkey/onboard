@@ -1,8 +1,17 @@
 import types
+from unittest.mock import MagicMock
 
 import pytest
 
 import app.main as app_module
+
+
+@pytest.fixture(autouse=True)
+def isolate_dependencies(monkeypatch):
+    for key in ("onboard_layout", "onboard_bookmark_manager", "onboard_link_tracker"):
+        monkeypatch.setitem(app_module.app.extensions, key, MagicMock())
+    with app_module.app.app_context():
+        app_module.app.extensions["onboard_cache"].clear()
 
 
 class FakeFeed:
@@ -42,7 +51,7 @@ class DummyDF:
 
 
 def test_index_and_tab():
-    app_module.layout = FakeLayout()
+    app_module.app.extensions["onboard_layout"] = FakeLayout()
     client = app_module.app.test_client()
 
     r = client.get("/")
@@ -53,7 +62,7 @@ def test_index_and_tab():
 
 
 def test_feed_route():
-    app_module.layout = FakeLayout()
+    app_module.app.extensions["onboard_layout"] = FakeLayout()
     client = app_module.app.test_client()
 
     r = client.get("/feed/someid")
@@ -62,12 +71,12 @@ def test_feed_route():
 
 
 def test_click_events(monkeypatch):
-    monkeypatch.setattr(
-        app_module,
-        "link_tracker",
+    monkeypatch.setitem(
+        app_module.app.extensions,
+        "onboard_link_tracker",
         types.SimpleNamespace(get_click_events=lambda: DummyDF()),
     )
-    app_module.layout = FakeLayout()
+    app_module.app.extensions["onboard_layout"] = FakeLayout()
     client = app_module.app.test_client()
 
     r = client.get("/click_events")
@@ -83,10 +92,12 @@ def test_track_redirect(monkeypatch, method):
     def fake_track(feed_id, link_id, link):
         called["args"] = (feed_id, link_id, link)
 
-    monkeypatch.setattr(
-        app_module, "link_tracker", types.SimpleNamespace(track_click_event=fake_track)
+    monkeypatch.setitem(
+        app_module.app.extensions,
+        "onboard_link_tracker",
+        types.SimpleNamespace(track_click_event=fake_track),
     )
-    app_module.layout = FakeLayout()
+    app_module.app.extensions["onboard_layout"] = FakeLayout()
     client = app_module.app.test_client()
 
     r = client.open("/redirect/f1/l1", method=method)
@@ -129,7 +140,7 @@ def test_widget_link_keeps_destination_in_href(tracking_url):
 
 def test_refresh():
     fake = FakeLayout()
-    app_module.layout = fake
+    app_module.app.extensions["onboard_layout"] = fake
     client = app_module.app.test_client()
 
     r = client.get("/feed/abc/refresh")

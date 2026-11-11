@@ -26,10 +26,10 @@ def test_from_dict_with_columns(row_dict_with_columns):
         # Verify from_dict was called for each column with bookmark_manager=None
         assert mock_column_from_dict.call_count == 2
         mock_column_from_dict.assert_any_call(
-            row_dict_with_columns["columns"][0], bookmark_manager=None
+            row_dict_with_columns["columns"][0], bookmark_manager=None, scheduler=None
         )
         mock_column_from_dict.assert_any_call(
-            row_dict_with_columns["columns"][1], bookmark_manager=None
+            row_dict_with_columns["columns"][1], bookmark_manager=None, scheduler=None
         )
 
 
@@ -51,5 +51,7 @@ def test_from_dict_with_widgets(row_dict_with_widgets):
         # Verify from_dict was called for each widget with bookmark_manager=None
         assert mock_widget_from_dict.call_count == 3
         for widget_data in row_dict_with_widgets["widgets"]:
-            mock_widget_from_dict.assert_any_call(widget_data, bookmark_manager=None)
+            mock_widget_from_dict.assert_any_call(
+                widget_data, bookmark_manager=None, scheduler=None
+            )
         mock_column_class.assert_called_once()

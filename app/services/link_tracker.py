@@ -19,14 +19,11 @@ class LinkTracker:
         self.create_table()
 
     def create_table(self):
-        self.cursor.execute(
-            """
+        self.cursor.execute("""
     SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='CLICK_EVENTS'
-    """
-        )
+    """)
         if self.cursor.fetchone()[0] == 0:
-            self.cursor.execute(
-                """
+            self.cursor.execute("""
     CREATE TABLE CLICK_EVENTS (
     ID TEXT PRIMARY KEY,
     TIMESTAMP DATETIME,
@@ -34,8 +31,7 @@ class LinkTracker:
     LINK_ID TEXT,
     LINK TEXT
     )
-    """
-            )
+    """)
             self.connection.commit()
 
     def track_click_event(self, widget_id, link_id, link):
@@ -76,6 +72,3 @@ class LinkTracker:
 
     def __del__(self):
         self.connection.close()
-
-
-link_tracker = LinkTracker()

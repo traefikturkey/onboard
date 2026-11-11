@@ -2,7 +2,7 @@ import json
 import os
 import tempfile
 import unittest
-from datetime import datetime
+from datetime import datetime, timezone
 from pathlib import Path
 from unittest.mock import MagicMock, patch
 
@@ -14,6 +14,14 @@ class TestFeed(unittest.TestCase):
     def setUp(self):
         self.tmpdir = tempfile.TemporaryDirectory()
         os.environ["WORKING_STORAGE"] = self.tmpdir.name
+        request_patch = patch("app.models.feed.requests.get")
+        request = request_patch.start()
+        self.addCleanup(request_patch.stop)
+        response = request.return_value.__enter__.return_value
+        response.status_code = 200
+        response.headers = {}
+        response.content = b"<rss version='2.0'><channel /></rss>"
+        response.url = "https://example.com/feed"
 
     def tearDown(self):
         self.tmpdir.cleanup()
@@ -220,11 +228,10 @@ class TestFeed(unittest.TestCase):
         widget = self.make_widget()
         f = Feed(widget)
 
-        with patch.object(
-            Feed, "download", return_value=[]
-        ) as mock_download, patch.object(
-            Feed, "save_articles", return_value=[]
-        ) as mock_save:
+        with (
+            patch.object(Feed, "download", return_value=[]) as mock_download,
+            patch.object(Feed, "save_articles", return_value=[]) as mock_save,
+        ):
             f.update()
             mock_download.assert_called_once()
             mock_save.assert_called_once()
@@ -233,7 +240,7 @@ class TestFeed(unittest.TestCase):
         """needs_update returns True when ONBOARD_FEED_FORCE_UPDATE is set."""
         widget = self.make_widget()
         f = Feed(widget)
-        f._last_updated = datetime.now()  # recently updated
+        f._last_updated = datetime.now(timezone.utc)  # recently updated
 
         with patch.dict(os.environ, {"ONBOARD_FEED_FORCE_UPDATE": "True"}):
             self.assertTrue(f.needs_update)
@@ -250,7 +257,7 @@ class TestFeed(unittest.TestCase):
         """needs_update returns False when updated less than 10 minutes ago."""
         widget = self.make_widget()
         f = Feed(widget)
-        f._last_updated = datetime.now()  # just now
+        f._last_updated = datetime.now(timezone.utc)  # just now
 
         # With the fix, empty string is not in ("true", "1", "yes") so force_update is False
         self.assertFalse(f.needs_update)
@@ -259,7 +266,7 @@ class TestFeed(unittest.TestCase):
         """needs_update correctly parses various ONBOARD_FEED_FORCE_UPDATE values."""
         widget = self.make_widget()
         f = Feed(widget)
-        f._last_updated = datetime.now()  # recently updated
+        f._last_updated = datetime.now(timezone.utc)  # recently updated
 
         # These should all trigger force update
         for value in ["true", "True", "TRUE", "1", "yes", "YES"]:

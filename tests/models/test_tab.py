@@ -34,10 +34,10 @@ class TestTab(unittest.TestCase):
         # Verify from_dict was called for each row with bookmark_manager=None
         assert mock_row_class.from_dict.call_count == 2
         mock_row_class.from_dict.assert_any_call(
-            dictionary["rows"][0], bookmark_manager=None
+            dictionary["rows"][0], bookmark_manager=None, scheduler=None
         )
         mock_row_class.from_dict.assert_any_call(
-            dictionary["rows"][1], bookmark_manager=None
+            dictionary["rows"][1], bookmark_manager=None, scheduler=None
         )
 
     @patch("app.models.row.Row")
@@ -67,10 +67,10 @@ class TestTab(unittest.TestCase):
         # Verify from_dict was called for each column with bookmark_manager=None
         assert mock_column_class.from_dict.call_count == 2
         mock_column_class.from_dict.assert_any_call(
-            dictionary["columns"][0], bookmark_manager=None
+            dictionary["columns"][0], bookmark_manager=None, scheduler=None
         )
         mock_column_class.from_dict.assert_any_call(
-            dictionary["columns"][1], bookmark_manager=None
+            dictionary["columns"][1], bookmark_manager=None, scheduler=None
         )
 
     def test_from_dict_missing_tab_key(self):

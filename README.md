@@ -152,7 +152,7 @@ tests/          Unit, Behave, and Docker/Selenium integration tests
 run.py          Runtime entry point imported by Gunicorn
 ```
 
-Production runs the Flask app defined in `app/main.py`. Tests commonly use the injectable factory in `app/factory.py`; route or initialization changes may need to stay aligned in both files.
+Production exports the Flask app from `app/main.py`, which calls the injectable factory in `app/factory.py`. Production and tests share the same routes and initialization code.
 
 ## Testing
 

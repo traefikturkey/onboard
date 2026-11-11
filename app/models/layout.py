@@ -2,8 +2,10 @@ import logging
 import os
 import shutil
 from pathlib import Path
+from types import SimpleNamespace
 
 import yaml
+from apscheduler.jobstores.base import JobLookupError
 
 from app.services.bookmark_bar_manager import BookmarkBarManager
 from app.services.bookmarks_migrator import BookmarksMigrator
@@ -31,6 +33,9 @@ class Layout:
         self.id: str = "layout"
         self.tabs: list[Tab] = []
         self.headers: list[Bookmark] = []
+        self.feed_hash = {}
+        self.last_reload = 0
+        self.reload_error: str | None = None
 
         # Allow skipping file operations for testing
         if not skip_file_init:
@@ -71,7 +76,10 @@ class Layout:
         return self.favicon_store.icon_path(url)
 
     def is_modified(self):
-        modified = self.mtime > self.last_reload
+        try:
+            modified = self.mtime != self.last_reload
+        except OSError:
+            modified = True
         logger.info(f"Layout modified?: {modified}")
         return modified
 
@@ -79,7 +87,9 @@ class Layout:
     def mtime(self):
         return os.path.getmtime(self.config_path)
 
-    def bookmarks_list(self, bookmarks, urls=[]):
+    def bookmarks_list(self, bookmarks, urls=None):
+        if urls is None:
+            urls = []
         for bookmark in bookmarks:
             if "contents" in bookmark:
                 self.bookmarks_list(bookmark["contents"], urls)
@@ -87,36 +97,62 @@ class Layout:
                 urls.append(bookmark["href"])
         return urls
 
-    def reload(self):
+    def reload(self) -> bool:
+        """Build a replacement before changing the active layout or its feed jobs."""
         logger.debug("Beginning Layout reload...")
-        Scheduler.clear_jobs()
-        content = self._load_layout_from_file()
-        self.tabs = [
-            Tab.from_dict(t, bookmark_manager=self.bar_manager)
-            for t in content.get("tabs", [])
-        ]
-        self.headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
+        try:
+            source_mtime = self.mtime
+            content = self._load_layout_from_file()
+            if not isinstance(content, dict) or not content.get("tabs"):
+                raise ValueError("Layout must contain at least one tab")
+            # Feed construction normally schedules work. Keep candidates inactive
+            # until the entire tree, including headers, has been constructed.
+            deferred_scheduler = SimpleNamespace(running=False)
+            tabs = [
+                Tab.from_dict(
+                    t, bookmark_manager=self.bar_manager, scheduler=deferred_scheduler
+                )
+                for t in content["tabs"]
+            ]
+            headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
+        except Exception as exc:
+            self.reload_error = f"Unable to load layout: {exc}"
+            logger.exception("Keeping current layout after reload failure")
+            if not self.tabs:
+                raise
+            return False
 
-        self.last_reload = self.mtime
+        # Remove only the old layout's feed jobs, not favicon or unrelated jobs.
+        for tab in self.tabs:
+            for row in tab.rows:
+                for column in row.columns:
+                    for feed in self.get_feeds(column):
+                        job = getattr(feed, "job", None)
+                        if job is not None:
+                            try:
+                                job.remove()
+                            except JobLookupError:
+                                pass
+
+        self.tabs = tabs
+        self.headers = headers
+        self.last_reload = source_mtime
         self.feed_hash = {}
+        self.reload_error = None
+        for tab in tabs:
+            for row in tab.rows:
+                for column in row.columns:
+                    for feed in self.get_feeds(column):
+                        feed._scheduler = None
+                        feed.start_scheduling()
 
         logger.debug("Completed Layout reload!")
+        return True
 
     def _load_layout_from_file(self) -> dict:
-        """Helper to load YAML layout content from the configured path.
-
-        Extracted to a separate method so tests can patch it easily.
-        Returns an empty dict on any read/parse error.
-        """
-        try:
-            with open(self.config_path, "r") as file:
-                content = yaml.safe_load(file) or {}
-                # Return raw content. Keep Tab.from_dict strict and let tests
-                # update fixtures to match canonical `tab` key when needed.
-                return content
-        except Exception:
-            logger.exception("Failed to read layout config; returning empty content")
-            return {}
+        """Read layout YAML, allowing errors to reach reload's preservation logic."""
+        with open(self.config_path, "r", encoding="utf-8") as file:
+            return yaml.safe_load(file)
 
     # NOTE: Legacy normalization removed. Parsing is strict and callers/tests
     # should provide canonical keys (e.g., `tab`).

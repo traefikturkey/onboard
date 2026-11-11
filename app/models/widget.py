@@ -106,14 +106,14 @@ class Widget:
         return self.widget.get(key, default)
 
     @staticmethod
-    def from_dict(widget: dict, bookmark_manager=None) -> "Widget":
+    def from_dict(widget: dict, bookmark_manager=None, scheduler=None) -> "Widget":
         from .bookmarks import Bookmarks
         from .feed import Feed
         from .iframe import Iframe
 
         match widget["type"]:
             case "feed":
-                return Feed(widget)
+                return Feed(widget, scheduler=scheduler)
             case "bookmarks":
                 return Bookmarks(widget, bookmark_manager=bookmark_manager)
             case "iframe":

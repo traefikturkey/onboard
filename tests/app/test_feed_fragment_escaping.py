@@ -22,7 +22,11 @@ def test_feed_fragment_escapes_decoded_feed_content_and_removes_load_trigger(
     else:
         main = importlib.import_module("app.main")
         app = main.app
-        monkeypatch.setattr(main, "layout", mock_layout)
+        monkeypatch.setitem(app.extensions, "onboard_layout", mock_layout)
+        monkeypatch.setitem(
+            app.extensions, "onboard_bookmark_manager", mock_bookmark_manager
+        )
+        monkeypatch.setitem(app.extensions, "onboard_link_tracker", mock_link_tracker)
 
     mock_layout.get_feed.return_value = SimpleNamespace(template="feed_fragment.html")
     loader = DictLoader(

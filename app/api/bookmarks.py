@@ -52,7 +52,9 @@ def create_bookmarks_blueprint(bookmark_manager=None):
         # Fallback: create a new one (backward compatibility)
         return BookmarkManager()
 
-    def handle_error(e: Exception, status_code: int = 400) -> tuple[dict[str, Any], int]:
+    def handle_error(
+        e: Exception, status_code: int = 400
+    ) -> tuple[dict[str, Any], int]:
         """Handle exceptions and return error response."""
         logger.error(f"API error: {e}")
         error_response = ErrorResponse(error=type(e).__name__, details=str(e))
@@ -286,7 +288,7 @@ def create_bookmarks_blueprint(bookmark_manager=None):
 
             try:
                 validated = SectionBookmarkItem(**data)
-                bookmark_data = validated.model_dump()
+                bookmark_data = validated.model_dump(exclude_none=True)
             except ValidationError as ve:
                 return handle_error(ve, 400)
 
@@ -314,7 +316,7 @@ def create_bookmarks_blueprint(bookmark_manager=None):
 
             try:
                 validated = SectionBookmarkItem(**data)
-                bookmark_data = validated.model_dump()
+                bookmark_data = validated.model_dump(exclude_none=True)
             except ValidationError as ve:
                 return handle_error(ve, 400)
 
@@ -333,7 +335,9 @@ def create_bookmarks_blueprint(bookmark_manager=None):
         except Exception as e:
             return handle_error(e, 500)
 
-    @bookmarks_bp.route("/sections/<section_id>/bookmarks/<int:index>", methods=["DELETE"])
+    @bookmarks_bp.route(
+        "/sections/<section_id>/bookmarks/<int:index>", methods=["DELETE"]
+    )
     def delete_section_bookmark(section_id: str, index: int):
         """Delete a bookmark from a section."""
         try:
@@ -428,7 +432,10 @@ def create_bookmarks_blueprint(bookmark_manager=None):
             except ValidationError as ve:
                 return handle_error(ve, 400)
 
-            get_manager().import_bookmarks(validated.data, validated.merge)
+            get_manager().import_bookmarks(
+                validated.data.model_dump(exclude_none=True, exclude_unset=True),
+                validated.merge,
+            )
             return jsonify(
                 SuccessResponse(message="Bookmarks imported successfully").model_dump()
             )

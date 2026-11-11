@@ -62,6 +62,7 @@
 			</div>
 		</div>
 		<div id="main-content">
+      {% include "layout_error.html" %}
 			{% for row in layout.tab(tab_name).rows:  %}
 				{% with row=row %}
 					{% include "row.html" %}

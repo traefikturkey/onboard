@@ -18,6 +18,18 @@ def write_file(path, content):
         f.write(content)
 
 
+def test_bookmark_collectors_do_not_share_default_url_lists():
+    first = object.__new__(BookmarkBarManager)
+    second = object.__new__(BookmarkBarManager)
+    assert first.bookmarks_list([{"href": "https://one.example"}]) == [
+        "https://one.example"
+    ]
+    assert second.bookmarks_list([{"href": "https://two.example"}]) == [
+        "https://two.example"
+    ]
+    assert first.bookmarks_list([]) == []
+
+
 def test_reload_loads_valid_json(tmp_path, monkeypatch):
     file_path = tmp_path / "bookmarks.json"
     # Use consolidated schema with bar + sections

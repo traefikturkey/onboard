@@ -3,6 +3,7 @@ import logging
 import os
 import socket
 import sys
+from urllib.parse import urlparse
 
 from langchain_classic.output_parsers import ResponseSchema, StructuredOutputParser
 from langchain_community.llms import Ollama
@@ -35,7 +36,10 @@ logger.setLevel(logging.DEBUG)
 class TitleEditor:
     def hostname_resolves(self, hostname):
         try:
-            socket.gethostbyname(hostname)
+            host = urlparse(hostname if "://" in hostname else f"//{hostname}").hostname
+            if not host:
+                return 0
+            socket.gethostbyname(host)
             return 1
         except socket.error:
             return 0
