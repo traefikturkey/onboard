@@ -13,14 +13,18 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         ("Amazon", "https://www.amazon.com/"),
         ("eBay", "https://www.ebay.com/"),
         ("Youtube", "https://www.youtube.com/"),
+        ("Other", "https://example.com/"),
     ]
     icons = {
+        "Docs": "docs.ico",
+        "Photos": "photos.ico",
+        "Maps": "maps.ico",
         "Amazon": "amazon.ico",
         "eBay": "ebay.ico",
         "Youtube": "youtube.ico",
     }
     if include_gmail:
-        headers.insert(1, ("Gmail", "https://mail.google.com/mail/u/0/"))
+        headers.insert(0, ("Gmail", "https://mail.google.com/mail/u/0/#inbox"))
         icons["Gmail"] = "gmail.ico"
 
     mock_layout.headers = [
