@@ -124,7 +124,7 @@ def test_header_section_and_presentation_reload_without_rebuild(tmp_path):
         assert menu["data-hover-delay"] == "350"
         assert menu.select_one(":scope > a img")["src"] == "/static/img/gmail.ico"
         assert not menu.select_one(":scope > a").has_attr("target")
-        assert menu.select_one("ul")["style"] == "--menu-columns: 3"
+        assert menu.select_one("ul")["style"] == "--menu-columns: 3; --menu-rows: 1"
         assert menu.select_one("ul a")["href"] == original_url
         assert "Old inline" not in menu.get_text()
         assert "--header-icon-size: 20px" in soup.select_one("#ui-settings").get_text()

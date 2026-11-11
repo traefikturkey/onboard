@@ -52,7 +52,9 @@
 					<a href="{{header.link}}"{% if header.open_in_new_tab|default(true) %} target="_blank"{% endif %}{% if header_icon_url %} class="header-link-with-icon"{% endif %}>{% if header_icon_url %}<img class="header-link-icon" src="{{ header_icon_url }}" width="16" height="16" alt="">{% endif %}{{header.name}}</a>
           {% if menu_links %}
             <button type="button" class="utility-menu-toggle" aria-label="Show {{ header.name }} searches" aria-expanded="false" aria-controls="utility-menu-{{ loop.index }}">▾</button>
-            <ul id="utility-menu-{{ loop.index }}" class="utility-menu-links" style="--menu-columns: {{ header.multi_column|default(2) }}" hidden>
+            {% set menu_columns = header.multi_column|default(2) %}
+            {% set menu_rows = (menu_links|length + menu_columns - 1) // menu_columns %}
+            <ul id="utility-menu-{{ loop.index }}" class="utility-menu-links" style="--menu-columns: {{ menu_columns }}; --menu-rows: {{ menu_rows }}" hidden>
               {% for item in menu_links %}
               <li><a href="{{ item.href|default(item.link) }}"{% if header.open_in_new_tab|default(true) %} target="_blank"{% endif %}>{{ item.name }}</a></li>
               {% endfor %}

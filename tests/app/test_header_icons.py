@@ -66,17 +66,25 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         assert resource.data.startswith(b"\x00\x00\x01\x00")
 
 
+@pytest.mark.parametrize(
+    ("link_count", "columns", "rows"), [(1, 2, 1), (5, 2, 3), (42, 2, 21), (7, 3, 3)]
+)
 def test_header_search_menu_keeps_homepage_link_and_exact_search_url(
-    test_client, mock_layout
+    test_client, mock_layout, link_count, columns, rows
 ):
     search_url = "https://example.com/search?q=3d%20printer&filter=1"
+    contents = [
+        {"name": f"Search {index}", "href": search_url + f"&item={index}"}
+        for index in range(link_count)
+    ]
+    contents[0] = {"name": "3D Printer", "href": search_url}
     mock_layout.headers = [
         Bookmark.from_dict(
             {
                 "name": "Searches",
                 "link": "https://example.com/",
-                "contents": [{"name": "3D Printer", "href": search_url}],
-                "multiColumn": 2,
+                "contents": contents,
+                "multiColumn": columns,
             },
             SimpleNamespace(id="layout"),
         )
@@ -98,6 +106,10 @@ def test_header_search_menu_keeps_homepage_link_and_exact_search_url(
     assert toggle["aria-expanded"] == "false"
     assert toggle["aria-controls"] == dropdown["id"]
     assert dropdown.has_attr("hidden")
+    assert dropdown["style"] == f"--menu-columns: {columns}; --menu-rows: {rows}"
+    assert [a["href"] for a in dropdown.select("a")] == [
+        item["href"] for item in contents
+    ]
     assert dropdown.select_one("a")["href"] == search_url
     assert dropdown.select_one("a")["target"] == "_blank"
     assert soup.select_one('script[src="/static/js/header-menu.js"]') is not None

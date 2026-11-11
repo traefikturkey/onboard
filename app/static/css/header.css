@@ -69,7 +69,9 @@
   background: var(--header-background, #333);
   border: 1px solid #555;
   border-radius: 4px;
-  column-count: var(--menu-columns, 2);
+  grid-auto-flow: column;
+  grid-template-columns: repeat(var(--menu-columns, 2), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--menu-rows, 1), max-content);
   column-gap: 8px;
   width: max-content;
   max-width: calc(100vw - 2rem);
@@ -77,8 +79,8 @@
   overflow-y: auto;
 }
 
-.utility-menu-links li {
-  break-inside: avoid;
+.utility-menu-links:not([hidden]) {
+  display: grid;
 }
 
 .utility-menu-links a {
