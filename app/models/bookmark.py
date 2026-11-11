@@ -13,9 +13,14 @@ class Bookmark(WidgetItem):
             raise TypeError("from_dict expects (dict, parent) or ((dict, parent),)")
         name = dictionary.get("name")
         link = dictionary.get("link")
-        return Bookmark(name, link, parent)
+        bookmark = Bookmark(name, link, parent)
+        bookmark.contents = dictionary.get("contents", [])
+        bookmark.multi_column = dictionary.get("multiColumn", 2)
+        return bookmark
 
     from .widget import Widget
 
     def __init__(self, name: str, link: str, parent: Widget) -> None:
         super().__init__(name, link, parent)
+        self.contents: list[dict] = []
+        self.multi_column: int = 2

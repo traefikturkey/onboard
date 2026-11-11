@@ -64,6 +64,26 @@ class TestBookmark(unittest.TestCase):
         self.assertEqual(bookmark.link, "https://only-link.com")
         self.assertEqual(bookmark.parent.id, "parent123")
 
+    def test_from_dict_preserves_header_menu_search_urls(self):
+        contents = [
+            {
+                "name": "Filtered",
+                "href": "https://example.com/search?q=3d%20printer&filter=1",
+            }
+        ]
+        bookmark = Bookmark.from_dict(
+            {
+                "name": "Searches",
+                "link": "https://example.com/",
+                "contents": contents,
+                "multiColumn": 2,
+            },
+            MockWidget(),
+        )
+        self.assertEqual(bookmark.contents, contents)
+        self.assertEqual(bookmark.multi_column, 2)
+        self.assertEqual(bookmark.link, "https://example.com/")
+
     def test_from_dict_invalid_args_count(self):
         """Test from_dict raises TypeError with invalid arguments"""
         parent = MockWidget()

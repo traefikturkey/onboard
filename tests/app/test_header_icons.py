@@ -61,3 +61,42 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         resource = test_client.get(icon["src"])
         assert resource.status_code == 200
         assert resource.data.startswith(b"\x00\x00\x01\x00")
+
+
+def test_header_search_menu_keeps_homepage_link_and_exact_search_url(
+    test_client, mock_layout
+):
+    from app.models.bookmark import Bookmark
+
+    search_url = "https://example.com/search?q=3d%20printer&filter=1"
+    mock_layout.headers = [
+        Bookmark.from_dict(
+            {
+                "name": "Searches",
+                "link": "https://example.com/",
+                "contents": [{"name": "3D Printer", "href": search_url}],
+                "multiColumn": 2,
+            },
+            SimpleNamespace(id="layout"),
+        )
+    ]
+    mock_layout.bookmark_bar = []
+    mock_layout.tabs = [SimpleNamespace(name="Home")]
+    mock_layout.tab.return_value = SimpleNamespace(rows=[])
+
+    response = test_client.get("/")
+
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+    menu = soup.select_one("[data-utility-menu]")
+    homepage = menu.select_one(":scope > a")
+    assert homepage["href"] == "https://example.com/"
+    assert homepage["target"] == "_blank"
+    toggle = menu.select_one("button")
+    dropdown = menu.select_one("ul")
+    assert toggle["aria-expanded"] == "false"
+    assert toggle["aria-controls"] == dropdown["id"]
+    assert dropdown.has_attr("hidden")
+    assert dropdown.select_one("a")["href"] == search_url
+    assert dropdown.select_one("a")["target"] == "_blank"
+    assert soup.select_one('script[src="/static/js/header-menu.js"]') is not None

@@ -20,11 +20,69 @@
 .header-link-with-icon {
   display: inline-flex;
   align-items: center;
-  gap: 0.25em;
+  gap: 4px;
 }
 
 .header-link-icon {
   flex-shrink: 0;
+}
+
+.utility-links {
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.utility-links a {
+  padding: 0.5rem 8px;
+}
+
+.utility-menu {
+  position: relative;
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.utility-menu-toggle {
+  border: 0;
+  padding: 0 4px;
+  background: #555;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.utility-menu-toggle:hover,
+.utility-menu-toggle[aria-expanded="true"] {
+  background: #444;
+}
+
+.utility-menu-links {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  z-index: 1002;
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  background: #333;
+  border: 1px solid #555;
+  border-radius: 4px;
+  column-count: var(--menu-columns, 2);
+  column-gap: 8px;
+  width: max-content;
+  max-width: calc(100vw - 2rem);
+  max-height: 65vh;
+  overflow-y: auto;
+}
+
+.utility-menu-links li {
+  break-inside: avoid;
+}
+
+.utility-menu-links a {
+  display: block;
+  padding: 4px 8px;
+  white-space: nowrap;
 }
 
 .header a:first-child {
