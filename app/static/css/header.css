@@ -17,6 +17,11 @@
   line-height: 1.5em;
 }
 
+.header-link-icon {
+  margin-right: 0.25em;
+  vertical-align: middle;
+}
+
 .header a:first-child {
   border-bottom-left-radius: 0.25rem; /* Add rounded corner to the first link */
 }
