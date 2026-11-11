@@ -2,6 +2,9 @@
   document.querySelectorAll('[data-utility-menu]').forEach(menu => {
     const toggle = menu.querySelector('.utility-menu-toggle');
     const links = menu.querySelector('.utility-menu-links');
+    const configuredDelay = Number(menu.dataset.hoverDelay ?? 2000);
+    const hoverDelay = Number.isFinite(configuredDelay) && configuredDelay >= 0
+      ? configuredDelay : 2000;
     let hoverTimer;
 
     function cancelHover() {
@@ -18,7 +21,7 @@
     menu.addEventListener('mouseenter', () => {
       cancelHover();
       if (links.hidden && window.matchMedia('(hover: hover)').matches) {
-        hoverTimer = setTimeout(() => setOpen(true), 2000);
+        hoverTimer = setTimeout(() => setOpen(true), hoverDelay);
       }
     });
     menu.addEventListener('mouseleave', () => setOpen(false));

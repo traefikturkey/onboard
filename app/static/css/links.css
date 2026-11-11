@@ -1,23 +1,24 @@
 /* Links */
-a, .bookmarks-link, .bookmarks-link:visited {
-  color: #98c379;
+a {
+  color: var(--link-color, #98c379);
   text-decoration: none;
 }
 
 a:visited {
-  color: #c678dd;
+  color: var(--visited-link-color, #c678dd);
 }
 
 a:hover, a:focus {
-  color: #e06c75;
+  color: var(--link-hover-color, #e06c75);
 }
 
 .box-header-link, .box-header-link:visited, .header a:visited {
-  color: #D3D3D3;
+  color: var(--header-text-color, #D3D3D3);
 }
 
 /* Prevent bookmark link text from wrapping and show ellipsis when too long */
 .bookmarks-link {
+  color: var(--bookmark-link-color, #98c379);
   display: inline-block; /* allow width control while remaining inline */
   max-width: 12rem; /* adjust as needed for your layout */
   min-width: 0; /* allows shrinking inside flex containers */
@@ -30,5 +31,5 @@ a:hover, a:focus {
 }
 
 .bookmarks-link:visited {
-  color: #98c379; /* keep same color for visited when using the class */
+  color: var(--bookmark-link-color, #98c379);
 }

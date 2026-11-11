@@ -1,15 +1,17 @@
 from . import row, widget
-from .utils import from_list
+from .presentation import ColumnPresentation
 
 
 class Column:
     def __init__(self):
         self.rows: list["row.Row"] = []
         self.widgets: list["widget.Widget"] = []
+        self.flex: float = 1
 
     @staticmethod
     def from_dict(dictionary: dict, bookmark_manager=None, scheduler=None) -> "Column":
         column_obj = Column()
+        column_obj.flex = ColumnPresentation.model_validate(dictionary).flex
         if "rows" in dictionary:
             column_obj.rows = [
                 row.Row.from_dict(

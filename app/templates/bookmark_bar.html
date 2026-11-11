@@ -11,9 +11,9 @@
       {% endwith %}
     {% else %}
       <a href="{{ bookmark.href }}" {% if inside_new_tab_folder %}target="_blank"{% endif %}>
-        {% set favicon_url = favicon_path(bookmark.href) %}
-        {% if favicon_url %}
-          <img src="{{ favicon_url }}" alt="{{ bookmark.name }}">
+        {% set icon_url = favicon_url(bookmark.favicon|default(None)) or favicon_path(bookmark.href) %}
+        {% if icon_url %}
+          <img src="{{ icon_url }}" alt="{{ bookmark.name }}">
         {% else %}
           <i class="fa fa-link"></i>
         {% endif %}

@@ -1,6 +1,6 @@
 /* Headers and Tab Bars */
 .header {
-  background-color: #333;
+  background-color: var(--header-background, #333);
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -9,21 +9,23 @@
 }
 
 .header a {
-  color: #d3d3d3;
+  color: var(--header-text-color, #d3d3d3);
   text-decoration: none;
   padding: 0.5rem 1rem; /* Adjust padding */
   transition: all 0.3s ease; /* Add transition for smooth hover effect */
-  background-color: #555;
+  background-color: var(--header-link-background, #555);
   line-height: 1.5em;
 }
 
 .header-link-with-icon {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: var(--header-icon-gap, 4px);
 }
 
 .header-link-icon {
+  width: var(--header-icon-size, 16px);
+  height: var(--header-icon-size, 16px);
   flex-shrink: 0;
 }
 
@@ -33,7 +35,7 @@
 }
 
 .utility-links a {
-  padding: 0.5rem 8px;
+  padding: var(--header-link-padding-y, 0.5rem) var(--header-link-padding-x, 8px);
 }
 
 .utility-menu {
@@ -45,7 +47,7 @@
 .utility-menu-toggle {
   border: 0;
   padding: 0 4px;
-  background: #555;
+  background: var(--header-link-background, #555);
   color: inherit;
   cursor: pointer;
   font: inherit;
@@ -53,7 +55,7 @@
 
 .utility-menu-toggle:hover,
 .utility-menu-toggle[aria-expanded="true"] {
-  background: #444;
+  background: var(--header-link-hover-background, #444);
 }
 
 .utility-menu-links {
@@ -64,7 +66,7 @@
   margin: 0;
   padding: 4px;
   list-style: none;
-  background: #333;
+  background: var(--header-background, #333);
   border: 1px solid #555;
   border-radius: 4px;
   column-count: var(--menu-columns, 2);
@@ -94,6 +96,6 @@
 }
 
 .header a:hover {
-  background-color: #444;
-  color: #d3d3d3;
+  background-color: var(--header-link-hover-background, #444);
+  color: var(--header-text-color, #d3d3d3);
 }

@@ -1,6 +1,7 @@
 import logging
 
 from .bookmark import Bookmark
+from .presentation import BookmarkListPresentation
 from .utils import from_list
 from .widget import Widget
 
@@ -10,6 +11,9 @@ logger = logging.getLogger(__name__)
 class Bookmarks(Widget):
     def __init__(self, widget, bookmark_manager=None):
         super().__init__(widget)
+        presentation = BookmarkListPresentation.model_validate(widget)
+        self.columns = presentation.columns
+        self.show_favicons = presentation.show_favicons
 
         # Load bookmarks from consolidated bookmarks.json sections
         if "bookmarks_section" not in widget:

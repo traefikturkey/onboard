@@ -14,6 +14,7 @@ from .apscheduler import Scheduler
 from .bookmark import Bookmark
 from .column import Column
 from .feed import Feed
+from .presentation import UISettings
 from .row import Row
 from .tab import Tab
 from .utils import from_list, pwd
@@ -33,6 +34,7 @@ class Layout:
         self.id: str = "layout"
         self.tabs: list[Tab] = []
         self.headers: list[Bookmark] = []
+        self.ui = UISettings()
         self.feed_hash = {}
         self.last_reload = 0
         self.reload_error: str | None = None
@@ -114,6 +116,7 @@ class Layout:
                 )
                 for t in content["tabs"]
             ]
+            ui = UISettings.model_validate(content.get("ui", {}))
             headers = from_list(Bookmark.from_dict, content.get("headers", []), self)
         except Exception as exc:
             self.reload_error = f"Unable to load layout: {exc}"
@@ -136,6 +139,7 @@ class Layout:
 
         self.tabs = tabs
         self.headers = headers
+        self.ui = ui
         self.last_reload = source_mtime
         self.feed_hash = {}
         self.reload_error = None

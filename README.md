@@ -101,6 +101,81 @@ Supported widget types in the current models and defaults are:
 - `bookmarks`: renders a named section from `bookmarks.json` using `bookmarks_section`.
 - `iframe`: embeds a page using `src`.
 
+### Presentation settings without image rebuilds
+
+Changes to `layout.yml` and `bookmarks.json` take effect on the next page load;
+no container restart or image rebuild is needed. Existing configurations retain
+their appearance when the optional settings below are omitted. New templates or
+JavaScript functionality still require an image update.
+
+```yaml
+ui:
+  header_icon_size: 16px
+  header_icon_gap: 4px
+  header_link_padding_x: 8px
+  header_link_padding_y: 0.5rem
+  feed_height: 300px
+  page_background: '#2a2a2c'
+
+headers:
+  - name: Example
+    link: https://example.com/
+    favicon: /static/assets/icons/example.ico
+    bookmarks_section: example-searches
+    hover_delay_ms: 2000
+    multiColumn: 2
+    openInNewTab: true
+
+tabs:
+  - tab: Home
+    columns:
+      - flex: 2
+        widgets:
+          - name: Useful links
+            type: bookmarks
+            bookmarks_section: useful-links
+            columns: 2
+            show_favicons: false
+      - flex: 1
+        widgets: []
+```
+
+Header dropdowns can reference any flat section in `bookmarks.json`, including
+sections edited through the bookmark manager. The section wins when both
+`bookmarks_section` and legacy inline `contents` are present. Inline entries
+continue to use `href`; section entries use `link`. A header label opens its site;
+hovering opens its dropdown after `hover_delay_ms` (0–60000). The adjacent button
+and Arrow Down open it immediately. `multiColumn` accepts 1–10 columns;
+`openInNewTab` applies to the header and its dropdown links and defaults to true.
+
+The `favicon` field accepts an HTTP(S) URL, a root-relative URL, or a bundled image
+filename such as `gmail.ico` (resolved under `/static/img/`). Header icons use the
+explicit value first, then compatibility defaults for the original utility links,
+then an available cached favicon. Bookmark-bar links honor the same explicit
+field. Bookmark widgets display icons only when `show_favicons: true`, preserving
+the existing text-only default. To keep custom files across image updates, mount
+an icon directory at `/srv/app/static/assets/icons` and reference its files with
+`/static/assets/icons/<filename>`.
+
+Column `flex` is a positive numeric proportion (for example, 2 and 1 produce a
+2:1 split). Bookmark widget `columns` accepts 1–10 and defaults to 1; it does not
+require splitting one bookmark section into multiple sections.
+
+Supported `ui` length settings are `header_icon_size`, `header_icon_gap`,
+`header_link_padding_x`, `header_link_padding_y`, `widget_padding`,
+`list_item_margin`, `list_item_padding_bottom`, and `feed_height`. Values are
+nonnegative lengths using `px`, `rem`, `em`, `vh`, `vw`, or `%`, or the string
+`'0'`.
+
+Color settings are `header_background`, `header_link_background`,
+`header_link_hover_background`, `header_text_color`, `page_background`,
+`text_color`, `link_color`, `link_hover_color`, `visited_link_color`,
+`bookmark_link_color`, and `widget_header_background`. Values are 3-, 4-, 6-, or
+8-digit hex colors, `transparent`, or `currentColor`. Quote hex colors in YAML.
+Unknown `ui` keys or invalid presentation values keep the previous valid layout
+active and show the existing layout error notice. Presentation values are not
+arbitrary CSS or JavaScript.
+
 ### Environment variables
 
 | Variable | Default | Purpose |

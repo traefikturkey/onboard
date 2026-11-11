@@ -8,6 +8,7 @@ from flask import Flask
 from flask_assets import Bundle, Environment
 from flask_caching import Cache
 
+from app.models.presentation import favicon_url
 from app.modules.testsupport import is_test_environment
 
 logger = logging.getLogger(__name__)
@@ -197,6 +198,7 @@ def _register_routes(app, cache):
             "today_date": datetime.now(),
             "site_title": os.environ.get("ONBOARD_SITE_TITLE", "OnBoard"),
             "favicon_path": layout.favicon_path if layout else lambda x: None,
+            "favicon_url": favicon_url,
         }
 
     def is_tab_fragment():

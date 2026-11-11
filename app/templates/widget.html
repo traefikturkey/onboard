@@ -22,7 +22,7 @@
   <div class="box {{ widget.type }}-box">
     <div class="box-header {{ widget.type }}-header" {{ 'style=display:none' if not widget.display_header }} >
       <a href="{{ widget.link }}" target="_blank" class="box-header-link {{ widget.type }}-header-link">{{ widget.name }}</a></div>
-    <div class="box-content {{ widget.type }}-content">
+    <div class="box-content {{ widget.type }}-content"{% if widget.type == "bookmarks" %} style="--bookmark-columns: {{ widget.columns|default(1) }}"{% endif %}>
   <ul data-widget="feed" data-open-id="">
         {% set name = widget.name %}
     {% for article in widget.display_items %}
@@ -31,7 +31,7 @@
   {% else %}
   <li id="{{ article.id }}" class="widget-item {{ widget.type }}-item">
   {% endif %}
-          <a href="{{ article.link }}" {% if article.tracking_link %}data-tracking-url="{{ article.tracking_link }}"{% endif %} class="{{ widget.type }}-link" data-hx-boost="false" data-stop-propagation>{{ article.name }}</a>
+          <a href="{{ article.link }}" {% if article.tracking_link %}data-tracking-url="{{ article.tracking_link }}"{% endif %} class="{{ widget.type }}-link" data-hx-boost="false" data-stop-propagation>{% if widget.type == "bookmarks" and widget.show_favicons %}{% set icon_url = favicon_url(article.favicon) or favicon_path(article.link) %}{% if icon_url %}<img class="bookmark-link-icon" src="{{ icon_url }}" width="16" height="16" alt=""> {% endif %}{% endif %}{{ article.name }}</a>
           {% if article.summary %}
           <div class="widget-item-toolbar">
             <i class="fas fa-chevron-down" data-toggle-icon-for="{{ article.id }}"></i>

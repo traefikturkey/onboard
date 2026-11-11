@@ -1,6 +1,6 @@
 /* Boxes */
 .box {
-  padding: 0.625em; /* 10px converted to 0.625em */
+  padding: var(--widget-padding, 0.625em);
 }
 
 .box ul {
@@ -14,8 +14,8 @@
 ul li {
   border-bottom: 0.063em solid #444; /* Rounded from 0.0625em */
   list-style: none outside none;
-  margin: 0.3em 0.3em; /* 8px converted to 0.5em */
-  padding-bottom: 0.3em;
+  margin: var(--list-item-margin, 0.3em);
+  padding-bottom: var(--list-item-padding-bottom, 0.3em);
 }
 
 ul li:last-child {
@@ -26,7 +26,7 @@ ul li:last-child {
 .box-header {
   border-top-left-radius: 0.313em; /* Rounded from 0.3125em */
   border-top-right-radius: 0.313em; /* Rounded from 0.3125em */
-  background-color: #3c3c3c;
+  background-color: var(--widget-header-background, #3c3c3c);
   font-size: 1.25em; /* Rounded from 0.8125em */
   font-weight: bold;
   height: 1.5em; /* 24px converted to 1.5em */
@@ -63,8 +63,8 @@ ul li:last-child {
 
 /* Feed Content */
 .feed-content {
-  max-height: 300px;
-  min-height: 300px;
+  max-height: var(--feed-height, 300px);
+  min-height: var(--feed-height, 300px);
   overflow-y: auto;
   scrollbar-width: none;
   scrollbar-color: #666 #333;
@@ -72,6 +72,19 @@ ul li:last-child {
 
 .feed-content a:visited {
   color: #a885fac7;
+}
+
+.bookmarks-content > ul {
+  column-count: var(--bookmark-columns, 1);
+  column-gap: 16px;
+}
+
+.bookmarks-content > ul > li {
+  break-inside: avoid;
+}
+
+.bookmark-link-icon {
+  vertical-align: middle;
 }
 
 .widget-item {

@@ -3,6 +3,8 @@ from types import SimpleNamespace
 import pytest
 from bs4 import BeautifulSoup
 
+from app.models.bookmark import Bookmark
+
 
 @pytest.mark.parametrize("include_gmail", [False, True])
 def test_header_icons_preserve_utility_links(test_client, mock_layout, include_gmail):
@@ -28,7 +30,8 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         icons["Gmail"] = "gmail.ico"
 
     mock_layout.headers = [
-        SimpleNamespace(name=name, link=link) for name, link in headers
+        Bookmark.from_dict({"name": name, "link": link}, SimpleNamespace(id="layout"))
+        for name, link in headers
     ]
     mock_layout.bookmark_bar = []
     mock_layout.tabs = [SimpleNamespace(name="Home")]
@@ -66,8 +69,6 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
 def test_header_search_menu_keeps_homepage_link_and_exact_search_url(
     test_client, mock_layout
 ):
-    from app.models.bookmark import Bookmark
-
     search_url = "https://example.com/search?q=3d%20printer&filter=1"
     mock_layout.headers = [
         Bookmark.from_dict(

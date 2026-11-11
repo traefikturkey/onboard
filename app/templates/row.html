@@ -1,6 +1,6 @@
 <div class="row content">
   {% for column in row.columns %}
-    <div class="column">
+    <div class="column"{% if column.flex|default(1) != 1 %} style="flex: {{ column.flex }}"{% endif %}>
       {% if column.rows %}
         {% for row in column.rows %}
           {% with row=row %}
