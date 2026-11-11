@@ -31,13 +31,15 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         SimpleNamespace(name=name, link=link) for name, link in headers
     ]
     mock_layout.bookmark_bar = []
-    mock_layout.tabs = []
+    mock_layout.tabs = [SimpleNamespace(name="Home")]
     mock_layout.tab.return_value = SimpleNamespace(rows=[])
 
     response = test_client.get("/")
 
     assert response.status_code == 200
-    links = BeautifulSoup(response.data, "html.parser").select(".header a")
+    soup = BeautifulSoup(response.data, "html.parser")
+    links = soup.select(".header .row:not(.tab-bar) > a")
+    assert "header-link-with-icon" not in soup.select_one(".tab-bar a").get("class", [])
     assert [(link.get_text(strip=True), link["href"]) for link in links] == headers
     assert all(link["target"] == "_blank" for link in links)
     assert len([icon for link in links for icon in link.select("img")]) == len(icons)
@@ -46,8 +48,10 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
         filename = icons.get(link.get_text(strip=True))
         if filename is None:
             assert link.find("img") is None
+            assert "header-link-with-icon" not in link.get("class", [])
             continue
 
+        assert link["class"] == ["header-link-with-icon"]
         icon = link.find("img")
         assert icon["src"] == f"/static/img/{filename}"
         assert icon["class"] == ["header-link-icon"]

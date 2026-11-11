@@ -17,9 +17,14 @@
   line-height: 1.5em;
 }
 
+.header-link-with-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25em;
+}
+
 .header-link-icon {
-  margin-right: 0.25em;
-  vertical-align: middle;
+  flex-shrink: 0;
 }
 
 .header a:first-child {
