@@ -46,6 +46,7 @@ def create_app(
     app = Flask(__name__)
     app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
     app.config["ONBOARD_BOOKS_ROOT"] = os.environ.get("ONBOARD_BOOKS_ROOT")
+    app.config["ONBOARD_BOOKS_METADATA"] = os.environ.get("ONBOARD_BOOKS_METADATA")
 
     # Apply custom config if provided
     if config:

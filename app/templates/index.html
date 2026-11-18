@@ -112,6 +112,9 @@
 	</div>
 </body>
 <script src="{{ url_for('static', filename='js/header-menu.js') }}"></script>
+{% if books_sections is defined %}
+<script src="{{ url_for('static', filename='js/book-details.js') }}"></script>
+{% endif %}
 <script>
 // Clean up any loading classes that may have been added during page initialization.
 // The loading-states HTMX extension should only add these during actual requests,

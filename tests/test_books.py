@@ -1,5 +1,7 @@
 """Books catalog and browser PDF responses."""
 
+import json
+
 import pytest
 
 PDF = b"%PDF-1.4\nSample book\n%%EOF\n"
@@ -11,6 +13,7 @@ def test_books_are_opt_in(test_app, test_client):
     assert b'/books/' not in test_client.get("/").data
     assert test_client.get("/books/").status_code == 404
     assert test_client.get("/books/pdf/sample.pdf").status_code == 404
+    assert test_client.get(f"/books/cover/{'a' * 64}.jpg").status_code == 404
 
 
 def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
@@ -45,6 +48,72 @@ def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
     assert url.encode() in updated.data
     with test_client.get(url) as book:
         assert book.data == PDF
+
+
+def test_metadata_displays_clean_title_and_optional_details(test_app, test_client, tmp_path):
+    root = tmp_path / "books"
+    root.mkdir()
+    pdf = root / "imported_title_-_Doe_v2.pdf"
+    pdf.write_bytes(PDF)
+    (root / "Other_Title.pdf").write_bytes(PDF)
+    metadata_file = tmp_path / "books.json"
+    cover = "a" * 64 + ".jpg"
+    covers = tmp_path / "book-covers"
+    covers.mkdir()
+    (covers / cover).write_bytes(b"cover")
+    test_app.config.update(
+        ONBOARD_BOOKS_ROOT=root, ONBOARD_BOOKS_METADATA=metadata_file
+    )
+    metadata = {
+        pdf.name: {
+            "title": "Verified & Complete",
+            "subtitle": "A Guide",
+            "authors": ["Jane Doe", "Alex Lee"],
+            "date": "2025-02-01",
+            "edition": "2nd edition",
+            "summary": "Example <book> summary.",
+            "cover": cover,
+        },
+        "absent.pdf": {"title": "A book not in the library"},
+    }
+    metadata_file.write_text(json.dumps(metadata), encoding="utf-8")
+
+    page = test_client.get("/books/")
+    assert page.status_code == 200
+    assert b"Verified &amp; Complete</a>" in page.data
+    assert b"/books/pdf/imported_title_-_Doe_v2.pdf" in page.data
+    assert b"Other Title</a>" in page.data
+    assert b"A book not in the library" not in page.data
+    assert page.data.count(b'popover="manual"') == 1
+    assert b"A Guide" in page.data
+    assert b"Jane Doe, Alex Lee" in page.data
+    assert b' datetime="2025-02-01"' in page.data
+    assert b"2nd edition" in page.data
+    assert b"Example &lt;book&gt; summary." in page.data
+    assert f'data-cover="/books/cover/{cover}"'.encode() in page.data
+    with test_client.get(f"/books/cover/{cover}") as response:
+        assert response.status_code == 200
+        assert response.mimetype == "image/jpeg"
+        assert response.headers["Cache-Control"] == "private, no-store"
+        assert response.data == b"cover"
+    assert test_client.get("/books/cover/not-a-cover.jpg").status_code == 404
+    assert pdf.read_bytes() == PDF
+
+
+def test_invalid_metadata_does_not_hide_books(test_app, test_client, tmp_path):
+    root = tmp_path / "books"
+    root.mkdir()
+    (root / "Fallback_Title.pdf").write_bytes(PDF)
+    metadata_file = tmp_path / "books.json"
+    metadata_file.write_text("{invalid JSON}", encoding="utf-8")
+    test_app.config.update(
+        ONBOARD_BOOKS_ROOT=root, ONBOARD_BOOKS_METADATA=metadata_file
+    )
+
+    response = test_client.get("/books/")
+    assert response.status_code == 200
+    assert b"Fallback Title</a>" in response.data
+    assert b'popover="manual"' not in response.data
 
 
 def test_pdf_opens_inline_and_supports_range(test_app, test_client, tmp_path):

@@ -200,6 +200,16 @@ restrict `/books` and `/books/` (including all subpaths) to trusted clients at
 your reverse proxy before enabling the feature. Do not publish the container's
 port directly when relying on the proxy for access control.
 
+For clean display titles and book previews, place a private `books.json` in
+the runtime configuration directory (or set `ONBOARD_BOOKS_METADATA` to a
+different path). Keys are exact library-relative PDF paths using forward
+slashes. Values may include `title`, `subtitle`, `authors` (an array of
+names), `date` (YYYY or YYYY-MM-DD), `edition`, `summary`, and `cover`.
+Put optional JPEG thumbnails in `book-covers/` next to the JSON file; cover
+names are 64 lowercase hexadecimal characters followed by `.jpg`. Keep
+both the metadata and the covers out of source control. Missing metadata
+falls back to the filename; the underlying PDFs are not changed.
+
 ## Development commands
 
 Run commands from the repository root.

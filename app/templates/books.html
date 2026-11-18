@@ -8,8 +8,30 @@
       <section class="books-shelf">
         <h2>{{ folder }} ({{ entries|length }})</h2>
         <ul>
-          {% for title, path in entries %}
-            <li><a href="{{ url_for('books.open_pdf', relative=path) }}" target="_blank" rel="noopener" hx-boost="false">{{ title }}</a></li>
+          {% set shelf_index = loop.index %}
+          {% for book in entries %}
+            <li class="book-row">
+              <a href="{{ url_for('books.open_pdf', relative=book.path) }}" target="_blank" rel="noopener" hx-boost="false">{{ book.title }}</a>
+              {% if book.has_details %}
+                {% set detail_id = 'book-details-' ~ shelf_index ~ '-' ~ loop.index %}
+                <button type="button" class="book-details-toggle" aria-label="Details for {{ book.title }}"
+                        aria-controls="{{ detail_id }}" aria-expanded="false" hidden>ⓘ</button>
+                <aside id="{{ detail_id }}" class="book-details" popover="manual" aria-label="Book details">
+                  {% if book.cover %}
+                    <img data-cover="{{ url_for('books.cover', name=book.cover) }}" width="88" alt="">
+                  {% endif %}
+                  <div>
+                    <strong>{{ book.title }}</strong>
+                    {% if book.subtitle %}<p class="book-subtitle">{{ book.subtitle }}</p>{% endif %}
+                    {% if book.authors %}<p>By {{ book.authors | join(', ') }}</p>{% endif %}
+                    {% if book.date or book.edition %}
+                      <p>{% if book.date %}<time datetime="{{ book.date }}">{{ book.date }}</time>{% endif %}{% if book.date and book.edition %} · {% endif %}{{ book.edition }}</p>
+                    {% endif %}
+                    {% if book.summary %}<p class="book-summary">{{ book.summary }}</p>{% endif %}
+                  </div>
+                </aside>
+              {% endif %}
+            </li>
           {% endfor %}
         </ul>
       </section>

@@ -26,6 +26,61 @@
   padding-inline-start: 1.25rem;
 }
 
-.books-shelf li + li {
-  margin-block-start: 0.35rem;
+.book-details-toggle:not([hidden]) {
+  display: inline-grid;
+  place-items: center;
+  min-inline-size: 1.75rem;
+  min-block-size: 1.75rem;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  font: inherit;
+}
+
+.book-details {
+  display: none;
+  position: fixed;
+  inset: auto;
+  margin: 0;
+  box-sizing: border-box;
+  width: min(25rem, calc(100vw - 1rem));
+  max-height: min(28rem, calc(100dvh - 1rem));
+  overflow: auto;
+  overscroll-behavior: contain;
+  padding: 1rem;
+  border: 1px solid #666;
+  border-radius: 0.45rem;
+  background: var(--page-background, #2a2a2c);
+  color: var(--text-color, #d3d3d3);
+  box-shadow: 0 0.4rem 1.4rem #0008;
+  font-size: 0.95rem;
+  overflow-wrap: anywhere;
+}
+
+.book-details:popover-open {
+  display: flex;
+  align-items: start;
+  gap: 0.8rem;
+}
+
+.book-details img:not([src]) {
+  display: none;
+}
+
+.book-details img {
+  max-inline-size: 25%;
+  block-size: auto;
+}
+
+.book-details p {
+  margin: 0.35rem 0 0;
+}
+
+.book-details .book-subtitle {
+  font-style: italic;
+}
+
+.book-details .book-summary {
+  margin-block-start: 0.65rem;
 }

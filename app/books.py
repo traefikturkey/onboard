@@ -5,6 +5,8 @@ from pathlib import Path
 
 from flask import Blueprint, abort, current_app, render_template, send_file
 
+from app.book_metadata import build_book, cover_path, read_metadata
+
 books = Blueprint("books", __name__, url_prefix="/books")
 
 
@@ -63,6 +65,7 @@ def no_store(response):
 def catalog():
     """List PDFs in their library folders."""
     root = library_root()
+    metadata = read_metadata()
     sections = []
     try:
         for folder, dirs, files in root.walk(on_error=scan_error):
@@ -75,8 +78,9 @@ def catalog():
             for filename in sorted(files, key=str.casefold):
                 relative = (directory / filename).as_posix()
                 if pdf_path(root, relative):
-                    entries.append((Path(filename).stem, relative))
+                    entries.append(build_book(relative, metadata))
             if entries:
+                entries.sort(key=lambda book: book.title.casefold())
                 label = " / ".join(part.replace("_", " ") for part in directory.parts)
                 sections.append((label or "Unsorted", entries))
     except OSError:
@@ -86,6 +90,22 @@ def catalog():
     if layout.is_modified():
         layout.reload()
     return render_template("index.html", layout=layout, books_sections=sections)
+
+
+@books.get("/cover/<name>")
+def cover(name: str):
+    """Serve a private local thumbnail through the Books access boundary."""
+    if not current_app.config.get("ONBOARD_BOOKS_ROOT"):
+        abort(404)
+    path = cover_path(name)
+    if path is None:
+        abort(404)
+    try:
+        return send_file(path, mimetype="image/jpeg")
+    except FileNotFoundError:
+        abort(404)
+    except OSError:
+        abort(503, "The cover is currently unavailable.")
 
 
 @books.get("/pdf/<path:relative>")
