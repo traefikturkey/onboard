@@ -8,6 +8,7 @@ from flask import Flask
 from flask_assets import Bundle, Environment
 from flask_caching import Cache
 
+from app.books import books
 from app.models.presentation import favicon_url
 from app.modules.testsupport import is_test_environment
 
@@ -44,6 +45,7 @@ def create_app(
 
     app = Flask(__name__)
     app.config["JSONIFY_PRETTYPRINT_REGULAR"] = True
+    app.config["ONBOARD_BOOKS_ROOT"] = os.environ.get("ONBOARD_BOOKS_ROOT")
 
     # Apply custom config if provided
     if config:
@@ -96,6 +98,7 @@ def create_app(
     from app.api.bookmarks import create_bookmarks_blueprint
 
     app.register_blueprint(create_bookmarks_blueprint())
+    app.register_blueprint(books)
 
     # Register main routes
     _register_routes(app, cache)

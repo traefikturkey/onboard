@@ -1,0 +1,31 @@
+.books-catalog {
+  padding: 1rem;
+}
+
+.books-shelves {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr));
+  gap: 1rem;
+  align-items: start;
+}
+
+.books-shelf {
+  padding: 0.75rem 1rem;
+  border: 1px solid currentColor;
+  border-radius: 0.25rem;
+  overflow-wrap: anywhere;
+}
+
+.books-shelf h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.125rem;
+}
+
+.books-shelf ul {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.books-shelf li + li {
+  margin-block-start: 0.35rem;
+}

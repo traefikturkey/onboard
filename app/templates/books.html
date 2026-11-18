@@ -1,0 +1,18 @@
+<section class="books-catalog" aria-labelledby="books-heading">
+  <h1 id="books-heading">Books</h1>
+  {% if not books_sections %}
+    <p>No PDF books found.</p>
+  {% endif %}
+  <div class="books-shelves">
+    {% for folder, entries in books_sections %}
+      <section class="books-shelf">
+        <h2>{{ folder }} ({{ entries|length }})</h2>
+        <ul>
+          {% for title, path in entries %}
+            <li><a href="{{ url_for('books.open_pdf', relative=path) }}" target="_blank" rel="noopener" hx-boost="false">{{ title }}</a></li>
+          {% endfor %}
+        </ul>
+      </section>
+    {% endfor %}
+  </div>
+</section>

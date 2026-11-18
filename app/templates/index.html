@@ -5,7 +5,7 @@
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="htmx-config" content='{"globalViewTransitions": true}'>
-	<title>{{ site_title }}</title>
+	<title>{% if books_sections is defined %}Books - {% endif %}{{ site_title }}</title>
 
 	<meta name="author" content="iLude">
 	<meta name="description" content="{{ site_title }}">
@@ -34,7 +34,7 @@
   }</style>
   {% endif %}
 </head>
-<body hx-boost="true" hx-ext="head-support,loading-states">
+<body hx-boost="true" hx-ext="head-support,loading-states"{% if books_sections is defined %} hx-history="false"{% endif %}>
 	{% include('flash_message.html') %}
 	<div id="bookmarkBar">
 		{% with bookmarks = layout.bookmark_bar %}
@@ -66,15 +66,20 @@
 				<div class="row tab-bar">
 					{% for tab in layout.tabs %}
 						<a href="/tab/{{tab.name}}"
-						   hx-get="/tab/{{tab.name}}"
+						   {% if books_sections is defined %}hx-boost="false"{% else %}hx-get="/tab/{{tab.name}}"
 						   hx-target="#main-content"
 						   hx-swap="innerHTML transition:true"
-						   hx-push-url="true"
+						   hx-push-url="true"{% endif %}
 						   data-loading-class="tab-loading"
 						   data-loading-class-remove="tab-loading"
 						   data-index="{{ loop.index }}"
 						   data-current="{{ tab.name == tab_name }}">{{tab.name}}</a>
 					{% endfor %}
+          {% if config.ONBOARD_BOOKS_ROOT %}
+            <a href="{{ url_for('books.catalog') }}" hx-boost="false"
+               data-index="{{ layout.tabs|length + 1 }}"
+               data-current="{{ books_sections is defined }}"{% if books_sections is defined %} aria-current="page"{% endif %}>Books</a>
+          {% endif %}
 				</div>
 			</div>
 			<div class="column">
@@ -83,11 +88,15 @@
 		</div>
 		<div id="main-content">
       {% include "layout_error.html" %}
+      {% if books_sections is defined %}
+        {% include "books.html" %}
+      {% else %}
 			{% for row in layout.tab(tab_name).rows:  %}
 				{% with row=row %}
 					{% include "row.html" %}
 				{% endwith %}
 			{% endfor %}
+      {% endif %}
 		</div>
 		<footer>
 			<div>

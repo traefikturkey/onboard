@@ -181,6 +181,7 @@ arbitrary CSS or JavaScript.
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `ONBOARD_PORT` | `9830` | Local application port used by `run.py` and `make run` |
+| `ONBOARD_BOOKS_ROOT` | unset | Absolute directory of PDFs. Setting it enables the Books tab at `/books/`. |
 | `ONBOARD_SITE_TITLE` | `OnBoard` | Browser page title |
 | `ONBOARD_PAGE_TIMEOUT` | `600` | Rendered-page cache timeout in seconds |
 | `WORKING_STORAGE` | `app/.working` | Feed-cache working directory |
@@ -191,6 +192,13 @@ arbitrary CSS or JavaScript.
 | `FLASK_DEBUG` | `True` in `run.py` | Toggle local Flask debug behavior |
 
 The production image binds Gunicorn to container port 9830 regardless of `ONBOARD_PORT`; change the host side of the Docker `-p` mapping to publish a different host port.
+
+The Books tab groups PDFs by folder and opens them in your browser's PDF viewer.
+If using Docker, mount only the dedicated library directory, read-only, and set
+`ONBOARD_BOOKS_ROOT` to its container path. Onboard does not authorize users:
+restrict `/books` and `/books/` (including all subpaths) to trusted clients at
+your reverse proxy before enabling the feature. Do not publish the container's
+port directly when relying on the proxy for access control.
 
 ## Development commands
 
