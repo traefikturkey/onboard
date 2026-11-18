@@ -27,6 +27,8 @@
   width: var(--header-icon-size, 16px);
   height: var(--header-icon-size, 16px);
   flex-shrink: 0;
+  /* Center against the visible letters, not the full text line box. */
+  transform: translateY(-1px);
 }
 
 .utility-links {
