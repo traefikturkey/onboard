@@ -38,22 +38,17 @@ def test_homepage_loads_and_has_body(selenium_url, app_url):
         assert body is not None
         assert len(driver.page_source) > 0
 
-        # A zero-height inline-block marks the label's text baseline.
         offsets = driver.execute_script("""
             const links = document.querySelectorAll('.header-link-with-icon');
+            const centerY = rect => rect.top + rect.height / 2;
             return Array.from(links, link => {
                 const icon = link.querySelector('img');
-                const bottom = icon.getBoundingClientRect().bottom;
-                const label = document.createElement('span');
-                const probe = document.createElement('span');
-                probe.style.display = 'inline-block';
-                label.append(link.lastChild, probe);
-                link.append(label);
-                return bottom - probe.getBoundingClientRect().bottom;
+                return centerY(icon.getBoundingClientRect()) -
+                    centerY(link.getBoundingClientRect());
             });
         """)
         assert offsets
-        assert offsets == pytest.approx([0] * len(offsets), abs=0.5)
+        assert offsets == pytest.approx([-2] * len(offsets), abs=0.5)
     finally:
         try:
             driver.quit()

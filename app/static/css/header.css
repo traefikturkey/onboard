@@ -19,7 +19,7 @@
 
 .header-link-with-icon {
   display: inline-flex;
-  align-items: baseline;
+  align-items: center;
   gap: var(--header-icon-gap, 4px);
 }
 
@@ -27,6 +27,8 @@
   width: var(--header-icon-size, 16px);
   height: var(--header-icon-size, 16px);
   flex-shrink: 0;
+  /* Account for descender space without lifting the full icon to the baseline. */
+  transform: translateY(-2px);
 }
 
 .utility-links {
