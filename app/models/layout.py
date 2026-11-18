@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 from pathlib import Path
+from threading import Lock
 from types import SimpleNamespace
 
 import yaml
@@ -37,6 +38,7 @@ class Layout:
         self.ui = UISettings()
         self.feed_hash = {}
         self.last_reload = 0
+        self._reload_lock = Lock()
         self.reload_error: str | None = None
 
         # Allow skipping file operations for testing
@@ -100,7 +102,11 @@ class Layout:
         return urls
 
     def reload(self) -> bool:
-        """Build a replacement before changing the active layout or its feed jobs."""
+        """Serialize replacements so concurrent requests cannot mix feed jobs."""
+        with self._reload_lock:
+            return self._reload_locked()
+
+    def _reload_locked(self) -> bool:
         logger.debug("Beginning Layout reload...")
         try:
             source_mtime = self.mtime

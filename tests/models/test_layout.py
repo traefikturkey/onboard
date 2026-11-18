@@ -80,14 +80,7 @@ class TestLayoutBasicMethods(unittest.TestCase):
 
 class TestLayout(unittest.TestCase):
     def setUp(self):
-        # Create a layout instance without running __init__
-        self.layout = object.__new__(Layout)
-        # Set required instance attributes that would be set in __init__
-        self.layout.id = "layout"
-        self.layout.tabs = []
-        self.layout.headers = []
-        # Mock bar_manager since reload() needs it
-        self.layout.bar_manager = MagicMock()
+        self.layout = Layout(skip_file_init=True, bar_manager=MagicMock())
         # ensure scheduler methods are patched when reload runs
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
@@ -214,12 +207,7 @@ class TestLayoutUncoveredPaths(unittest.TestCase):
     """Tests for previously uncovered paths in layout.py"""
 
     def setUp(self):
-        self.layout = object.__new__(Layout)
-        # Set required instance attributes that would be set in __init__
-        self.layout.id = "layout"
-        self.layout.tabs = []
-        self.layout.headers = []
-        self.layout.bar_manager = MagicMock()
+        self.layout = Layout(skip_file_init=True, bar_manager=MagicMock())
         self.patcher = patch("app.models.layout.Scheduler.clear_jobs")
         self.mock_clear = self.patcher.start()
 

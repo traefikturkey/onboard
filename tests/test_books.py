@@ -38,9 +38,9 @@ def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
     assert b".hidden.pdf" not in response.data
     assert b"thumbnail.pdf" not in response.data
 
-    (nested / "Parsers #1%.pdf").write_bytes(PDF)
+    (nested / "#1 Parsers%.pdf").write_bytes(PDF)
     updated = test_client.get("/books/")
-    url = "/books/pdf/Computer_Science/Compilers/Parsers%20%231%25.pdf"
+    url = "/books/pdf/Computer_Science/Compilers/%231%20Parsers%25.pdf"
     assert b"Computer Science / Compilers (1)" in updated.data
     assert url.encode() in updated.data
     with test_client.get(url) as book:

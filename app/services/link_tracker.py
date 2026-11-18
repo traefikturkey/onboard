@@ -1,5 +1,6 @@
 import sqlite3
 from datetime import datetime
+from threading import Lock
 
 import pandas as pd
 
@@ -16,15 +17,13 @@ class LinkTracker:
             db_path = pwd.joinpath("configs", "tracking.db")
         self.connection = sqlite3.connect(db_path, check_same_thread=False)
         self.cursor = self.connection.cursor()
+        self._lock = Lock()
         self.create_table()
 
     def create_table(self):
-        self.cursor.execute("""
-    SELECT COUNT(name) FROM sqlite_master WHERE type='table' AND name='CLICK_EVENTS'
-    """)
-        if self.cursor.fetchone()[0] == 0:
+        with self._lock, self.connection:
             self.cursor.execute("""
-    CREATE TABLE CLICK_EVENTS (
+    CREATE TABLE IF NOT EXISTS CLICK_EVENTS (
     ID TEXT PRIMARY KEY,
     TIMESTAMP DATETIME,
     WIDGET_ID TEXT,
@@ -32,7 +31,6 @@ class LinkTracker:
     LINK TEXT
     )
     """)
-            self.connection.commit()
 
     def track_click_event(self, widget_id, link_id, link):
         # Store timestamp as ISO-formatted string to avoid passing a datetime
@@ -43,17 +41,18 @@ class LinkTracker:
         timestamp_str = timestamp.isoformat()
         event_id = calculate_sha1_hash(f"{widget_id}_{link_id}_{str(timestamp)}")
 
-        self.cursor.execute(
-            """
+        with self._lock, self.connection:
+            self.cursor.execute(
+                """
     INSERT INTO CLICK_EVENTS (ID, TIMESTAMP, WIDGET_ID, LINK_ID, LINK) VALUES (?, ?, ?, ?, ?)
     """,
-            (event_id, timestamp_str, widget_id, link_id, link),
-        )
-        self.connection.commit()
+                (event_id, timestamp_str, widget_id, link_id, link),
+            )
 
     def get_click_events(self):
-        self.cursor.execute("SELECT TIMESTAMP, LINK FROM CLICK_EVENTS")
-        rows = self.cursor.fetchall()
+        with self._lock:
+            self.cursor.execute("SELECT TIMESTAMP, LINK FROM CLICK_EVENTS")
+            rows = self.cursor.fetchall()
         df = pd.DataFrame(rows, columns=["TIMESTAMP", "LINK"])
         # If there are no rows, return the empty dataframe immediately
         if df.empty:

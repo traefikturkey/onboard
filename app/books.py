@@ -1,5 +1,6 @@
 """Browse a configured, read-only directory of PDFs."""
 
+import os
 from pathlib import Path
 
 from flask import Blueprint, abort, current_app, render_template, send_file
@@ -24,11 +25,15 @@ def library_root() -> Path:
 def pdf_path(root: Path, relative: str) -> Path | None:
     """Allow regular PDFs only, with no hidden paths or symlink components."""
     parts = relative.split("/")
-    if any(not part or part.startswith((".", "@", "#")) for part in parts):
+    if any(not part or part.startswith(".") for part in parts):
         return None
-    if any(char in relative for char in ("\\", ":", "\x00")):
+    if any(part.startswith(("@", "#")) for part in parts[:-1]):
         return None
-    if not relative.isprintable() or Path(parts[-1]).suffix.lower() != ".pdf":
+    if "\\" in relative or (os.name == "nt" and ":" in relative):
+        return None
+    if Path(parts[-1]).suffix.lower() != ".pdf":
+        return None
+    if any(ord(char) < 32 or 0xD800 <= ord(char) <= 0xDFFF for char in relative):
         return None
 
     path = root.joinpath(*parts)

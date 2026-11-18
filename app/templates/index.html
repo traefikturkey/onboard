@@ -106,7 +106,7 @@
 				&copy; {{ today_date.year }}
 			</div>
 			<div>
-				<a href="/bookmarks/manage"><i class="fas fa-bookmark"></i> Manage Bookmarks</a>
+				<a href="/bookmarks/manage"{% if books_sections is defined %} hx-boost="false"{% endif %}><i class="fas fa-bookmark"></i> Manage Bookmarks</a>
 			</div>
 		</footer>
 	</div>
