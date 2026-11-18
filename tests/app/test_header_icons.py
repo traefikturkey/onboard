@@ -41,7 +41,9 @@ def test_header_icons_preserve_utility_links(test_client, mock_layout, include_g
 
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")
-    links = soup.select(".header .row:not(.tab-bar) > a")
+    columns = soup.select(".header > .column")
+    assert len(columns) == 1
+    links = columns[0].select(".utility-links > a")
     assert "header-link-with-icon" not in soup.select_one(".tab-bar a").get("class", [])
     assert [(link.get_text(strip=True), link["href"]) for link in links] == headers
     assert all(link["target"] == "_blank" for link in links)
