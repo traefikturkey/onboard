@@ -23,17 +23,17 @@ class Book(NamedTuple):
     edition: str
     summary: str
     cover: str
+    tags: dict[str, str]
 
     @property
-    def has_details(self) -> bool:
-        return bool(
-            self.subtitle
-            or self.authors
-            or self.date
-            or self.edition
-            or self.summary
-            or self.cover
-        )
+    def folder(self) -> str:
+        return self.path.rpartition("/")[0] or "."
+
+    @property
+    def folder_label(self) -> str:
+        if self.folder == ".":
+            return "Unsorted"
+        return " / ".join(part.replace("_", " ") for part in self.folder.split("/"))
 
 
 def metadata_path() -> Path:
@@ -47,7 +47,7 @@ def read_metadata() -> dict:
         raw = json.loads(metadata_path().read_text(encoding="utf-8-sig"))
     except FileNotFoundError:
         return {}
-    except (OSError, ValueError):
+    except OSError, ValueError:
         current_app.logger.warning("Could not read the optional books metadata file")
         return {}
     if not isinstance(raw, dict):
@@ -74,15 +74,25 @@ def build_book(relative: str, metadata: dict) -> Book:
     authors = entry.get("authors")
     cover = clean_text(entry.get("cover"))
     date = clean_text(entry.get("date"))
+    tags = {}
+    if isinstance(entry.get("tags"), list):
+        for value in entry["tags"]:
+            if tag := clean_text(value):
+                tags.setdefault(tag.casefold(), tag)
     return Book(
         relative,
-        clean_text(entry.get("title")) or clean_text(fallback),
+        clean_text(entry.get("title")) or clean_text(fallback) or Path(relative).name,
         clean_text(entry.get("subtitle")),
-        list(filter(None, map(clean_text, authors))) if isinstance(authors, list) else [],
+        (
+            list(filter(None, map(clean_text, authors)))
+            if isinstance(authors, list)
+            else []
+        ),
         date if DATE.fullmatch(date) else "",
         clean_text(entry.get("edition")),
         clean_text(entry.get("summary")),
         cover if COVER_NAME.fullmatch(cover) and cover_path(cover) else "",
+        tags,
     )
 
 

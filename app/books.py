@@ -63,33 +63,49 @@ def no_store(response):
 
 @books.get("/")
 def catalog():
-    """List PDFs in their library folders."""
+    """List PDFs in title order with catalog-derived filter options."""
     root = library_root()
     metadata = read_metadata()
-    sections = []
+    by_path = {}
     try:
         for folder, dirs, files in root.walk(on_error=scan_error):
-            dirs[:] = sorted(
-                (name for name in dirs if not name.startswith((".", "@", "#"))),
-                key=str.casefold,
-            )
+            dirs[:] = [name for name in dirs if not name.startswith((".", "@", "#"))]
             directory = folder.relative_to(root)
-            entries = []
-            for filename in sorted(files, key=str.casefold):
+            for filename in files:
                 relative = (directory / filename).as_posix()
                 if pdf_path(root, relative):
-                    entries.append(build_book(relative, metadata))
-            if entries:
-                entries.sort(key=lambda book: book.title.casefold())
-                label = " / ".join(part.replace("_", " ") for part in directory.parts)
-                sections.append((label or "Unsorted", entries))
+                    by_path[relative] = build_book(relative, metadata)
     except OSError:
         abort(503, "The book library is currently unavailable.")
+
+    entries = sorted(
+        by_path.values(), key=lambda book: (book.title.casefold(), book.path)
+    )
+    folders = {book.folder: book.folder_label for book in entries}
+    topics = {}
+    topic_counts = {}
+    # Use metadata order for spelling, ignoring stale entries for PDFs no longer here.
+    for path in metadata:
+        if path in by_path:
+            for key, label in by_path[path].tags.items():
+                topics.setdefault(key, label)
+                topic_counts[key] = topic_counts.get(key, 0) + 1
+    untagged_count = sum(not book.tags for book in entries) if topics else 0
 
     layout = current_app.extensions["onboard_layout"]
     if layout.is_modified():
         layout.reload()
-    return render_template("index.html", layout=layout, books_sections=sections)
+    return render_template(
+        "index.html",
+        layout=layout,
+        books_entries=entries,
+        book_folders=sorted(
+            folders.items(), key=lambda item: (item[1].casefold(), item[0])
+        ),
+        book_topics=topics,
+        book_topic_counts=topic_counts,
+        books_untagged_count=untagged_count,
+    )
 
 
 @books.get("/cover/<name>")

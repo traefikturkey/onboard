@@ -193,7 +193,8 @@ arbitrary CSS or JavaScript.
 
 The production image binds Gunicorn to container port 9830 regardless of `ONBOARD_PORT`; change the host side of the Docker `-p` mapping to publish a different host port.
 
-The Books tab groups PDFs by folder and opens them in your browser's PDF viewer.
+The Books tab shows PDFs in a title-sorted cover grid. Selecting a cover or title
+opens the PDF in a new tab. Select **Details** to read the full metadata.
 If using Docker, mount only the dedicated library directory, read-only, and set
 `ONBOARD_BOOKS_ROOT` to its container path. Onboard does not authorize users:
 restrict `/books` and `/books/` (including all subpaths) to trusted clients at
@@ -204,11 +205,24 @@ For clean display titles and book previews, place a private `books.json` in
 the runtime configuration directory (or set `ONBOARD_BOOKS_METADATA` to a
 different path). Keys are exact library-relative PDF paths using forward
 slashes. Values may include `title`, `subtitle`, `authors` (an array of
-names), `date` (YYYY or YYYY-MM-DD), `edition`, `summary`, and `cover`.
-Put optional JPEG thumbnails in `book-covers/` next to the JSON file; cover
-names are 64 lowercase hexadecimal characters followed by `.jpg`. Keep
-both the metadata and the covers out of source control. Missing metadata
-falls back to the filename; the underlying PDFs are not changed.
+names), `date` (YYYY or YYYY-MM-DD), `edition`, `summary`, `cover`, and
+`tags` (an optional array of topic strings). Tags are trimmed, internal
+whitespace is collapsed, and duplicates are combined case-insensitively. The
+first nonblank spelling in file order for a PDF in the library is used across
+the catalog. Put optional JPEG thumbnails in `book-covers/` next to the JSON
+file; cover names are 64 lowercase hexadecimal characters followed by `.jpg`.
+Keep the metadata and covers out of source control. Missing titles fall back
+to the filename. Books without a thumbnail show a title-only cover. With
+JavaScript enabled, failed thumbnail loads use the same fallback. The
+underlying PDFs are not changed.
+
+Search matches every word across title, subtitle, author, folder, year,
+edition, and topics, ignoring case and accents. Summaries are not searched.
+The folder filter and selected topics narrow the results together. Each topic
+count shows how many results would remain if that topic were added. **Untagged**
+is available when the catalog contains both tagged and untagged books. With
+JavaScript disabled, the full grid, PDF links, and native details still work
+in browsers that support popovers.
 
 ## Development commands
 

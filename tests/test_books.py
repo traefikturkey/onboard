@@ -3,12 +3,19 @@
 import json
 
 import pytest
+from bs4 import BeautifulSoup
 
 PDF = b"%PDF-1.4\nSample book\n%%EOF\n"
 
 
-def test_books_are_opt_in(test_app, test_client):
-    test_app.config["ONBOARD_BOOKS_ROOT"] = None
+@pytest.fixture(autouse=True)
+def isolate_books(test_app, tmp_path):
+    test_app.config.update(
+        ONBOARD_BOOKS_ROOT=None, ONBOARD_BOOKS_METADATA=tmp_path / "books.json"
+    )
+
+
+def test_books_are_opt_in(test_client):
 
     assert b'/books/' not in test_client.get("/").data
     assert test_client.get("/books/").status_code == 404
@@ -16,7 +23,9 @@ def test_books_are_opt_in(test_app, test_client):
     assert test_client.get(f"/books/cover/{'a' * 64}.jpg").status_code == 404
 
 
-def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
+def test_catalog_lists_current_pdfs_with_folder_filters(
+    test_app, test_client, tmp_path
+):
     test_app.config["ONBOARD_BOOKS_ROOT"] = tmp_path
     shelf = tmp_path / "Computer_Science"
     shelf.mkdir()
@@ -34,7 +43,13 @@ def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
     assert response.status_code == 200
     assert response.headers["Cache-Control"] == "private, no-store"
     assert b'hx-history="false"' in response.data
-    assert b"Computer Science (1)" in response.data
+    page = BeautifulSoup(response.data, 'html.parser')
+    options = page.select('#books-folder option')
+    assert [(option['value'], option.text) for option in options] == [
+        ('', 'All folders'),
+        ('Computer_Science', 'Computer Science'),
+    ]
+    assert page.select_one('.book-tile')['data-folder'] == 'Computer_Science'
     assert b"One &amp; Two" in response.data
     assert b'/books/pdf/Computer_Science/One%20&amp;%20Two.PDF' in response.data
     assert b"notes.txt" not in response.data
@@ -44,13 +59,16 @@ def test_catalog_lists_current_pdfs_by_folder(test_app, test_client, tmp_path):
     (nested / "#1 Parsers%.pdf").write_bytes(PDF)
     updated = test_client.get("/books/")
     url = "/books/pdf/Computer_Science/Compilers/%231%20Parsers%25.pdf"
-    assert b"Computer Science / Compilers (1)" in updated.data
+    assert b'<option value="Computer_Science/Compilers">' in updated.data
+    assert b"Computer Science / Compilers" in updated.data
     assert url.encode() in updated.data
     with test_client.get(url) as book:
         assert book.data == PDF
 
 
-def test_metadata_displays_clean_title_and_optional_details(test_app, test_client, tmp_path):
+def test_metadata_displays_cover_caption_and_native_details(
+    test_app, test_client, tmp_path
+):
     root = tmp_path / "books"
     root.mkdir()
     pdf = root / "imported_title_-_Doe_v2.pdf"
@@ -78,19 +96,40 @@ def test_metadata_displays_clean_title_and_optional_details(test_app, test_clien
     }
     metadata_file.write_text(json.dumps(metadata), encoding="utf-8")
 
-    page = test_client.get("/books/")
-    assert page.status_code == 200
-    assert b"Verified &amp; Complete</a>" in page.data
-    assert b"/books/pdf/imported_title_-_Doe_v2.pdf" in page.data
-    assert b"Other Title</a>" in page.data
-    assert b"A book not in the library" not in page.data
-    assert page.data.count(b'popover="manual"') == 1
-    assert b"A Guide" in page.data
-    assert b"Jane Doe, Alex Lee" in page.data
-    assert b' datetime="2025-02-01"' in page.data
-    assert b"2nd edition" in page.data
-    assert b"Example &lt;book&gt; summary." in page.data
-    assert f'data-cover="/books/cover/{cover}"'.encode() in page.data
+    response = test_client.get("/books/")
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data, 'html.parser')
+    assert page.select_one('.books-filters').has_attr('hidden')
+    fallback, tile = page.select('.books-grid > li')
+    assert fallback.select_one('.book-title').text == 'Other Title'
+    assert (
+        fallback.select_one('.book-cover-fallback').get_text(strip=True)
+        == 'Other Title'
+    )
+    assert fallback.img is None
+    assert 'A book not in the library' not in page.get_text()
+    (link,) = tile.select('a')
+    assert link['href'] == '/books/pdf/imported_title_-_Doe_v2.pdf'
+    assert link['target'] == '_blank'
+    assert link['hx-boost'] == 'false'
+    assert link.select_one('.book-title')['id'] == link['aria-labelledby']
+    assert link.select_one('.book-title').text == 'Verified & Complete'
+    assert link.img['src'] == f'/books/cover/{cover}'
+    assert link.img['loading'] == 'lazy'
+    assert tile.select_one('.book-edition').text == '2025 · 2nd edition'
+    toggle = tile.select_one('.book-details-toggle')
+    assert not toggle.has_attr('hidden')
+    panel = tile.find(id=toggle['popovertarget'])
+    assert panel['popover'] == 'auto'
+    assert panel.find(id=panel['aria-labelledby']).text == 'Verified & Complete'
+    assert panel.img is None
+    assert 'A Guide' in panel.text
+    assert 'Jane Doe, Alex Lee' in panel.text
+    assert panel.time.text == '2025-02-01'
+    assert '2nd edition' in panel.text
+    assert 'Folder: Unsorted' in panel.text
+    assert 'Example <book> summary.' in panel.text
+    assert panel.find('book') is None
     with test_client.get(f"/books/cover/{cover}") as response:
         assert response.status_code == 200
         assert response.mimetype == "image/jpeg"
@@ -98,6 +137,69 @@ def test_metadata_displays_clean_title_and_optional_details(test_app, test_clien
         assert response.data == b"cover"
     assert test_client.get("/books/cover/not-a-cover.jpg").status_code == 404
     assert pdf.read_bytes() == PDF
+
+
+def test_catalog_sorts_by_title_then_path_and_derives_topics(
+    test_app, test_client, tmp_path
+):
+    root = tmp_path / 'library'
+    root.mkdir()
+    (root / 'Z_shelf').mkdir()
+    for path in ('Z_shelf/second.pdf', 'first.pdf', 'last.pdf', 'earliest.pdf'):
+        (root / path).write_bytes(PDF)
+    test_app.config['ONBOARD_BOOKS_ROOT'] = root
+    (tmp_path / 'books.json').write_text(
+        json.dumps(
+            {
+                'absent.pdf': {'tags': ['URBAN GARDEN', 'Stale']},
+                'Z_shelf/second.pdf': {
+                    'title': 'A title',
+                    'tags': ['  Urban\t Garden ', 'urban garden', None, '', 'Design'],
+                },
+                'first.pdf': {
+                    'title': 'A title',
+                    'tags': ['urban garden', ' Design ', '   '],
+                    'summary': 'Unique summary word',
+                },
+                'last.pdf': {'title': 'Z title', 'tags': 'Not a list'},
+                'earliest.pdf': {'title': '0 title', 'tags': []},
+            }
+        ),
+        encoding='utf-8',
+    )
+
+    page = BeautifulSoup(test_client.get('/books/').data, 'html.parser')
+    tiles = page.select('.books-grid > li')
+    assert [tile.a['href'] for tile in tiles] == [
+        '/books/pdf/earliest.pdf',
+        '/books/pdf/Z_shelf/second.pdf',
+        '/books/pdf/first.pdf',
+        '/books/pdf/last.pdf',
+    ]
+    assert {
+        chip['data-topic']: ' '.join(chip.stripped_strings)
+        for chip in page.select('button[data-topic]')
+    } == {
+        '': 'Untagged 2',
+        'design': 'Design 2',
+        'urban garden': 'Urban Garden 2',
+    }
+    assert json.loads(tiles[2]['data-topics']) == ['urban garden', 'design']
+    assert 'Unique summary word' not in tiles[2]['data-search']
+    assert 'Topics: Urban Garden, Design' in tiles[2].select_one('.book-details').text
+
+
+def test_empty_catalog_still_renders_as_books_page(test_app, test_client, tmp_path):
+    test_app.config['ONBOARD_BOOKS_ROOT'] = tmp_path
+
+    response = test_client.get('/books/')
+    assert response.status_code == 200
+    page = BeautifulSoup(response.data, 'html.parser')
+    assert page.body['hx-history'] == 'false'
+    assert page.title.text.startswith('Books - ')
+    assert page.select_one('a[aria-current=page]')['href'] == '/books/'
+    assert 'No PDF books found.' in page.select_one('.books-catalog').text
+    assert page.select_one('.books-filters') is None
 
 
 def test_invalid_metadata_does_not_hide_books(test_app, test_client, tmp_path):
@@ -112,8 +214,10 @@ def test_invalid_metadata_does_not_hide_books(test_app, test_client, tmp_path):
 
     response = test_client.get("/books/")
     assert response.status_code == 200
-    assert b"Fallback Title</a>" in response.data
-    assert b'popover="manual"' not in response.data
+    page = BeautifulSoup(response.data, 'html.parser')
+    assert page.select_one('.book-title').text == 'Fallback Title'
+    assert page.select_one('.book-details-toggle').has_attr('popovertarget')
+    assert page.select_one('.books-topics') is None
 
 
 def test_pdf_opens_inline_and_supports_range(test_app, test_client, tmp_path):
