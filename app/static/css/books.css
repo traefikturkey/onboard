@@ -264,6 +264,72 @@
   margin-block-start: 0.75rem;
 }
 
+.book-hover-preview {
+  position: fixed;
+  inset: auto;
+  box-sizing: border-box;
+  inline-size: min(18rem, calc(100vw - 1rem));
+  max-block-size: min(21.25rem, calc(100dvh - 1rem));
+  margin: 0;
+  overflow: hidden;
+  padding: 0.75rem 0.875rem;
+  border: 1px solid var(--book-line);
+  border-radius: 0.35rem;
+  background: var(--page-background, #2a2a2c);
+  color: var(--text-color, #d3d3d3);
+  box-shadow: 0 0.4rem 1.1rem #0006;
+  font-size: 0.8125rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
+.book-hover-preview > * {
+  display: -webkit-box;
+  margin: 0.35rem 0 0;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.book-hover-preview .book-preview-title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.25;
+  -webkit-line-clamp: 2;
+}
+
+.book-hover-preview :is(.book-byline, .book-publication, .book-topic-list) {
+  color: color-mix(in srgb, currentColor 83%, var(--page-background, #2a2a2c));
+}
+
+.book-hover-preview :is(.book-publication, .book-topic-list) {
+  font-size: 0.75rem;
+}
+
+.book-hover-preview .book-summary {
+  margin-block-start: 0.55rem;
+  -webkit-line-clamp: 6;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .book-hover-preview:popover-open {
+    animation: book-preview-enter 120ms ease-out;
+  }
+
+  @keyframes book-preview-enter {
+    from {
+      opacity: 0;
+      transform: translateX(var(--book-preview-offset, -4px));
+    }
+
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
 @media (pointer: coarse) {
   .books-catalog button,
   .books-catalog input,

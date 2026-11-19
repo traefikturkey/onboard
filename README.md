@@ -194,7 +194,8 @@ arbitrary CSS or JavaScript.
 The production image binds Gunicorn to container port 9830 regardless of `ONBOARD_PORT`; change the host side of the Docker `-p` mapping to publish a different host port.
 
 The Books tab shows PDFs in a title-sorted cover grid. Selecting a cover or title
-opens the PDF in a new tab. Select **Details** to read the full metadata.
+opens the PDF in a new tab. Hover over a cover or title with a mouse to preview
+its description and metadata. Select **Details** to read the full metadata.
 If using Docker, mount only the dedicated library directory, read-only, and set
 `ONBOARD_BOOKS_ROOT` to its container path. Onboard does not authorize users:
 restrict `/books` and `/books/` (including all subpaths) to trusted clients at

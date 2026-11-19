@@ -58,18 +58,19 @@
               <button type="button" popovertarget="{{ detail_id }}" popovertargetaction="hide" autofocus>Close</button>
             </div>
             {% if book.subtitle %}<p class="book-subtitle">{{ book.subtitle }}</p>{% endif %}
-            {% if authors %}<p>By {{ authors }}</p>{% endif %}
+            {% if authors %}<p class="book-byline">By {{ authors }}</p>{% endif %}
             {% if book.date or book.edition %}
-              <p>{% if book.date %}<time datetime="{{ book.date }}">{{ book.date }}</time>{% endif %}{% if book.date and book.edition %} · {% endif %}{{ book.edition }}</p>
+              <p class="book-publication">{% if book.date %}<time datetime="{{ book.date }}">{{ book.date }}</time>{% endif %}{% if book.date and book.edition %} · {% endif %}{{ book.edition }}</p>
             {% endif %}
             <p>Folder: {{ book.folder_label }}</p>
             {% if book.tags %}
-              <p>Topics: {% for key in book.tags %}{{ book_topics[key] }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
+              <p class="book-topic-list">Topics: {% for key in book.tags %}{{ book_topics[key] }}{% if not loop.last %}, {% endif %}{% endfor %}</p>
             {% endif %}
             {% if book.summary %}<p class="book-summary">{{ book.summary }}</p>{% endif %}
           </div>
         </li>
       {% endfor %}
     </ul>
+    <div class="book-hover-preview" popover="manual" aria-hidden="true"></div>
   {% endif %}
 </section>

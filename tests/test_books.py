@@ -121,6 +121,10 @@ def test_metadata_displays_cover_caption_and_native_details(
     assert not toggle.has_attr('hidden')
     panel = tile.find(id=toggle['popovertarget'])
     assert panel['popover'] == 'auto'
+    (preview,) = page.select('.book-hover-preview')
+    assert preview['popover'] == 'manual'
+    assert preview['aria-hidden'] == 'true'
+    assert not preview.get_text(strip=True)
     assert panel.find(id=panel['aria-labelledby']).text == 'Verified & Complete'
     assert panel.img is None
     assert 'A Guide' in panel.text
